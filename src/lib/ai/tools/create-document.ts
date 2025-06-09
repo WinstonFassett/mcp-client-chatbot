@@ -18,7 +18,9 @@ export const createDocument = ({ session, dataStream }: CreateDocumentProps) =>
       "Create a document for a writing or content creation activities. This tool will call other functions that will generate the contents of the document based on the title and kind.",
     parameters: z.object({
       title: z.string(),
-      kind: z.enum(artifactKinds),
+      kind: z.string().refine(value => documentHandlersByArtifactKind.some(handler => handler.kind === value), {
+        message: `Kind must be one of: ${documentHandlersByArtifactKind.map(h => h.kind).join(', ')}`
+      }),
     }),
     execute: async ({ title, kind }) => {
       dataStream.writeData({
@@ -39,7 +41,7 @@ export const createDocument = ({ session, dataStream }: CreateDocumentProps) =>
       const documentHandler = documentHandlersByArtifactKind.find(h => h.kind === kind);
 
       if (!documentHandler) {
-        throw new Error(`Invalid document kind: ${kind}. Must be one of: ${artifactKinds.join(', ')}`);
+        throw new Error(`Invalid document kind: ${kind}. Must be one of: ${documentHandlersByArtifactKind.map(h => h.kind).join(', ')}`);
       }
 
       try {

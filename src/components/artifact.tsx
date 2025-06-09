@@ -21,9 +21,8 @@ import { simpleCodeArtifact } from "@/artifacts/code/client";
 import { sheetArtifact } from "@/artifacts/sheet/client";
 import { textArtifact } from "@/artifacts/text/client";
 import { pythonFileArtifact } from "@/artifacts/code/python-file-pyodide/client";
-// These will be imported once implemented
-// import { jsProjectArtifact } from "@/artifacts/code/js-project-sandpack/client";
-// import { htmlFragmentArtifact } from "@/artifacts/code/html-fragment/client";
+import { jsProjectArtifact } from "@/artifacts/code/js-project-sandpack/client";
+import { htmlFragmentArtifact } from "@/artifacts/code/html-fragment/client";
 import equal from "fast-deep-equal";
 import { UseChatHelpers } from "@ai-sdk/react";
 
@@ -31,8 +30,8 @@ export const artifactDefinitions = [
   textArtifact,
   simpleCodeArtifact,
   pythonFileArtifact,
-  // jsProjectArtifact,
-  // htmlFragmentArtifact,
+  jsProjectArtifact,
+  htmlFragmentArtifact,
   imageArtifact,
   sheetArtifact,
 ];

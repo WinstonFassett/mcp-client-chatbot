@@ -1,4 +1,7 @@
 import { simpleCodeDocumentHandler } from "@/artifacts/code/server";
+import { pythonFileDocumentHandler } from "@/artifacts/code/python-file-pyodide/server";
+import { jsProjectDocumentHandler } from "@/artifacts/code/js-project-sandpack/server";
+import { htmlFragmentDocumentHandler } from "@/artifacts/code/html-fragment/server";
 import { imageDocumentHandler } from "@/artifacts/image/server";
 import { sheetDocumentHandler } from "@/artifacts/sheet/server";
 import { textDocumentHandler } from "@/artifacts/text/server";
@@ -101,16 +104,11 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
 export const documentHandlersByArtifactKind: Array<DocumentHandler> = [
   textDocumentHandler,
   simpleCodeDocumentHandler,
+  pythonFileDocumentHandler,
+  jsProjectDocumentHandler,
+  htmlFragmentDocumentHandler,
   imageDocumentHandler,
   sheetDocumentHandler,
 ];
 
-export const artifactKinds = [
-  "text", 
-  "simple-code-block", 
-  "python-file-pyodide", 
-  "js-project-sandpack", 
-  "html-fragment", 
-  "image", 
-  "sheet"
-] as const;
+export const artifactKinds = documentHandlersByArtifactKind.map(handler => handler.kind) as readonly string[];
