@@ -207,24 +207,29 @@ You are a spreadsheet creation assistant. Create a spreadsheet in csv format bas
 
 export const updateDocumentPrompt = (
   currentContent: string | null,
-  type: ArtifactKind,
-) =>
-  type === "text"
-    ? `\
-Improve the following contents of the document based on the given prompt.
-
-${currentContent}
-`
-    : type === "code"
-      ? `\
+  type: ArtifactKind | "python-file" | "js-project" | "html-fragment",
+) => {
+  // Handle all code-related artifact types with appropriate prompts
+  // @ts-ignore - Supporting both standard and custom artifact types
+  if (type === "code" || type === "python-file" || type === "js-project" || type === "html-fragment") {
+    return `\
 Improve the following code snippet based on the given prompt.
 
 ${currentContent}
-`
-      : type === "sheet"
-        ? `\
+`;
+  } else if (type === "text") {
+    return `\
+Improve the following contents of the document based on the given prompt.
+
+${currentContent}
+`;
+  } else if (type === "sheet") {
+    return `\
 Improve the following spreadsheet based on the given prompt.
 
 ${currentContent}
-`
-        : "";
+`;
+  } else {
+    return "";
+  }
+};

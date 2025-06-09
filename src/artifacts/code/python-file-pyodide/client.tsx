@@ -1,5 +1,3 @@
-"use client";
-
 import { Artifact } from "@/components/create-artifact";
 import { CodeEditor } from "@/components/code-editor";
 import {
@@ -17,31 +15,6 @@ import {
   ConsoleOutput,
   ConsoleOutputContent,
 } from "@/components/console";
-
-// Import our artifact detection and selection functions
-import { detectCodeArtifactType, getCodeArtifact } from "./index";
-
-// Import all our artifact types
-import { pythonFileArtifact } from './python-file-pyodide/client';
-import { jsProjectArtifact } from './js-project-sandpack/client';
-import { htmlFragmentArtifact } from './html-fragment/client';
-
-// Re-export the pythonFileArtifact as codeArtifact for backward compatibility
-export { pythonFileArtifact as codeArtifact };
-
-// Export a function to get the appropriate artifact based on content and intent
-export function getArtifactByType(type: string) {
-  switch (type) {
-    case 'python-file-pyodide':
-      return pythonFileArtifact;
-    case 'js-project-sandpack':
-      return jsProjectArtifact;
-    case 'html-fragment':
-      return htmlFragmentArtifact;
-    default:
-      return pythonFileArtifact; // Default to Python for backward compatibility
-  }
-}
 
 const OUTPUT_HANDLERS = {
   matplotlib: `
@@ -93,13 +66,10 @@ interface Metadata {
   outputs: Array<ConsoleOutput>;
 }
 
-// This is the legacy codeArtifact implementation that will be replaced by our dynamic artifact selection
-// We're keeping it for backward compatibility, but new code should use the dynamic artifact selection
-// @ts-ignore - This is used for reference and compatibility
-export const legacyCodeArtifact = new Artifact<"code", Metadata>({
-  kind: "code",
+export const pythonFileArtifact = new Artifact<"python-file", Metadata>({
+  kind: "python-file",
   description:
-    "Useful for code generation; Code execution is only available for python code.",
+    "Useful for Python code generation; Code execution is available using Pyodide.",
   initialize: async ({ setMetadata }) => {
     setMetadata({
       outputs: [],
@@ -229,7 +199,12 @@ export const legacyCodeArtifact = new Artifact<"code", Metadata>({
               ...metadata.outputs.filter((output) => output.id !== runId),
               {
                 id: runId,
-                contents: [{ type: "text", value: error.message }],
+                contents: [
+                  {
+                    type: "text",
+                    value: `Error: ${error.message}`,
+                  },
+                ],
                 status: "failed",
               },
             ],
@@ -244,11 +219,7 @@ export const legacyCodeArtifact = new Artifact<"code", Metadata>({
         handleVersionChange("prev");
       },
       isDisabled: ({ currentVersionIndex }) => {
-        if (currentVersionIndex === 0) {
-          return true;
-        }
-
-        return false;
+        return currentVersionIndex === 0;
       },
     },
     {
@@ -258,11 +229,7 @@ export const legacyCodeArtifact = new Artifact<"code", Metadata>({
         handleVersionChange("next");
       },
       isDisabled: ({ isCurrentVersion }) => {
-        if (isCurrentVersion) {
-          return true;
-        }
-
-        return false;
+        return isCurrentVersion;
       },
     },
     {
@@ -270,18 +237,18 @@ export const legacyCodeArtifact = new Artifact<"code", Metadata>({
       description: "Copy code to clipboard",
       onClick: ({ content }) => {
         navigator.clipboard.writeText(content);
-        toast.success("Copied to clipboard!");
+        toast.success("Code copied to clipboard");
       },
     },
   ],
   toolbar: [
     {
       icon: <MessageIcon />,
-      description: "Add comments",
+      description: "Ask about this code",
       onClick: ({ appendMessage }) => {
         appendMessage({
           role: "user",
-          content: "Add comments to the code snippet for understanding",
+          content: "Can you explain this code?",
         });
       },
     },
@@ -291,7 +258,7 @@ export const legacyCodeArtifact = new Artifact<"code", Metadata>({
       onClick: ({ appendMessage }) => {
         appendMessage({
           role: "user",
-          content: "Add logs to the code snippet for debugging",
+          content: "Can you add logging to this code?",
         });
       },
     },
