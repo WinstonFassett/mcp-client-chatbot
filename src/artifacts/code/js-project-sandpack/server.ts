@@ -5,16 +5,15 @@ import { codePrompt, updateDocumentPrompt } from "@/lib/ai/prompts";
 import { createDocumentHandler } from "@/lib/artifacts/server";
 
 // JavaScript project document handler with Sandpack support
-// @ts-ignore - Using 'code' kind for compatibility
-export const jsProjectDocumentHandler = createDocumentHandler<"code">({
-  kind: "code",
+export const jsProjectDocumentHandler = createDocumentHandler<"js-project-sandpack">({
+  kind: "js-project-sandpack",
   onCreateDocument: async ({ title, dataStream }) => {
     let draftContent = "";
 
     // Make artifact visible immediately
     dataStream.writeData({
       type: "kind",
-      content: "js-project",
+      content: "js-project-sandpack",
     });
 
     // Set a loading message while generating code
@@ -99,8 +98,7 @@ ReactDOM.render(<App />, document.getElementById('root'));
 
     const { fullStream } = streamObject({
       model: myProvider.getModel("artifact-model"),
-      // @ts-ignore - Using 'code' kind for compatibility
-      system: updateDocumentPrompt(document.content, "code") + `
+      system: updateDocumentPrompt(document.content, "js-project-sandpack") + `
 Maintain the multi-file structure using the format:
 
 ---filepath:/path/to/file.ext

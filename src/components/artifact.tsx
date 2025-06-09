@@ -17,19 +17,30 @@ import { ArtifactMessages } from "./artifact-messages";
 import { useSidebar } from "./ui/sidebar";
 import { useArtifact } from "@/hooks/use-artifact";
 import { imageArtifact } from "@/artifacts/image/client";
-import { codeArtifact } from "@/artifacts/code/client";
+import { simpleCodeArtifact } from "@/artifacts/code/client";
 import { sheetArtifact } from "@/artifacts/sheet/client";
 import { textArtifact } from "@/artifacts/text/client";
+import { pythonFileArtifact } from "@/artifacts/code/python-file-pyodide/client";
+// These will be imported once implemented
+// import { jsProjectArtifact } from "@/artifacts/code/js-project-sandpack/client";
+// import { htmlFragmentArtifact } from "@/artifacts/code/html-fragment/client";
 import equal from "fast-deep-equal";
 import { UseChatHelpers } from "@ai-sdk/react";
 
 export const artifactDefinitions = [
   textArtifact,
-  codeArtifact,
+  simpleCodeArtifact,
+  pythonFileArtifact,
+  // jsProjectArtifact,
+  // htmlFragmentArtifact,
   imageArtifact,
   sheetArtifact,
 ];
-export type ArtifactKind = (typeof artifactDefinitions)[number]["kind"];
+// Import the artifactKinds from server.ts to ensure consistency
+import { artifactKinds } from "@/lib/artifacts/server";
+
+// Define ArtifactKind type based on the artifactKinds array
+export type ArtifactKind = typeof artifactKinds[number];
 
 export interface UIArtifact {
   title: string;

@@ -7,13 +7,13 @@ import { htmlFragmentArtifact } from './html-fragment/client';
 import { Artifact } from '@/components/create-artifact';
 
 // Server-side handlers
-import { codeDocumentHandler } from "./server";
+import { simpleCodeDocumentHandler } from "./server";
 import { pythonFileDocumentHandler } from "./python-file-pyodide/server";
 import { jsProjectDocumentHandler } from "./js-project-sandpack/server";
 import { htmlFragmentDocumentHandler } from "./html-fragment/server";
 
-// Legacy export for backward compatibility
-export { pythonFileArtifact as codeArtifact } from './python-file-pyodide/client';
+// Export the simpleCodeArtifact for backward compatibility
+export { pythonFileArtifact as simpleCodeArtifact } from './python-file-pyodide/client';
 
 // Detect the appropriate code artifact type based on content and intent
 export function detectCodeArtifactType(content: string, intent?: string): string {
@@ -58,15 +58,17 @@ export function getCodeArtifact(type: string): Artifact<any, any> {
   }
 }
 
-// Export all artifact types
-export const codeArtifacts = {
+// Export all client-side artifacts
+export const clientArtifacts = {
+  'simple-code-block': pythonFileArtifact, // Fallback for backward compatibility
   'python-file-pyodide': pythonFileArtifact,
   'js-project-sandpack': jsProjectArtifact,
   'html-fragment': htmlFragmentArtifact
 };
 
 // Export all document handlers
-export const serverHandlers = {
+export const documentHandlers = {
+  'simple-code-block': simpleCodeDocumentHandler,
   'python-file-pyodide': pythonFileDocumentHandler,
   'js-project-sandpack': jsProjectDocumentHandler,
   'html-fragment': htmlFragmentDocumentHandler

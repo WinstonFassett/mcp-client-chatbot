@@ -1,4 +1,4 @@
-import { codeDocumentHandler } from "@/artifacts/code/server";
+import { simpleCodeDocumentHandler } from "@/artifacts/code/server";
 import { imageDocumentHandler } from "@/artifacts/image/server";
 import { sheetDocumentHandler } from "@/artifacts/sheet/server";
 import { textDocumentHandler } from "@/artifacts/text/server";
@@ -100,9 +100,17 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
  */
 export const documentHandlersByArtifactKind: Array<DocumentHandler> = [
   textDocumentHandler,
-  codeDocumentHandler,
+  simpleCodeDocumentHandler,
   imageDocumentHandler,
   sheetDocumentHandler,
 ];
 
-export const artifactKinds = ["text", "code", "image", "sheet"] as const;
+export const artifactKinds = [
+  "text", 
+  "simple-code-block", 
+  "python-file-pyodide", 
+  "js-project-sandpack", 
+  "html-fragment", 
+  "image", 
+  "sheet"
+] as const;

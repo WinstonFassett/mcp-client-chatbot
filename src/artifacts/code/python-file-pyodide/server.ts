@@ -5,16 +5,15 @@ import { codePrompt, updateDocumentPrompt } from "@/lib/ai/prompts";
 import { createDocumentHandler } from "@/lib/artifacts/server";
 
 // Python code document handler with Pyodide execution support
-// @ts-ignore - Using 'code' kind for compatibility
-export const pythonFileDocumentHandler = createDocumentHandler<"code">({
-  kind: "code",
+export const pythonFileDocumentHandler = createDocumentHandler<"python-file-pyodide">({
+  kind: "python-file-pyodide",
   onCreateDocument: async ({ title, dataStream }) => {
     let draftContent = "";
 
     // Make artifact visible immediately
     dataStream.writeData({
       type: "kind",
-      content: "python-file",
+      content: "python-file-pyodide",
     });
 
     // Set a loading message while generating code
@@ -66,9 +65,7 @@ export const pythonFileDocumentHandler = createDocumentHandler<"code">({
 
     const { fullStream } = streamObject({
       model: myProvider.getModel("artifact-model"),
-      // @ts-ignore - Using 'code' kind for compatibility
-      system: updateDocumentPrompt(document.content, "code") + 
-        "\nMake sure the code is compatible with Pyodide execution environment.",
+      system: updateDocumentPrompt(document.content, "python-file-pyodide"),
       prompt: description,
       schema: z.object({
         code: z.string(),

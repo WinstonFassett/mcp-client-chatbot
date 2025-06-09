@@ -60,9 +60,8 @@ interface Metadata {
   activeTab: 'editor' | 'preview';
 }
 
-// @ts-ignore - Using 'code' kind for compatibility
-export const htmlFragmentArtifact = new Artifact<"code", Metadata>({
-  kind: "code",
+export const htmlFragmentArtifact = new Artifact<"html-fragment", Metadata>({
+  kind: "html-fragment",
   description:
     "HTML/CSS/JS fragment with live preview. Ideal for simple web demos and code snippets.",
   initialize: async ({ setMetadata }) => {
@@ -116,7 +115,7 @@ export const htmlFragmentArtifact = new Artifact<"code", Metadata>({
         
         {activeTab === 'editor' ? (
           <div className="px-1">
-            <CodeEditor {...props} />
+            <CodeEditor content={content} {...props} />
           </div>
         ) : (
           <HtmlPreview html={content} />

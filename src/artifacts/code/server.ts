@@ -4,16 +4,16 @@ import { myProvider } from "@/lib/ai/models";
 import { codePrompt, updateDocumentPrompt } from "@/lib/ai/prompts";
 import { createDocumentHandler } from "@/lib/artifacts/server";
 
-// Improved code document handler with better streaming support
-export const codeDocumentHandler = createDocumentHandler<"code">({
-  kind: "code",
+// Simple code document handler for basic code snippets
+export const simpleCodeDocumentHandler = createDocumentHandler<"simple-code-block">({
+  kind: "simple-code-block",
   onCreateDocument: async ({ title, dataStream }) => {
     let draftContent = "";
 
     // Make artifact visible immediately
     dataStream.writeData({
       type: "kind",
-      content: "code",
+      content: "simple-code-block",
     });
 
     // Set a loading message while generating code
@@ -65,7 +65,7 @@ export const codeDocumentHandler = createDocumentHandler<"code">({
 
     const { fullStream } = streamObject({
       model: myProvider.getModel("artifact-model"),
-      system: updateDocumentPrompt(document.content, "code"),
+      system: updateDocumentPrompt(document.content, "simple-code-block"),
       prompt: description,
       schema: z.object({
         code: z.string(),

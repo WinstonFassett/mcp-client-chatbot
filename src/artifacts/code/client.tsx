@@ -26,8 +26,8 @@ import { pythonFileArtifact } from './python-file-pyodide/client';
 import { jsProjectArtifact } from './js-project-sandpack/client';
 import { htmlFragmentArtifact } from './html-fragment/client';
 
-// Re-export the pythonFileArtifact as codeArtifact for backward compatibility
-export { pythonFileArtifact as codeArtifact };
+// Export the pythonFileArtifact as simpleCodeArtifact for backward compatibility
+export { pythonFileArtifact as simpleCodeArtifact };
 
 // Export a function to get the appropriate artifact based on content and intent
 export function getArtifactByType(type: string) {
@@ -93,10 +93,10 @@ interface Metadata {
   outputs: Array<ConsoleOutput>;
 }
 
-// This is the legacy codeArtifact implementation that will be replaced by our dynamic artifact selection
-// We're keeping it for backward compatibility, but new code should use the dynamic artifact selection
+// This is the simple code artifact implementation that will be used as a fallback
+// It's based on the Python implementation but renamed to be more specific
 // @ts-ignore - This is used for reference and compatibility
-export const legacyCodeArtifact = new Artifact<"code", Metadata>({
+export const _legacyCodeArtifact = new Artifact<"code", Metadata>({
   kind: "code",
   description:
     "Useful for code generation; Code execution is only available for python code.",

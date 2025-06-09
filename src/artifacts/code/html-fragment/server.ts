@@ -5,9 +5,8 @@ import { codePrompt, updateDocumentPrompt } from "@/lib/ai/prompts";
 import { createDocumentHandler } from "@/lib/artifacts/server";
 
 // HTML fragment document handler for simple HTML/CSS/JS snippets
-// @ts-ignore - Using 'code' kind for compatibility
-export const htmlFragmentDocumentHandler = createDocumentHandler<"code">({
-  kind: "code",
+export const htmlFragmentDocumentHandler = createDocumentHandler<"html-fragment">({
+  kind: "html-fragment",
   onCreateDocument: async ({ title, dataStream }) => {
     let draftContent = "";
 
@@ -70,8 +69,7 @@ Include appropriate styling with CSS and any necessary JavaScript functionality.
 
     const { fullStream } = streamObject({
       model: myProvider.getModel("artifact-model"),
-      // @ts-ignore - Using 'code' kind for compatibility
-      system: updateDocumentPrompt(document.content, "code") + `
+      system: updateDocumentPrompt(document.content, "html-fragment") + `
 Maintain the HTML structure with embedded CSS and JavaScript.
 Ensure the HTML is a complete, self-contained document that can be rendered in a browser.
 `,

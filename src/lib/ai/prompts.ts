@@ -207,16 +207,27 @@ You are a spreadsheet creation assistant. Create a spreadsheet in csv format bas
 
 export const updateDocumentPrompt = (
   currentContent: string | null,
-  type: ArtifactKind | "python-file" | "js-project" | "html-fragment",
+  type: ArtifactKind,
 ) => {
   // Handle all code-related artifact types with appropriate prompts
-  // @ts-ignore - Supporting both standard and custom artifact types
-  if (type === "code" || type === "python-file" || type === "js-project" || type === "html-fragment") {
-    return `\
-Improve the following code snippet based on the given prompt.
-
-${currentContent}
-`;
+  if (
+    type === "simple-code-block" || 
+    type === "python-file-pyodide" || 
+    type === "js-project-sandpack" || 
+    type === "html-fragment"
+  ) {
+    // Customize prompt based on specific code artifact type
+    let prompt = "Improve the following code snippet based on the given prompt.";
+    
+    if (type === "python-file-pyodide") {
+      prompt = "Improve the following Python code snippet based on the given prompt. Make sure it's compatible with Pyodide execution environment.";
+    } else if (type === "js-project-sandpack") {
+      prompt = "Improve the following JavaScript project based on the given prompt. Maintain proper file structure and dependencies.";
+    } else if (type === "html-fragment") {
+      prompt = "Improve the following HTML fragment based on the given prompt. Include any necessary CSS and JavaScript.";
+    }
+    
+    return `${prompt}\n\n${currentContent}`;
   } else if (type === "text") {
     return `\
 Improve the following contents of the document based on the given prompt.

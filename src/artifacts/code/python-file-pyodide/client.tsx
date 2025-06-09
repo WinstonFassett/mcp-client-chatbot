@@ -66,8 +66,8 @@ interface Metadata {
   outputs: Array<ConsoleOutput>;
 }
 
-export const pythonFileArtifact = new Artifact<"python-file", Metadata>({
-  kind: "python-file",
+export const pythonFileArtifact = new Artifact<"python-file-pyodide", Metadata>({
+  kind: "python-file-pyodide",
   description:
     "Useful for Python code generation; Code execution is available using Pyodide.",
   initialize: async ({ setMetadata }) => {

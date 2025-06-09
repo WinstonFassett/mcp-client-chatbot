@@ -340,9 +340,8 @@ interface Metadata {
   template: string;
 }
 
-// @ts-ignore - Using 'code' kind for compatibility
-export const jsProjectArtifact = new Artifact<"code", Metadata>({
-  kind: "code",
+export const jsProjectArtifact = new Artifact<"js-project-sandpack", Metadata>({
+  kind: "js-project-sandpack",
   description:
     "Multi-file JavaScript project with live preview. Supports React, Vue, and vanilla JS.",
   initialize: async ({ setMetadata }) => {
@@ -365,7 +364,7 @@ export const jsProjectArtifact = new Artifact<"code", Metadata>({
       }));
     }
   },
-  content: ({ content, metadata, setMetadata, ...props }) => {
+  content: ({ content }) => {
     return (
       <div className="px-1 w-full">
         <SandpackWrapper content={content} />
