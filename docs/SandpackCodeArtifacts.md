@@ -1,33 +1,132 @@
-# Sandpack Code Artifacts
+# Multi-Type Code Artifacts Implementation
 
-We have some nice artifacts in place for docs, sheets, code. BUT the code artifacts seem to be mainly python. 
+## Overview
 
-See src/artifacts/code.tsx and the server file with it. I believe it uses pyodide. It does work nicely but it is python only. I would like to refactor to have different types of runnable code artifacts where we know that we have extra abilities. python-file-pyodide vs js-project-sandpack which is multifile. Could/should also have plain HTML/css/jss artifact type html-fragment that does not require sandpack. 
+This document describes the implementation of multiple specialized code artifact types in our chatbot project. We've refactored the original generic "code" artifact into several specialized types to better handle different programming languages and use cases.
 
-## Instructions
+## Original Requirements
 
-- Review current artifacts implementation and how it is invoked via prompts.
-- Fill in the remaining sections of this doc with your feature design and implementation plan.
-- Execute the plan
-- Work with user to test and troubleshoot until working
+We had nice artifacts in place for docs, sheets, and code, but the code artifacts were mainly Python-focused. The goal was to refactor the system to have different types of runnable code artifacts with specialized capabilities:
 
-Use Context7 and Tavily when researching. 
+- **python-file-pyodide**: For Python code execution using Pyodide
+- **js-project-sandpack**: For multi-file JavaScript projects using Sandpack
+- **html-fragment**: For HTML/CSS/JS fragments with live preview
+- **simple-code-block**: As a fallback for generic code snippets
 
-If copying/adapting something, really copy it first using CLI, then adapt.
+## Implementation
 
-## Feature Design
+### Artifact Kinds
 
-The enhanced code artifacts system will consist of three distinct artifact types:
+We've implemented the following artifact kinds:
 
-1. **python-file-pyodide**: Refactored from the existing code artifact
+1. **simple-code-block**
+   - Basic code snippet display and execution
+   - Fallback for unspecified code types
+   - Uses the same execution engine as python-file-pyodide
+
+2. **python-file-pyodide**
    - Single-file Python code execution using Pyodide
    - Support for matplotlib and other Python libraries
    - Console output with text and image rendering
 
-2. **js-project-sandpack**: New multi-file JavaScript project support
-   - Multiple file editing and navigation via file explorer
-   - Support for various templates (React, Vue, vanilla JS)
+3. **js-project-sandpack**
+   - Multi-file JavaScript project support
+   - File explorer for navigating between files
    - Live preview of running code
+   - Uses Sandpack from CodeSandbox
+
+4. **html-fragment**
+   - HTML/CSS/JS fragment with live preview
+   - Simpler than js-project-sandpack for basic web snippets
+   - Split view with code editor and preview
+
+### Architecture
+
+The implementation follows a client-server architecture:
+
+1. **Client Components**:
+   - Each artifact type has its own client-side implementation in `/src/artifacts/code/[type]/client.tsx`
+   - These define the UI, actions, and behavior specific to each artifact type
+
+2. **Server Handlers**:
+   - Each artifact type has a server-side handler in `/src/artifacts/code/[type]/server.ts`
+   - These handle document creation and updates for each specific artifact type
+
+3. **Artifact Detection**:
+   - The system intelligently detects which artifact type to use based on content and intent
+   - Implementation in `/src/artifacts/code/index.ts`
+
+4. **Registration System**:
+   - All artifact handlers are registered in `/src/lib/artifacts/server.ts`
+   - All client-side artifacts are registered in `/src/components/artifact.tsx`
+
+### Database Schema
+
+The database schema has been updated to support the new artifact kinds:
+
+```typescript
+kind: varchar("kind", { enum: ["text", "simple-code-block", "python-file-pyodide", "js-project-sandpack", "html-fragment", "image", "sheet"] })
+```
+
+### AI Prompt Integration
+
+The AI system prompts have been updated to guide the AI to use the specific artifact kinds:
+
+```
+Use these specific artifact kinds for code:
+- "simple-code-block" - For basic code snippets (default fallback)
+- "python-file-pyodide" - For Python code that can be executed with Pyodide
+- "js-project-sandpack" - For JavaScript/TypeScript projects with multiple files
+- "html-fragment" - For HTML/CSS/JS fragments with live preview
+```
+
+## Retrospective
+
+### What Worked Well
+
+1. **Specialized Artifact Types**: Breaking down the generic "code" artifact into specialized types allows for better handling of different languages and use cases.
+
+2. **Dynamic Registration**: The system for registering artifact handlers and deriving artifact kinds from them ensures consistency between client and server.
+
+3. **Intelligent Detection**: The enhanced detection logic helps the system choose the most appropriate artifact type based on content and intent.
+
+4. **Backward Compatibility**: We maintained backward compatibility by handling the legacy "code" kind as an alias for "simple-code-block".
+
+### Challenges
+
+1. **TypeScript Errors**: The refactoring introduced some TypeScript errors due to the change in artifact kind types.
+
+2. **Database Schema Changes**: Updating the database schema required careful handling to ensure existing data remained compatible.
+
+3. **AI Prompt Updates**: Ensuring the AI model uses the correct artifact kinds required updates to the system prompts.
+
+4. **Dependencies**: The js-project-sandpack artifact requires Sandpack dependencies which may need to be installed.
+
+## Next Steps
+
+1. **Testing and Refinement**:
+   - Thoroughly test all artifact types to ensure they work as expected
+   - Refine the detection logic based on real-world usage
+
+2. **UI Improvements**:
+   - Enhance the UI for each artifact type to provide a better user experience
+   - Add more templates for js-project-sandpack
+
+3. **Database Migration**:
+   - Create a migration to convert existing "code" artifacts to the appropriate specialized types
+
+4. **Documentation**:
+   - Create comprehensive documentation for each artifact type
+   - Add examples of how to use each artifact type
+
+5. **Performance Optimization**:
+   - Optimize the loading and execution of each artifact type
+   - Consider lazy-loading dependencies for better initial load performance
+
+6. **Additional Artifact Types**:
+   - Consider adding more specialized artifact types for other languages or frameworks
+   - Potential candidates: SQL, Rust (via WASM), TypeScript (with type checking)
+
    - Package dependency management
    - Console output for JavaScript execution
 
