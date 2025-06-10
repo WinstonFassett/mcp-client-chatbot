@@ -9,6 +9,9 @@ import Cookies from 'js-cookie';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/artifacts/bolt/components/ui/Collapsible';
 import { Button } from '@/artifacts/bolt/components/ui/Button';
 
+// Helper function to check if code is running in browser environment
+const isBrowser = () => typeof window !== "undefined";
+
 interface GitHubUserResponse {
   login: string;
   avatar_url: string;
@@ -158,7 +161,7 @@ export default function GitHubConnection() {
       Cookies.set('git:github.com', JSON.stringify({ username: token, password: 'x-oauth-basic' }));
 
       // Store connection details in localStorage
-      localStorage.setItem(
+      isBrowser() && localStorage.setItem(
         'github_connection',
         JSON.stringify({
           user,
@@ -284,7 +287,7 @@ export default function GitHubConnection() {
       };
 
       // Get the current user first to ensure we have the latest value
-      const currentConnection = JSON.parse(localStorage.getItem('github_connection') || '{}');
+      const currentConnection = JSON.parse(isBrowser() && localStorage.getItem('github_connection') || '{}');
       const currentUser = currentConnection.user || connection.user;
 
       // Update connection with stats
@@ -297,7 +300,7 @@ export default function GitHubConnection() {
       };
 
       // Update localStorage
-      localStorage.setItem('github_connection', JSON.stringify(updatedConnection));
+      isBrowser() && localStorage.setItem('github_connection', JSON.stringify(updatedConnection));
 
       // Update state
       setConnection(updatedConnection);
@@ -351,7 +354,7 @@ export default function GitHubConnection() {
     const loadSavedConnection = async () => {
       setIsLoading(true);
 
-      const savedConnection = localStorage.getItem('github_connection');
+      const savedConnection = isBrowser() && localStorage.getItem('github_connection');
 
       if (savedConnection) {
         try {
@@ -378,7 +381,7 @@ export default function GitHubConnection() {
           }
         } catch (error) {
           console.error('Error parsing saved GitHub connection:', error);
-          localStorage.removeItem('github_connection');
+          isBrowser() && localStorage.removeItem('github_connection');
         }
       } else {
         // Check for environment variable token
@@ -496,7 +499,7 @@ export default function GitHubConnection() {
        * Save token type to localStorage even before connecting
        * This ensures the token type is persisted even if connection fails
        */
-      localStorage.setItem(
+      isBrowser() && localStorage.setItem(
         'github_connection',
         JSON.stringify({
           user: null,
@@ -522,7 +525,7 @@ export default function GitHubConnection() {
   };
 
   const handleDisconnect = () => {
-    localStorage.removeItem('github_connection');
+    isBrowser() && localStorage.removeItem('github_connection');
 
     // Remove all GitHub-related cookies
     Cookies.remove('githubToken');

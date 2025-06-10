@@ -8,7 +8,8 @@ import { shortcutEventEmitter } from '@/artifacts/bolt/lib/hooks';
 import { themeStore } from '@/artifacts/bolt/lib/stores/theme';
 import { workbenchStore } from '@/artifacts/bolt/lib/stores/workbench';
 import { classNames } from '@/artifacts/bolt/utils/classNames';
-import { Terminal, type TerminalRef } from './Terminal';
+import DynamicTerminal from './DynamicTerminal';
+import type { TerminalRef } from './Terminal';
 import { createScopedLogger } from '@/artifacts/bolt/utils/logger';
 
 const logger = createScopedLogger('Terminal');

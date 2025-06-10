@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { checkForUpdates, acknowledgeUpdate } from '@/artifacts/bolt/lib/api/updates';
 
+// Helper function to check if code is running in browser environment
+const isBrowser = () => typeof window !== "undefined";
+
 const LAST_ACKNOWLEDGED_VERSION_KEY = 'bolt_last_acknowledged_version';
 
 export const useUpdateCheck = () => {
@@ -8,7 +11,7 @@ export const useUpdateCheck = () => {
   const [currentVersion, setCurrentVersion] = useState<string>('');
   const [lastAcknowledgedVersion, setLastAcknowledgedVersion] = useState<string | null>(() => {
     try {
-      return localStorage.getItem(LAST_ACKNOWLEDGED_VERSION_KEY);
+      return isBrowser() && localStorage.getItem(LAST_ACKNOWLEDGED_VERSION_KEY);
     } catch {
       return null;
     }
@@ -42,7 +45,7 @@ export const useUpdateCheck = () => {
 
       // Store in localStorage
       try {
-        localStorage.setItem(LAST_ACKNOWLEDGED_VERSION_KEY, version);
+        isBrowser() && localStorage.setItem(LAST_ACKNOWLEDGED_VERSION_KEY, version);
       } catch (error) {
         console.error('Failed to persist acknowledged version:', error);
       }

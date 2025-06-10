@@ -7,6 +7,9 @@ import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
 import type { GitHubUserResponse } from '@/artifacts/bolt/types/GitHub';
 
+// Helper function to check if code is running in browser environment
+const isBrowser = () => typeof window !== "undefined";
+
 interface GitHubAuthDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -49,7 +52,7 @@ export function GitHubAuthDialog({ isOpen, onClose }: GitHubAuthDialogProps) {
           connected_at: new Date().toISOString(),
         };
 
-        localStorage.setItem('github_connection', JSON.stringify(connectionData));
+        isBrowser() && localStorage.setItem('github_connection', JSON.stringify(connectionData));
 
         // Set cookies for API requests
         Cookies.set('githubToken', token);

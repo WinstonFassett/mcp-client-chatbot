@@ -101,7 +101,7 @@ export const checkForUpdates = async (): Promise<UpdateCheckResult> => {
 export const acknowledgeUpdate = async (version: string): Promise<void> => {
   // Store the acknowledged version in localStorage
   try {
-    localStorage.setItem('last_acknowledged_update', version);
+    isBrowser() && localStorage.setItem('last_acknowledged_update', version);
   } catch (error) {
     console.error('Failed to store acknowledged version:', error);
   }

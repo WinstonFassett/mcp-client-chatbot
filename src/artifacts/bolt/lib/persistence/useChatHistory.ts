@@ -23,6 +23,9 @@ import {
 // import { detectProjectCommands, createCommandActionsString } from '@/artifacts/bolt/utils/projectCommands';
 // import type { ContextAnnotation } from '@/artifacts/bolt/types/context';
 
+// Helper function to check if code is running in browser environment
+const isBrowser = () => typeof window !== "undefined";
+
 export interface ChatHistoryItem {
   id: string;
   urlId?: string;
@@ -70,7 +73,7 @@ export interface ChatHistoryItem {
 //         .then(async ([storedMessages, snapshot]) => {
 //           if (storedMessages && storedMessages.messages.length > 0) {
 //             /*
-//              * const snapshotStr = localStorage.getItem(`snapshot:${mixedId}`); // Remove localStorage usage
+//              * const snapshotStr = isBrowser() && localStorage.getItem(`snapshot:${mixedId}`); // Remove localStorage usage
 //              * const snapshot: Snapshot = snapshotStr ? JSON.parse(snapshotStr) : { chatIndex: 0, files: {} }; // Use snapshot from DB
 //              */
 //             const validSnapshot = snapshot || { chatIndex: '', files: {} }; // Ensure snapshot is not undefined
@@ -211,7 +214,7 @@ export interface ChatHistoryItem {
 //         summary: chatSummary,
 //       };
 
-//       // localStorage.setItem(`snapshot:${id}`, JSON.stringify(snapshot)); // Remove localStorage usage
+//       // isBrowser() && localStorage.setItem(`snapshot:${id}`, JSON.stringify(snapshot)); // Remove localStorage usage
 //       try {
 //         await setSnapshot(db, id, snapshot);
 //       } catch (error) {
@@ -223,7 +226,7 @@ export interface ChatHistoryItem {
 //   );
 
 //   const restoreSnapshot = useCallback(async (id: string, snapshot?: Snapshot) => {
-//     // const snapshotStr = localStorage.getItem(`snapshot:${id}`); // Remove localStorage usage
+//     // const snapshotStr = isBrowser() && localStorage.getItem(`snapshot:${id}`); // Remove localStorage usage
 //     const container = await webcontainer;
 
 //     const validSnapshot = snapshot || { chatIndex: '', files: {} };

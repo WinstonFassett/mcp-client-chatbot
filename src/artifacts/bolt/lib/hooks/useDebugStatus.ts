@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { getDebugStatus, acknowledgeWarning, acknowledgeError, type DebugIssue } from '@/artifacts/bolt/lib/api/debug';
 
+// Helper function to check if code is running in browser environment
+const isBrowser = () => typeof window !== "undefined";
+
 const ACKNOWLEDGED_DEBUG_ISSUES_KEY = 'bolt_acknowledged_debug_issues';
 
 const getAcknowledgedIssues = (): string[] => {
   try {
-    const stored = localStorage.getItem(ACKNOWLEDGED_DEBUG_ISSUES_KEY);
+    const stored = isBrowser() && localStorage.getItem(ACKNOWLEDGED_DEBUG_ISSUES_KEY);
     return stored ? JSON.parse(stored) : [];
   } catch {
     return [];
@@ -14,7 +17,7 @@ const getAcknowledgedIssues = (): string[] => {
 
 const setAcknowledgedIssues = (issueIds: string[]) => {
   try {
-    localStorage.setItem(ACKNOWLEDGED_DEBUG_ISSUES_KEY, JSON.stringify(issueIds));
+    isBrowser() && localStorage.setItem(ACKNOWLEDGED_DEBUG_ISSUES_KEY, JSON.stringify(issueIds));
   } catch (error) {
     console.error('Failed to persist acknowledged debug issues:', error);
   }

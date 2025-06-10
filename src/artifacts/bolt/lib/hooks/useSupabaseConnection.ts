@@ -11,6 +11,9 @@ import {
   fetchProjectApiKeys,
 } from '@/artifacts/bolt/lib/stores/supabase';
 
+// Helper function to check if code is running in browser environment
+const isBrowser = () => typeof window !== "undefined";
+
 export function useSupabaseConnection() {
   const connection = useStore(supabaseConnection);
   const connecting = useStore(isConnecting);
@@ -20,8 +23,8 @@ export function useSupabaseConnection() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
-    const savedConnection = localStorage.getItem('supabase_connection');
-    const savedCredentials = localStorage.getItem('supabaseCredentials');
+    const savedConnection = isBrowser() && localStorage.getItem('supabase_connection');
+    const savedCredentials = isBrowser() && localStorage.getItem('supabaseCredentials');
 
     if (savedConnection) {
       const parsed = JSON.parse(savedConnection);

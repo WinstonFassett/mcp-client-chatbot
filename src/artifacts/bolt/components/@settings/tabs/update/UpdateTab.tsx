@@ -9,6 +9,9 @@ import { Dialog, DialogRoot, DialogTitle, DialogDescription, DialogButton } from
 import { classNames } from '@/artifacts/bolt/utils/classNames';
 import { Markdown } from '@/artifacts/bolt/components/chat/Markdown';
 
+// Helper function to check if code is running in browser environment
+const isBrowser = () => typeof window !== "undefined";
+
 interface UpdateProgress {
   stage: 'fetch' | 'pull' | 'install' | 'build' | 'complete';
   message: string;
@@ -125,7 +128,7 @@ const UpdateTab = () => {
   const [isChecking, setIsChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [updateSettings, setUpdateSettings] = useState<UpdateSettings>(() => {
-    const stored = localStorage.getItem('update_settings');
+    const stored = isBrowser() && localStorage.getItem('update_settings');
     return stored
       ? JSON.parse(stored)
       : {
@@ -138,7 +141,7 @@ const UpdateTab = () => {
   const [updateProgress, setUpdateProgress] = useState<UpdateProgress | null>(null);
 
   useEffect(() => {
-    localStorage.setItem('update_settings', JSON.stringify(updateSettings));
+    isBrowser() && localStorage.setItem('update_settings', JSON.stringify(updateSettings));
   }, [updateSettings]);
 
   const checkForUpdates = async () => {

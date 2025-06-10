@@ -9,6 +9,9 @@ import { getLocalStorage } from '@/artifacts/bolt/lib/persistence';
 import { motion, AnimatePresence } from 'framer-motion';
 import Cookies from 'js-cookie';
 
+// Helper function to check if code is running in browser environment
+const isBrowser = () => typeof window !== "undefined";
+
 // Import UI components
 import { Input, SearchInput, Badge, FilterChip } from '@/artifacts/bolt/components/ui';
 
@@ -102,7 +105,7 @@ export function RepositorySelectionDialog({ isOpen, onClose, onSelect }: Reposit
             connected_at: new Date().toISOString(),
           };
 
-          localStorage.setItem('github_connection', JSON.stringify(newConnection));
+          isBrowser() && localStorage.setItem('github_connection', JSON.stringify(newConnection));
 
           // Also save as cookies for API requests
           Cookies.set('githubToken', token);

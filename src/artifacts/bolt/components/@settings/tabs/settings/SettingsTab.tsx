@@ -8,6 +8,9 @@ import { Switch } from '@/artifacts/bolt/components/ui/Switch';
 import type { UserProfile } from '@/artifacts/bolt/components/@settings/core/types';
 import { isMac } from '@/artifacts/bolt/utils/os';
 
+// Helper function to check if code is running in browser environment
+const isBrowser = () => typeof window !== "undefined";
+
 // Helper to get modifier key symbols/text
 const getModifierSymbol = (modifier: string): string => {
   switch (modifier) {
@@ -25,7 +28,7 @@ const getModifierSymbol = (modifier: string): string => {
 export default function SettingsTab() {
   const [currentTimezone, setCurrentTimezone] = useState('');
   const [settings, setSettings] = useState<UserProfile>(() => {
-    const saved = localStorage.getItem('bolt_user_profile');
+    const saved = isBrowser() && localStorage.getItem('bolt_user_profile');
     return saved
       ? JSON.parse(saved)
       : {
@@ -43,7 +46,7 @@ export default function SettingsTab() {
   useEffect(() => {
     try {
       // Get existing profile data
-      const existingProfile = JSON.parse(localStorage.getItem('bolt_user_profile') || '{}');
+      const existingProfile = JSON.parse(isBrowser() && localStorage.getItem('bolt_user_profile') || '{}');
 
       // Merge with new settings
       const updatedProfile = {
@@ -53,7 +56,7 @@ export default function SettingsTab() {
         timezone: settings.timezone,
       };
 
-      localStorage.setItem('bolt_user_profile', JSON.stringify(updatedProfile));
+      isBrowser() && localStorage.setItem('bolt_user_profile', JSON.stringify(updatedProfile));
       toast.success('Settings updated');
     } catch (error) {
       console.error('Error saving settings:', error);
@@ -121,12 +124,12 @@ export default function SettingsTab() {
                 setSettings((prev) => ({ ...prev, notifications: checked }));
 
                 // Update localStorage immediately
-                const existingProfile = JSON.parse(localStorage.getItem('bolt_user_profile') || '{}');
+                const existingProfile = JSON.parse(isBrowser() && localStorage.getItem('bolt_user_profile') || '{}');
                 const updatedProfile = {
                   ...existingProfile,
                   notifications: checked,
                 };
-                localStorage.setItem('bolt_user_profile', JSON.stringify(updatedProfile));
+                isBrowser() && localStorage.setItem('bolt_user_profile', JSON.stringify(updatedProfile));
 
                 // Dispatch storage event for other components
                 window.dispatchEvent(

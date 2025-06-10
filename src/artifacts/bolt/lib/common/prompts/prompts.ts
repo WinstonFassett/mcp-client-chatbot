@@ -3,6 +3,9 @@ import { WORK_DIR } from '@/artifacts/bolt/utils/constants';
 import { allowedHTMLElements } from '@/artifacts/bolt/utils/markdown';
 import { stripIndents } from '@/artifacts/bolt/utils/stripIndent';
 
+// Helper function to check if code is running in browser environment
+const isBrowser = () => typeof window !== "undefined";
+
 export const getSystemPrompt = (
   cwd: string = WORK_DIR,
   supabase?: {

@@ -1,6 +1,9 @@
 import { atom } from 'nanostores';
 import type { SupabaseUser, SupabaseStats, SupabaseApiKey, SupabaseCredentials } from '@/artifacts/bolt/types/supabase';
 
+// Helper function to check if code is running in browser environment
+const isBrowser = () => typeof window !== "undefined";
+
 export interface SupabaseProject {
   id: string;
   name: string;
@@ -26,8 +29,8 @@ export interface SupabaseConnectionState {
   credentials?: SupabaseCredentials;
 }
 
-const savedConnection = typeof localStorage !== 'undefined' ? localStorage.getItem('supabase_connection') : null;
-const savedCredentials = typeof localStorage !== 'undefined' ? localStorage.getItem('supabaseCredentials') : null;
+const savedConnection = isBrowser() ? isBrowser() && localStorage.getItem('supabase_connection') : null;
+const savedCredentials = isBrowser() ? isBrowser() && localStorage.getItem('supabaseCredentials') : null;
 
 const initialState: SupabaseConnectionState = savedConnection
   ? JSON.parse(savedConnection)
@@ -98,16 +101,16 @@ export function updateSupabaseConnection(connection: Partial<SupabaseConnectionS
    * Always save the connection state to localStorage to persist across chats
    */
   if (connection.user || connection.token || connection.selectedProjectId !== undefined || connection.credentials) {
-    localStorage.setItem('supabase_connection', JSON.stringify(newState));
+    isBrowser() && localStorage.setItem('supabase_connection', JSON.stringify(newState));
 
     if (newState.credentials) {
-      localStorage.setItem('supabaseCredentials', JSON.stringify(newState.credentials));
+      isBrowser() && localStorage.setItem('supabaseCredentials', JSON.stringify(newState.credentials));
     } else {
-      localStorage.removeItem('supabaseCredentials');
+      isBrowser() && localStorage.removeItem('supabaseCredentials');
     }
   } else {
-    localStorage.removeItem('supabase_connection');
-    localStorage.removeItem('supabaseCredentials');
+    isBrowser() && localStorage.removeItem('supabase_connection');
+    isBrowser() && localStorage.removeItem('supabaseCredentials');
   }
 }
 

@@ -24,6 +24,9 @@ import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/artifacts
 import { formatDistanceToNow } from 'date-fns';
 import { Badge } from '@/artifacts/bolt/components/ui/Badge';
 
+// Helper function to check if code is running in browser environment
+const isBrowser = () => typeof window !== "undefined";
+
 // Add the Netlify logo SVG component at the top of the file
 const NetlifyLogo = () => (
   <svg viewBox="0 0 40 40" className="w-5 h-5">
@@ -204,7 +207,7 @@ export default function NetlifyConnection() {
 
   const handleDisconnect = () => {
     // Clear from localStorage
-    localStorage.removeItem('netlify_connection');
+    isBrowser() && localStorage.removeItem('netlify_connection');
 
     // Remove cookies
     document.cookie = 'netlifyToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';

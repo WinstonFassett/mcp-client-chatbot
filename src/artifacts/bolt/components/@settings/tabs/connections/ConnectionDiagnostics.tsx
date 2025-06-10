@@ -8,6 +8,9 @@ import { classNames } from '@/artifacts/bolt/utils/classNames';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/artifacts/bolt/components/ui/Collapsible';
 import { CodeBracketIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 
+// Helper function to check if code is running in browser environment
+const isBrowser = () => typeof window !== "undefined";
+
 // Helper function to safely parse JSON
 const safeJsonParse = (item: string | null) => {
   if (!item) {
@@ -38,10 +41,10 @@ export default function ConnectionDiagnostics() {
 
       // Check browser-side storage
       const localStorageChecks = {
-        githubConnection: localStorage.getItem('github_connection'),
-        netlifyConnection: localStorage.getItem('netlify_connection'),
-        vercelConnection: localStorage.getItem('vercel_connection'),
-        supabaseConnection: localStorage.getItem('supabase_connection'),
+        githubConnection: isBrowser() && localStorage.getItem('github_connection'),
+        netlifyConnection: isBrowser() && localStorage.getItem('netlify_connection'),
+        vercelConnection: isBrowser() && localStorage.getItem('vercel_connection'),
+        supabaseConnection: isBrowser() && localStorage.getItem('supabase_connection'),
       };
 
       // Get diagnostic data from server
@@ -157,27 +160,27 @@ export default function ConnectionDiagnostics() {
       setDiagnosticResults(results);
 
       // Display simple results
-      if (results.localStorage.hasGithubConnection && results.apiEndpoints.github.some((r: { ok: boolean }) => !r.ok)) {
+      if (results.isBrowser() && localStorage.hasGithubConnection && results.apiEndpoints.github.some((r: { ok: boolean }) => !r.ok)) {
         toast.error('GitHub API connections are failing. Try reconnecting.');
       }
 
-      if (results.localStorage.hasNetlifyConnection && netlifyUserCheck && !netlifyUserCheck.ok) {
+      if (results.isBrowser() && localStorage.hasNetlifyConnection && netlifyUserCheck && !netlifyUserCheck.ok) {
         toast.error('Netlify API connection is failing. Try reconnecting.');
       }
 
-      if (results.localStorage.hasVercelConnection && vercelUserCheck && !vercelUserCheck.ok) {
+      if (results.isBrowser() && localStorage.hasVercelConnection && vercelUserCheck && !vercelUserCheck.ok) {
         toast.error('Vercel API connection is failing. Try reconnecting.');
       }
 
-      if (results.localStorage.hasSupabaseConnection && supabaseCheck && !supabaseCheck.ok) {
+      if (results.isBrowser() && localStorage.hasSupabaseConnection && supabaseCheck && !supabaseCheck.ok) {
         toast.warning('Supabase connection check failed or missing details. Verify settings.');
       }
 
       if (
-        !results.localStorage.hasGithubConnection &&
-        !results.localStorage.hasNetlifyConnection &&
-        !results.localStorage.hasVercelConnection &&
-        !results.localStorage.hasSupabaseConnection
+        !results.isBrowser() && localStorage.hasGithubConnection &&
+        !results.isBrowser() && localStorage.hasNetlifyConnection &&
+        !results.isBrowser() && localStorage.hasVercelConnection &&
+        !results.isBrowser() && localStorage.hasSupabaseConnection
       ) {
         toast.info('No connection data found in browser storage.');
       }
@@ -193,7 +196,7 @@ export default function ConnectionDiagnostics() {
   // Helper to reset GitHub connection
   const resetGitHubConnection = () => {
     try {
-      localStorage.removeItem('github_connection');
+      isBrowser() && localStorage.removeItem('github_connection');
       document.cookie = 'githubToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
       document.cookie = 'githubUsername=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
       document.cookie = 'git:github.com=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
@@ -208,7 +211,7 @@ export default function ConnectionDiagnostics() {
   // Helper to reset Netlify connection
   const resetNetlifyConnection = () => {
     try {
-      localStorage.removeItem('netlify_connection');
+      isBrowser() && localStorage.removeItem('netlify_connection');
       document.cookie = 'netlifyToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
       toast.success('Netlify connection data cleared. Please refresh the page and reconnect.');
       setDiagnosticResults(null);
@@ -221,7 +224,7 @@ export default function ConnectionDiagnostics() {
   // Helper to reset Vercel connection
   const resetVercelConnection = () => {
     try {
-      localStorage.removeItem('vercel_connection');
+      isBrowser() && localStorage.removeItem('vercel_connection');
       toast.success('Vercel connection data cleared. Please refresh the page and reconnect.');
       setDiagnosticResults(null);
     } catch (error) {
@@ -233,7 +236,7 @@ export default function ConnectionDiagnostics() {
   // Helper to reset Supabase connection
   const resetSupabaseConnection = () => {
     try {
-      localStorage.removeItem('supabase_connection');
+      isBrowser() && localStorage.removeItem('supabase_connection');
       toast.success('Supabase connection data cleared. Please refresh the page and reconnect.');
       setDiagnosticResults(null);
     } catch (error) {
@@ -260,19 +263,19 @@ export default function ConnectionDiagnostics() {
                 <span
                   className={classNames(
                     'text-xl font-semibold',
-                    diagnosticResults.localStorage.hasGithubConnection
+                    diagnosticResults.isBrowser() && localStorage.hasGithubConnection
                       ? 'text-green-500 dark:text-green-400'
                       : 'text-red-500 dark:text-red-400',
                   )}
                 >
-                  {diagnosticResults.localStorage.hasGithubConnection ? 'Connected' : 'Not Connected'}
+                  {diagnosticResults.isBrowser() && localStorage.hasGithubConnection ? 'Connected' : 'Not Connected'}
                 </span>
               </div>
-              {diagnosticResults.localStorage.hasGithubConnection && (
+              {diagnosticResults.isBrowser() && localStorage.hasGithubConnection && (
                 <>
                   <div className="text-xs text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary mt-2 flex items-center gap-1.5">
                     <div className="i-ph:user w-3.5 h-3.5 text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent" />
-                    User: {diagnosticResults.localStorage.githubConnectionParsed?.user?.login || 'N/A'}
+                    User: {diagnosticResults.isBrowser() && localStorage.githubConnectionParsed?.user?.login || 'N/A'}
                   </div>
                   <div className="text-xs text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary mt-2 flex items-center gap-1.5">
                     <div className="i-ph:check-circle w-3.5 h-3.5 text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent" />
@@ -290,7 +293,7 @@ export default function ConnectionDiagnostics() {
                   </div>
                 </>
               )}
-              {!diagnosticResults.localStorage.hasGithubConnection && (
+              {!diagnosticResults.isBrowser() && localStorage.hasGithubConnection && (
                 <Button
                   onClick={() => window.location.reload()}
                   variant="outline"
@@ -326,21 +329,21 @@ export default function ConnectionDiagnostics() {
                 <span
                   className={classNames(
                     'text-xl font-semibold',
-                    diagnosticResults.localStorage.hasNetlifyConnection
+                    diagnosticResults.isBrowser() && localStorage.hasNetlifyConnection
                       ? 'text-green-500 dark:text-green-400'
                       : 'text-red-500 dark:text-red-400',
                   )}
                 >
-                  {diagnosticResults.localStorage.hasNetlifyConnection ? 'Connected' : 'Not Connected'}
+                  {diagnosticResults.isBrowser() && localStorage.hasNetlifyConnection ? 'Connected' : 'Not Connected'}
                 </span>
               </div>
-              {diagnosticResults.localStorage.hasNetlifyConnection && (
+              {diagnosticResults.isBrowser() && localStorage.hasNetlifyConnection && (
                 <>
                   <div className="text-xs text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary mt-2 flex items-center gap-1.5">
                     <div className="i-ph:user w-3.5 h-3.5 text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent" />
                     User:{' '}
-                    {diagnosticResults.localStorage.netlifyConnectionParsed?.user?.full_name ||
-                      diagnosticResults.localStorage.netlifyConnectionParsed?.user?.email ||
+                    {diagnosticResults.isBrowser() && localStorage.netlifyConnectionParsed?.user?.full_name ||
+                      diagnosticResults.isBrowser() && localStorage.netlifyConnectionParsed?.user?.email ||
                       'N/A'}
                   </div>
                   <div className="text-xs text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary mt-2 flex items-center gap-1.5">
@@ -355,7 +358,7 @@ export default function ConnectionDiagnostics() {
                   </div>
                 </>
               )}
-              {!diagnosticResults.localStorage.hasNetlifyConnection && (
+              {!diagnosticResults.isBrowser() && localStorage.hasNetlifyConnection && (
                 <Button
                   onClick={() => window.location.reload()}
                   variant="outline"
@@ -391,21 +394,21 @@ export default function ConnectionDiagnostics() {
                 <span
                   className={classNames(
                     'text-xl font-semibold',
-                    diagnosticResults.localStorage.hasVercelConnection
+                    diagnosticResults.isBrowser() && localStorage.hasVercelConnection
                       ? 'text-green-500 dark:text-green-400'
                       : 'text-red-500 dark:text-red-400',
                   )}
                 >
-                  {diagnosticResults.localStorage.hasVercelConnection ? 'Connected' : 'Not Connected'}
+                  {diagnosticResults.isBrowser() && localStorage.hasVercelConnection ? 'Connected' : 'Not Connected'}
                 </span>
               </div>
-              {diagnosticResults.localStorage.hasVercelConnection && (
+              {diagnosticResults.isBrowser() && localStorage.hasVercelConnection && (
                 <>
                   <div className="text-xs text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary mt-2 flex items-center gap-1.5">
                     <div className="i-ph:user w-3.5 h-3.5 text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent" />
                     User:{' '}
-                    {diagnosticResults.localStorage.vercelConnectionParsed?.user?.username ||
-                      diagnosticResults.localStorage.vercelConnectionParsed?.user?.user?.username ||
+                    {diagnosticResults.isBrowser() && localStorage.vercelConnectionParsed?.user?.username ||
+                      diagnosticResults.isBrowser() && localStorage.vercelConnectionParsed?.user?.user?.username ||
                       'N/A'}
                   </div>
                   <div className="text-xs text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary mt-2 flex items-center gap-1.5">
@@ -420,7 +423,7 @@ export default function ConnectionDiagnostics() {
                   </div>
                 </>
               )}
-              {!diagnosticResults.localStorage.hasVercelConnection && (
+              {!diagnosticResults.isBrowser() && localStorage.hasVercelConnection && (
                 <Button
                   onClick={() => window.location.reload()}
                   variant="outline"
@@ -456,19 +459,19 @@ export default function ConnectionDiagnostics() {
                 <span
                   className={classNames(
                     'text-xl font-semibold',
-                    diagnosticResults.localStorage.hasSupabaseConnection
+                    diagnosticResults.isBrowser() && localStorage.hasSupabaseConnection
                       ? 'text-green-500 dark:text-green-400'
                       : 'text-red-500 dark:text-red-400',
                   )}
                 >
-                  {diagnosticResults.localStorage.hasSupabaseConnection ? 'Configured' : 'Not Configured'}
+                  {diagnosticResults.isBrowser() && localStorage.hasSupabaseConnection ? 'Configured' : 'Not Configured'}
                 </span>
               </div>
-              {diagnosticResults.localStorage.hasSupabaseConnection && (
+              {diagnosticResults.isBrowser() && localStorage.hasSupabaseConnection && (
                 <>
                   <div className="text-xs text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary mt-2 flex items-center gap-1.5 truncate">
                     <div className="i-ph:link w-3.5 h-3.5 text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent flex-shrink-0" />
-                    Project URL: {diagnosticResults.localStorage.supabaseConnectionParsed?.projectUrl || 'N/A'}
+                    Project URL: {diagnosticResults.isBrowser() && localStorage.supabaseConnectionParsed?.projectUrl || 'N/A'}
                   </div>
                   <div className="text-xs text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary mt-2 flex items-center gap-1.5">
                     <div className="i-ph:check-circle w-3.5 h-3.5 text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent" />
@@ -482,7 +485,7 @@ export default function ConnectionDiagnostics() {
                   </div>
                 </>
               )}
-              {!diagnosticResults.localStorage.hasSupabaseConnection && (
+              {!diagnosticResults.isBrowser() && localStorage.hasSupabaseConnection && (
                 <Button
                   onClick={() => window.location.reload()}
                   variant="outline"
@@ -523,7 +526,7 @@ export default function ConnectionDiagnostics() {
 
         <Button
           onClick={resetGitHubConnection}
-          disabled={isRunning || !diagnosticResults?.localStorage.hasGithubConnection}
+          disabled={isRunning || !diagnosticResults?.isBrowser() && localStorage.hasGithubConnection}
           variant="outline"
           className="flex items-center gap-2 hover:bg-bolt-elements-item-backgroundActive/10 hover:text-bolt-elements-textPrimary dark:hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:text-bolt-elements-textPrimary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -533,7 +536,7 @@ export default function ConnectionDiagnostics() {
 
         <Button
           onClick={resetNetlifyConnection}
-          disabled={isRunning || !diagnosticResults?.localStorage.hasNetlifyConnection}
+          disabled={isRunning || !diagnosticResults?.isBrowser() && localStorage.hasNetlifyConnection}
           variant="outline"
           className="flex items-center gap-2 hover:bg-bolt-elements-item-backgroundActive/10 hover:text-bolt-elements-textPrimary dark:hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:text-bolt-elements-textPrimary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -543,7 +546,7 @@ export default function ConnectionDiagnostics() {
 
         <Button
           onClick={resetVercelConnection}
-          disabled={isRunning || !diagnosticResults?.localStorage.hasVercelConnection}
+          disabled={isRunning || !diagnosticResults?.isBrowser() && localStorage.hasVercelConnection}
           variant="outline"
           className="flex items-center gap-2 hover:bg-bolt-elements-item-backgroundActive/10 hover:text-bolt-elements-textPrimary dark:hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:text-bolt-elements-textPrimary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -553,7 +556,7 @@ export default function ConnectionDiagnostics() {
 
         <Button
           onClick={resetSupabaseConnection}
-          disabled={isRunning || !diagnosticResults?.localStorage.hasSupabaseConnection}
+          disabled={isRunning || !diagnosticResults?.isBrowser() && localStorage.hasSupabaseConnection}
           variant="outline"
           className="flex items-center gap-2 hover:bg-bolt-elements-item-backgroundActive/10 hover:text-bolt-elements-textPrimary dark:hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:text-bolt-elements-textPrimary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >

@@ -73,7 +73,7 @@ export const getDebugStatus = async (): Promise<DebugStatus> => {
     }
 
     // Check for console errors (if any)
-    const errorLogs = localStorage.getItem('error_logs');
+    const errorLogs = isBrowser() && localStorage.getItem('error_logs');
 
     if (errorLogs) {
       const errors = JSON.parse(errorLogs);
@@ -108,12 +108,12 @@ export const acknowledgeError = async (id: string): Promise<void> => {
 
   // Also remove from error logs if present
   try {
-    const errorLogs = localStorage.getItem('error_logs');
+    const errorLogs = isBrowser() && localStorage.getItem('error_logs');
 
     if (errorLogs) {
       const errors = JSON.parse(errorLogs);
       const updatedErrors = errors.filter((error: any) => `error-${error.timestamp}` !== id);
-      localStorage.setItem('error_logs', JSON.stringify(updatedErrors));
+      isBrowser() && localStorage.setItem('error_logs', JSON.stringify(updatedErrors));
     }
   } catch (error) {
     console.error('Error acknowledging error:', error);

@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import { checkConnection } from '@/artifacts/bolt/lib/api/connection';
 
+// Helper function to check if code is running in browser environment
+const isBrowser = () => typeof window !== "undefined";
+
 const ACKNOWLEDGED_CONNECTION_ISSUE_KEY = 'bolt_acknowledged_connection_issue';
 
 type ConnectionIssueType = 'disconnected' | 'high-latency' | null;
 
 const getAcknowledgedIssue = (): string | null => {
   try {
-    return localStorage.getItem(ACKNOWLEDGED_CONNECTION_ISSUE_KEY);
+    return isBrowser() && localStorage.getItem(ACKNOWLEDGED_CONNECTION_ISSUE_KEY);
   } catch {
     return null;
   }

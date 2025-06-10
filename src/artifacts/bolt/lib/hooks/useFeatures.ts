@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { getFeatureFlags, markFeatureViewed, type Feature } from '@/artifacts/bolt/lib/api/features';
 
+// Helper function to check if code is running in browser environment
+const isBrowser = () => typeof window !== "undefined";
+
 const VIEWED_FEATURES_KEY = 'bolt_viewed_features';
 
 const getViewedFeatures = (): string[] => {
   try {
-    const stored = localStorage.getItem(VIEWED_FEATURES_KEY);
+    const stored = isBrowser() && localStorage.getItem(VIEWED_FEATURES_KEY);
     return stored ? JSON.parse(stored) : [];
   } catch {
     return [];
@@ -14,7 +17,7 @@ const getViewedFeatures = (): string[] => {
 
 const setViewedFeatures = (featureIds: string[]) => {
   try {
-    localStorage.setItem(VIEWED_FEATURES_KEY, JSON.stringify(featureIds));
+    isBrowser() && localStorage.setItem(VIEWED_FEATURES_KEY, JSON.stringify(featureIds));
   } catch (error) {
     console.error('Failed to persist viewed features:', error);
   }

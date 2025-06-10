@@ -6,6 +6,9 @@ import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
 import { Octokit } from '@octokit/rest';
 
+// Helper function to check if code is running in browser environment
+const isBrowser = () => typeof window !== "undefined";
+
 // Internal imports
 import { getLocalStorage } from '@/artifacts/bolt/lib/persistence';
 import { classNames } from '@/artifacts/bolt/utils/classNames';
@@ -138,7 +141,7 @@ export function PushToGitHubDialog({ isOpen, onClose, onPush }: PushToGitHubDial
             const connection = getLocalStorage('github_connection');
 
             if (connection) {
-              localStorage.removeItem('github_connection');
+              isBrowser() && localStorage.removeItem('github_connection');
               setUser(null);
             }
           } else if (response.status === 403 && response.headers.get('x-ratelimit-remaining') === '0') {
