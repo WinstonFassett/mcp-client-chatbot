@@ -123,13 +123,19 @@ export async function startDevServer(): Promise<{ url: string; output: string }>
   const webcontainer = await getWebContainerInstance();
   
   return new Promise(async (resolve, reject) => {
+    // Track the timeout so we can clear it
+    let timeoutId: number | null = null;
+    
     // Listen for server-ready event
     const onServerReady = (port: number, url: string) => {
       console.log('Server ready on port:', port, 'URL:', url);
       serverUrl = url;
       isServerRunning = true;
-      // Remove the event listener to prevent memory leaks
-      (webcontainer as any).removeListener('server-ready', onServerReady);
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+      // WebContainer automatically cleans up event listeners
       resolve({ url: serverUrl, output: 'Server started successfully' });
     };
 
@@ -175,25 +181,34 @@ export async function startDevServer(): Promise<{ url: string; output: string }>
         if (exitCode !== 0) {
           const error = new Error(`Server process exited with code ${exitCode}`);
           console.error(error.message);
-          (webcontainer as any).removeListener('server-ready', onServerReady);
+          if (timeoutId !== null) {
+            clearTimeout(timeoutId);
+            timeoutId = null;
+          }
           reject(error);
         }
       });
       
       // Set a timeout in case the server doesn't start
-      const timeout = setTimeout(() => {
-        (webcontainer as any).removeListener('server-ready', onServerReady);
+      timeoutId = window.setTimeout(() => {
+        timeoutId = null;
         reject(new Error('Server start timed out after 30 seconds'));
       }, 30000);
       
       // Clean up the timeout if the server starts successfully
       (webcontainer as any).once('server-ready', () => {
-        clearTimeout(timeout);
+        if (timeoutId !== null) {
+          clearTimeout(timeoutId);
+          timeoutId = null;
+        }
       });
       
     } catch (error) {
       console.error('Failed to start dev server:', error);
-      (webcontainer as any).removeListener('server-ready', onServerReady);
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
       reject(error);
     }
   });
