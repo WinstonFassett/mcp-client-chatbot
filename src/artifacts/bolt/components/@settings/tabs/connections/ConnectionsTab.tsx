@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
 import React, { Suspense, useState } from 'react';
-import { classNames } from '~/utils/classNames';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
 import ConnectionDiagnostics from './ConnectionDiagnostics';
-import { Button } from '~/components/ui/Button';
+import { Button } from '@/artifacts/bolt/components/ui/Button';
 import VercelConnection from './VercelConnection';
 
 // Use React.lazy for dynamic imports

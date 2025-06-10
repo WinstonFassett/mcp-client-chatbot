@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { classNames } from '~/utils/classNames';
-import type { GitHubAuthState } from '~/components/@settings/tabs/connections/types/GitHub';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
+import type { GitHubAuthState } from '@/artifacts/bolt/components/@settings/tabs/connections/types/GitHub';
 import Cookies from 'js-cookie';
-import { getLocalStorage } from '~/lib/persistence';
+import { getLocalStorage } from '@/artifacts/bolt/lib/persistence';
 
 const GITHUB_TOKEN_KEY = 'github_token';
 

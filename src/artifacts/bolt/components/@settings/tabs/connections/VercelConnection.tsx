@@ -2,15 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { useStore } from '@nanostores/react';
-import { logStore } from '~/lib/stores/logs';
-import { classNames } from '~/utils/classNames';
+import { logStore } from '@/artifacts/bolt/lib/stores/logs';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
 import {
   vercelConnection,
   isConnecting,
   isFetchingStats,
   updateVercelConnection,
   fetchVercelStats,
-} from '~/lib/stores/vercel';
+} from '@/artifacts/bolt/lib/stores/vercel';
 
 export default function VercelConnection() {
   const connection = useStore(vercelConnection);

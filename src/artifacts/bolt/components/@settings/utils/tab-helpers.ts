@@ -1,5 +1,5 @@
-import type { TabType, TabVisibilityConfig } from '~/components/@settings/core/types';
-import { DEFAULT_TAB_CONFIG } from '~/components/@settings/core/constants';
+import type { TabType, TabVisibilityConfig } from '@/artifacts/bolt/components/@settings/core/types';
+import { DEFAULT_TAB_CONFIG } from '@/artifacts/bolt/components/@settings/core/constants';
 
 export const getVisibleTabs = (
   tabConfiguration: { userTabs: TabVisibilityConfig[]; developerTabs?: TabVisibilityConfig[] },

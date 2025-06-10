@@ -1,18 +1,18 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Switch } from '~/components/ui/Switch';
-import { useSettings } from '~/lib/hooks/useSettings';
-import { LOCAL_PROVIDERS, URL_CONFIGURABLE_PROVIDERS } from '~/lib/stores/settings';
-import type { IProviderConfig } from '~/types/model';
-import { logStore } from '~/lib/stores/logs';
+import { Switch } from '@/artifacts/bolt/components/ui/Switch';
+import { useSettings } from '@/artifacts/bolt/lib/hooks/useSettings';
+import { LOCAL_PROVIDERS, URL_CONFIGURABLE_PROVIDERS } from '@/artifacts/bolt/lib/stores/settings';
+import type { IProviderConfig } from '@/artifacts/bolt/types/model';
+import { logStore } from '@/artifacts/bolt/lib/stores/logs';
 import { motion, AnimatePresence } from 'framer-motion';
-import { classNames } from '~/utils/classNames';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
 import { BsRobot } from 'react-icons/bs';
 import type { IconType } from 'react-icons';
 import { BiChip } from 'react-icons/bi';
 import { TbBrandOpenai } from 'react-icons/tb';
-import { providerBaseUrlEnvKeys } from '~/utils/constants';
-import { useToast } from '~/components/ui/use-toast';
-import { Progress } from '~/components/ui/Progress';
+import { providerBaseUrlEnvKeys } from '@/artifacts/bolt/utils/constants';
+import { useToast } from '@/artifacts/bolt/components/ui/use-toast';
+import { Progress } from '@/artifacts/bolt/components/ui/Progress';
 import OllamaModelInstaller from './OllamaModelInstaller';
 
 // Add type for provider names to ensure type safety

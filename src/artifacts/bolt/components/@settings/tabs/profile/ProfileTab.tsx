@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react';
 import { useStore } from '@nanostores/react';
-import { classNames } from '~/utils/classNames';
-import { profileStore, updateProfile } from '~/lib/stores/profile';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
+import { profileStore, updateProfile } from '@/artifacts/bolt/lib/stores/profile';
 import { toast } from 'react-toastify';
-import { debounce } from '~/utils/debounce';
+import { debounce } from '@/artifacts/bolt/utils/debounce';
 
 export default function ProfileTab() {
   const profile = useStore(profileStore);

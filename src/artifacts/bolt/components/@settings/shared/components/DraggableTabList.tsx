@@ -1,9 +1,9 @@
 import { useDrag, useDrop } from 'react-dnd';
 import { motion } from 'framer-motion';
-import { classNames } from '~/utils/classNames';
-import type { TabVisibilityConfig } from '~/components/@settings/core/types';
-import { TAB_LABELS } from '~/components/@settings/core/types';
-import { Switch } from '~/components/ui/Switch';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
+import type { TabVisibilityConfig } from '@/artifacts/bolt/components/@settings/core/types';
+import { TAB_LABELS } from '@/artifacts/bolt/components/@settings/core/types';
+import { Switch } from '@/artifacts/bolt/components/ui/Switch';
 
 interface DraggableTabListProps {
   tabs: TabVisibilityConfig[];

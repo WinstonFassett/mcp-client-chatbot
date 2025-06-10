@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Switch } from '~/components/ui/Switch';
-import { logStore, type LogEntry } from '~/lib/stores/logs';
+import { Switch } from '@/artifacts/bolt/components/ui/Switch';
+import { logStore, type LogEntry } from '@/artifacts/bolt/lib/stores/logs';
 import { useStore } from '@nanostores/react';
-import { classNames } from '~/utils/classNames';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { Dialog, DialogRoot, DialogTitle } from '~/components/ui/Dialog';
+import { Dialog, DialogRoot, DialogTitle } from '@/artifacts/bolt/components/ui/Dialog';
 import { jsPDF } from 'jspdf';
 import { toast } from 'react-toastify';
 

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
-import { classNames } from '~/utils/classNames';
-import { Switch } from '~/components/ui/Switch';
-import type { UserProfile } from '~/components/@settings/core/types';
-import { isMac } from '~/utils/os';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
+import { Switch } from '@/artifacts/bolt/components/ui/Switch';
+import type { UserProfile } from '@/artifacts/bolt/components/@settings/core/types';
+import { isMac } from '@/artifacts/bolt/utils/os';
 
 // Helper to get modifier key symbols/text
 const getModifierSymbol = (modifier: string): string => {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
-import { classNames } from '~/utils/classNames';
-import type { GitHubRepoInfo } from '~/components/@settings/tabs/connections/types/GitHub';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
+import type { GitHubRepoInfo } from '@/artifacts/bolt/components/@settings/tabs/connections/types/GitHub';
 import { GitBranch } from '@phosphor-icons/react';
 
 interface GitHubBranch {

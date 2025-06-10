@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-import type { GitHubRepoInfo } from '~/types/GitHub';
-import { EmptyState, StatusIndicator } from '~/components/ui';
+import type { GitHubRepoInfo } from '@/artifacts/bolt/types/GitHub';
+import { EmptyState, StatusIndicator } from '@/artifacts/bolt/components/ui';
 import { RepositoryCard } from './RepositoryCard';
 import { RepositoryDialogContext } from './RepositoryDialogContext';
 

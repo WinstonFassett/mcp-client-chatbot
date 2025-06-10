@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
-import { logStore } from '~/lib/stores/logs';
-import { classNames } from '~/utils/classNames';
+import { logStore } from '@/artifacts/bolt/lib/stores/logs';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
 import Cookies from 'js-cookie';
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '~/components/ui/Collapsible';
-import { Button } from '~/components/ui/Button';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/artifacts/bolt/components/ui/Collapsible';
+import { Button } from '@/artifacts/bolt/components/ui/Button';
 
 interface GitHubUserResponse {
   login: string;

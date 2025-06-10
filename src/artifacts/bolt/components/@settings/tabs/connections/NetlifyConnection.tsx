@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { classNames } from '~/utils/classNames';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
 import { useStore } from '@nanostores/react';
-import { netlifyConnection, updateNetlifyConnection, initializeNetlifyConnection } from '~/lib/stores/netlify';
-import type { NetlifySite, NetlifyDeploy, NetlifyBuild, NetlifyUser } from '~/types/netlify';
+import { netlifyConnection, updateNetlifyConnection, initializeNetlifyConnection } from '@/artifacts/bolt/lib/stores/netlify';
+import type { NetlifySite, NetlifyDeploy, NetlifyBuild, NetlifyUser } from '@/artifacts/bolt/types/netlify';
 import {
   CloudIcon,
   BuildingLibraryIcon,
@@ -17,10 +17,10 @@ import {
   LockOpenIcon,
   RocketLaunchIcon,
 } from '@heroicons/react/24/outline';
-import { Button } from '~/components/ui/Button';
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '~/components/ui/Collapsible';
+import { Button } from '@/artifacts/bolt/components/ui/Button';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/artifacts/bolt/components/ui/Collapsible';
 import { formatDistanceToNow } from 'date-fns';
-import { Badge } from '~/components/ui/Badge';
+import { Badge } from '@/artifacts/bolt/components/ui/Badge';
 
 // Add the Netlify logo SVG component at the top of the file
 const NetlifyLogo = () => (

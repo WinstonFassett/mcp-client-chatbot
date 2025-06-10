@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { logStore } from '~/lib/stores/logs';
+import { logStore } from '@/artifacts/bolt/lib/stores/logs';
 import { useStore } from '@nanostores/react';
 import { formatDistanceToNow } from 'date-fns';
-import { classNames } from '~/utils/classNames';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 
 interface NotificationDetails {

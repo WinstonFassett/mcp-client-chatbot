@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useState, useCallback } from 'react';
-import { classNames } from '~/utils/classNames';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -14,8 +14,8 @@ import {
   type Chart,
 } from 'chart.js';
 import { toast } from 'react-toastify'; // Import toast
-import { useUpdateCheck } from '~/lib/hooks/useUpdateCheck';
-import { tabConfigurationStore, type TabConfig } from '~/lib/stores/tabConfigurationStore';
+import { useUpdateCheck } from '@/artifacts/bolt/lib/hooks/useUpdateCheck';
+import { tabConfigurationStore, type TabConfig } from '@/artifacts/bolt/lib/stores/tabConfigurationStore';
 import { useStore } from 'zustand';
 
 // Register ChartJS components

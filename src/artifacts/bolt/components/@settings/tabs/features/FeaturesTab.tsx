@@ -1,11 +1,11 @@
 // Remove unused imports
 import React, { memo, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Switch } from '~/components/ui/Switch';
-import { useSettings } from '~/lib/hooks/useSettings';
-import { classNames } from '~/utils/classNames';
+import { Switch } from '@/artifacts/bolt/components/ui/Switch';
+import { useSettings } from '@/artifacts/bolt/lib/hooks/useSettings';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
 import { toast } from 'react-toastify';
-import { PromptLibrary } from '~/lib/common/prompt-library';
+import { PromptLibrary } from '@/artifacts/bolt/lib/common/prompt-library';
 
 interface FeatureToggle {
   id: string;

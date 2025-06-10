@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useStore } from '@nanostores/react';
-import { Switch } from '~/components/ui/Switch';
-import { classNames } from '~/utils/classNames';
-import { tabConfigurationStore } from '~/lib/stores/settings';
-import { TAB_LABELS } from '~/components/@settings/core/constants';
-import type { TabType } from '~/components/@settings/core/types';
+import { Switch } from '@/artifacts/bolt/components/ui/Switch';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
+import { tabConfigurationStore } from '@/artifacts/bolt/lib/stores/settings';
+import { TAB_LABELS } from '@/artifacts/bolt/components/@settings/core/constants';
+import type { TabType } from '@/artifacts/bolt/components/@settings/core/types';
 import { toast } from 'react-toastify';
 import { TbLayoutGrid } from 'react-icons/tb';
-import { useSettingsStore } from '~/lib/stores/settings';
+import { useSettingsStore } from '@/artifacts/bolt/lib/stores/settings';
 
 // Define tab icons mapping
 const TAB_ICONS: Record<TabType, string> = {

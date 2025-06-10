@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { classNames } from '~/utils/classNames';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
 import { TbActivityHeartbeat } from 'react-icons/tb';
 import { BsCheckCircleFill, BsXCircleFill, BsExclamationCircleFill } from 'react-icons/bs';
 import { SiAmazon, SiGoogle, SiHuggingface, SiPerplexity, SiOpenai } from 'react-icons/si';
@@ -9,8 +9,8 @@ import { TbBrain } from 'react-icons/tb';
 import { BiChip, BiCodeBlock } from 'react-icons/bi';
 import { FaCloud, FaBrain } from 'react-icons/fa';
 import type { IconType } from 'react-icons';
-import { useSettings } from '~/lib/hooks/useSettings';
-import { useToast } from '~/components/ui/use-toast';
+import { useSettings } from '@/artifacts/bolt/lib/hooks/useSettings';
+import { useToast } from '@/artifacts/bolt/components/ui/use-toast';
 
 // Types
 type ProviderName =

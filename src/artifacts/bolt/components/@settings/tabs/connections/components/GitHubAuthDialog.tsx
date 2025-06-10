@@ -3,7 +3,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
-import type { GitHubUserResponse } from '~/types/GitHub';
+import type { GitHubUserResponse } from '@/artifacts/bolt/types/GitHub';
 
 interface GitHubAuthDialogProps {
   isOpen: boolean;

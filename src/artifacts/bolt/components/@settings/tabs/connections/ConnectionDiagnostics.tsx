@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { Button } from '~/components/ui/Button';
-import { Badge } from '~/components/ui/Badge';
-import { classNames } from '~/utils/classNames';
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '~/components/ui/Collapsible';
+import { Button } from '@/artifacts/bolt/components/ui/Button';
+import { Badge } from '@/artifacts/bolt/components/ui/Badge';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/artifacts/bolt/components/ui/Collapsible';
 import { CodeBracketIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 
 // Helper function to safely parse JSON

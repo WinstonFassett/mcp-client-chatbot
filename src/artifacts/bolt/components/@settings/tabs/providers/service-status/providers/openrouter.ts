@@ -1,5 +1,5 @@
-import { BaseProviderChecker } from '~/components/@settings/tabs/providers/service-status/base-provider';
-import type { StatusCheckResult } from '~/components/@settings/tabs/providers/service-status/types';
+import { BaseProviderChecker } from '@/artifacts/bolt/components/@settings/tabs/providers/service-status/base-provider';
+import type { StatusCheckResult } from '@/artifacts/bolt/components/@settings/tabs/providers/service-status/types';
 
 export class OpenRouterStatusChecker extends BaseProviderChecker {
   async checkStatus(): Promise<StatusCheckResult> {

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useSettings } from '~/lib/hooks/useSettings';
-import { logStore } from '~/lib/stores/logs';
+import { useSettings } from '@/artifacts/bolt/lib/hooks/useSettings';
+import { logStore } from '@/artifacts/bolt/lib/stores/logs';
 import { toast } from 'react-toastify';
-import { Dialog, DialogRoot, DialogTitle, DialogDescription, DialogButton } from '~/components/ui/Dialog';
-import { classNames } from '~/utils/classNames';
-import { Markdown } from '~/components/chat/Markdown';
+import { Dialog, DialogRoot, DialogTitle, DialogDescription, DialogButton } from '@/artifacts/bolt/components/ui/Dialog';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
+import { Markdown } from '@/artifacts/bolt/components/chat/Markdown';
 
 interface UpdateProgress {
   stage: 'fetch' | 'pull' | 'install' | 'build' | 'complete';

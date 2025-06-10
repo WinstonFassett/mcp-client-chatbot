@@ -3,41 +3,41 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '@nanostores/react';
 import { Switch } from '@radix-ui/react-switch';
 import * as RadixDialog from '@radix-ui/react-dialog';
-import { classNames } from '~/utils/classNames';
-import { TabManagement } from '~/components/@settings/shared/components/TabManagement';
-import { TabTile } from '~/components/@settings/shared/components/TabTile';
-import { useUpdateCheck } from '~/lib/hooks/useUpdateCheck';
-import { useFeatures } from '~/lib/hooks/useFeatures';
-import { useNotifications } from '~/lib/hooks/useNotifications';
-import { useConnectionStatus } from '~/lib/hooks/useConnectionStatus';
-import { useDebugStatus } from '~/lib/hooks/useDebugStatus';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
+import { TabManagement } from '@/artifacts/bolt/components/@settings/shared/components/TabManagement';
+import { TabTile } from '@/artifacts/bolt/components/@settings/shared/components/TabTile';
+import { useUpdateCheck } from '@/artifacts/bolt/lib/hooks/useUpdateCheck';
+import { useFeatures } from '@/artifacts/bolt/lib/hooks/useFeatures';
+import { useNotifications } from '@/artifacts/bolt/lib/hooks/useNotifications';
+import { useConnectionStatus } from '@/artifacts/bolt/lib/hooks/useConnectionStatus';
+import { useDebugStatus } from '@/artifacts/bolt/lib/hooks/useDebugStatus';
 import {
   tabConfigurationStore,
   developerModeStore,
   setDeveloperMode,
   resetTabConfiguration,
-} from '~/lib/stores/settings';
-import { profileStore } from '~/lib/stores/profile';
+} from '@/artifacts/bolt/lib/stores/settings';
+import { profileStore } from '@/artifacts/bolt/lib/stores/profile';
 import type { TabType, TabVisibilityConfig, Profile } from './types';
 import { TAB_LABELS, DEFAULT_TAB_CONFIG } from './constants';
-import { DialogTitle } from '~/components/ui/Dialog';
+import { DialogTitle } from '@/artifacts/bolt/components/ui/Dialog';
 import { AvatarDropdown } from './AvatarDropdown';
-import BackgroundRays from '~/components/ui/BackgroundRays';
+import BackgroundRays from '@/artifacts/bolt/components/ui/BackgroundRays';
 
 // Import all tab components
-import ProfileTab from '~/components/@settings/tabs/profile/ProfileTab';
-import SettingsTab from '~/components/@settings/tabs/settings/SettingsTab';
-import NotificationsTab from '~/components/@settings/tabs/notifications/NotificationsTab';
-import FeaturesTab from '~/components/@settings/tabs/features/FeaturesTab';
-import { DataTab } from '~/components/@settings/tabs/data/DataTab';
-import DebugTab from '~/components/@settings/tabs/debug/DebugTab';
-import { EventLogsTab } from '~/components/@settings/tabs/event-logs/EventLogsTab';
-import UpdateTab from '~/components/@settings/tabs/update/UpdateTab';
-import ConnectionsTab from '~/components/@settings/tabs/connections/ConnectionsTab';
-import CloudProvidersTab from '~/components/@settings/tabs/providers/cloud/CloudProvidersTab';
-import ServiceStatusTab from '~/components/@settings/tabs/providers/status/ServiceStatusTab';
-import LocalProvidersTab from '~/components/@settings/tabs/providers/local/LocalProvidersTab';
-import TaskManagerTab from '~/components/@settings/tabs/task-manager/TaskManagerTab';
+import ProfileTab from '@/artifacts/bolt/components/@settings/tabs/profile/ProfileTab';
+import SettingsTab from '@/artifacts/bolt/components/@settings/tabs/settings/SettingsTab';
+import NotificationsTab from '@/artifacts/bolt/components/@settings/tabs/notifications/NotificationsTab';
+import FeaturesTab from '@/artifacts/bolt/components/@settings/tabs/features/FeaturesTab';
+import { DataTab } from '@/artifacts/bolt/components/@settings/tabs/data/DataTab';
+import DebugTab from '@/artifacts/bolt/components/@settings/tabs/debug/DebugTab';
+import { EventLogsTab } from '@/artifacts/bolt/components/@settings/tabs/event-logs/EventLogsTab';
+import UpdateTab from '@/artifacts/bolt/components/@settings/tabs/update/UpdateTab';
+import ConnectionsTab from '@/artifacts/bolt/components/@settings/tabs/connections/ConnectionsTab';
+import CloudProvidersTab from '@/artifacts/bolt/components/@settings/tabs/providers/cloud/CloudProvidersTab';
+import ServiceStatusTab from '@/artifacts/bolt/components/@settings/tabs/providers/status/ServiceStatusTab';
+import LocalProvidersTab from '@/artifacts/bolt/components/@settings/tabs/providers/local/LocalProvidersTab';
+import TaskManagerTab from '@/artifacts/bolt/components/@settings/tabs/task-manager/TaskManagerTab';
 
 interface ControlPanelProps {
   open: boolean;

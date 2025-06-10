@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import type { GitHubRepoInfo } from '~/types/GitHub';
+import type { GitHubRepoInfo } from '@/artifacts/bolt/types/GitHub';
 
 interface RepositoryCardProps {
   repo: GitHubRepoInfo;

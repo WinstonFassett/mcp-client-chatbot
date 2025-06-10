@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { classNames } from '~/utils/classNames';
-import { Progress } from '~/components/ui/Progress';
-import { useToast } from '~/components/ui/use-toast';
-import { useSettings } from '~/lib/hooks/useSettings';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
+import { Progress } from '@/artifacts/bolt/components/ui/Progress';
+import { useToast } from '@/artifacts/bolt/components/ui/use-toast';
+import { useSettings } from '@/artifacts/bolt/lib/hooks/useSettings';
 
 interface OllamaModelInstallerProps {
   onModelInstalled: () => void;

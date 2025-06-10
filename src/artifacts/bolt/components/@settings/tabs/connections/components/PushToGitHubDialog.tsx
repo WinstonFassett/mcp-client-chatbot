@@ -5,17 +5,17 @@ import { motion } from 'framer-motion';
 import { Octokit } from '@octokit/rest';
 
 // Internal imports
-import { getLocalStorage } from '~/lib/persistence';
-import { classNames } from '~/utils/classNames';
-import type { GitHubUserResponse } from '~/types/GitHub';
-import { logStore } from '~/lib/stores/logs';
-import { workbenchStore } from '~/lib/stores/workbench';
-import { extractRelativePath } from '~/utils/diff';
-import { formatSize } from '~/utils/formatSize';
-import type { FileMap, File } from '~/lib/stores/files';
+import { getLocalStorage } from '@/artifacts/bolt/lib/persistence';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
+import type { GitHubUserResponse } from '@/artifacts/bolt/types/GitHub';
+import { logStore } from '@/artifacts/bolt/lib/stores/logs';
+import { workbenchStore } from '@/artifacts/bolt/lib/stores/workbench';
+import { extractRelativePath } from '@/artifacts/bolt/utils/diff';
+import { formatSize } from '@/artifacts/bolt/utils/formatSize';
+import type { FileMap, File } from '@/artifacts/bolt/lib/stores/files';
 
 // UI Components
-import { Badge, EmptyState, StatusIndicator, SearchInput } from '~/components/ui';
+import { Badge, EmptyState, StatusIndicator, SearchInput } from '@/artifacts/bolt/components/ui';
 
 interface PushToGitHubDialogProps {
   isOpen: boolean;
