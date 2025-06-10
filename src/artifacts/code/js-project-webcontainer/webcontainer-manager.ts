@@ -122,68 +122,81 @@ export async function startDevServer(): Promise<{ url: string; output: string }>
   
   const webcontainer = await getWebContainerInstance();
   
-  try {
-    // Check if package.json exists and has a start script
-    const packageJsonContent = await webcontainer.fs.readFile('package.json', 'utf-8');
-    const packageJson = JSON.parse(packageJsonContent);
-    
-    // Determine which script to run
-    const command = 'npm';
-    let args = ['start'];
-    
-    if (packageJson.scripts) {
-      if (packageJson.scripts.dev) {
-        args = ['run', 'dev'];
-      } else if (packageJson.scripts.serve) {
-        args = ['run', 'serve'];
-      }
-    }
-    
-    console.log(`Starting dev server with command: ${command} ${args.join(' ')}`);
-    
-    // Start the server
-    const serverProcess = await webcontainer.spawn(command, args);
-    
-    // Collect output
-    let output = '';
-    let portFound = false;
-    let port = 3000; // Default port
-    
-    serverProcess.output.pipeTo(
-      new WritableStream({
-        write(data) {
-          output += data;
-          console.log(data); // Log server output in real-time
-          
-          // Try to extract port information from server output
-          if (!portFound) {
-            const portMatch = data.match(/localhost:(\d+)/);
-            if (portMatch && portMatch[1]) {
-              port = parseInt(portMatch[1], 10);
-              portFound = true;
-              console.log(`Detected server running on port: ${port}`);
-            }
-          }
+  return new Promise(async (resolve, reject) => {
+    // Listen for server-ready event
+    const onServerReady = (port: number, url: string) => {
+      console.log('Server ready on port:', port, 'URL:', url);
+      serverUrl = url;
+      isServerRunning = true;
+      // Remove the event listener to prevent memory leaks
+      (webcontainer as any).removeListener('server-ready', onServerReady);
+      resolve({ url: serverUrl, output: 'Server started successfully' });
+    };
+
+    // Add the event listener
+    (webcontainer as any).on('server-ready', onServerReady);
+
+    try {
+      // Check if package.json exists and has a start script
+      const packageJsonContent = await webcontainer.fs.readFile('package.json', 'utf-8');
+      const packageJson = JSON.parse(packageJsonContent);
+      
+      // Determine which script to run
+      const command = 'npm';
+      let args = ['start'];
+      
+      if (packageJson.scripts) {
+        if (packageJson.scripts.dev) {
+          args = ['run', 'dev'];
+        } else if (packageJson.scripts.serve) {
+          args = ['run', 'serve'];
         }
-      })
-    );
-    
-    // Wait a bit for the server to start
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // The correct URL format for accessing WebContainer services
-    // This is the key to fixing the preview
-    serverUrl = `/_webcontainer/${port}/`;
-    console.log('WebContainer server URL:', serverUrl);
-    
-    isServerRunning = true;
-    return { url: serverUrl, output };
-  } catch (error) {
-    console.error('Failed to start dev server:', error);
-    isServerRunning = false;
-    serverUrl = '';
-    return { url: '', output: String(error) };
-  }
+      }
+      
+      console.log(`Starting dev server with command: ${command} ${args.join(' ')}`);
+      
+      // Start the server
+      const serverProcess = await webcontainer.spawn(command, args);
+      
+      // Collect output
+      const outputChunks: string[] = [];
+      
+      serverProcess.output.pipeTo(
+        new WritableStream({
+          write(data) {
+            outputChunks.push(data);
+            console.log(data); // Log server output in real-time
+          }
+        })
+      );
+      
+      // Set up error handling
+      serverProcess.exit.then(exitCode => {
+        if (exitCode !== 0) {
+          const error = new Error(`Server process exited with code ${exitCode}`);
+          console.error(error.message);
+          (webcontainer as any).removeListener('server-ready', onServerReady);
+          reject(error);
+        }
+      });
+      
+      // Set a timeout in case the server doesn't start
+      const timeout = setTimeout(() => {
+        (webcontainer as any).removeListener('server-ready', onServerReady);
+        reject(new Error('Server start timed out after 30 seconds'));
+      }, 30000);
+      
+      // Clean up the timeout if the server starts successfully
+      (webcontainer as any).once('server-ready', () => {
+        clearTimeout(timeout);
+      });
+      
+    } catch (error) {
+      console.error('Failed to start dev server:', error);
+      (webcontainer as any).removeListener('server-ready', onServerReady);
+      reject(error);
+    }
+  });
 }
 
 export async function readFile(path: string): Promise<string> {
