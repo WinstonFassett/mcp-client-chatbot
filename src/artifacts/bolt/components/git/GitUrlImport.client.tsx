@@ -1,6 +1,6 @@
 'use client';
 
-import { useSearchParams } from '@remix-run/react';
+import { useSearchParams } from 'next/navigation';
 import { generateId, type Message } from 'ai';
 import ignore from 'ignore';
 import { useEffect, useState } from 'react';
@@ -120,6 +120,7 @@ ${escapeBoltTags(file.content)}
       return;
     }
 
+    // Next.js useSearchParams returns a ReadonlyURLSearchParams object
     const url = searchParams.get('url');
 
     if (!url) {

@@ -22,7 +22,7 @@ import Cookies from 'js-cookie';
 import { debounce } from '@/artifacts/bolt/utils/debounce';
 import { useSettings } from '@/artifacts/bolt/lib/hooks/useSettings';
 import type { ProviderInfo } from '@/artifacts/bolt/types/model';
-import { useSearchParams } from '@remix-run/react';
+import { useSearchParams } from 'next/navigation';
 import { createSampler } from '@/artifacts/bolt/utils/sampler';
 import { getTemplates, selectStarterTemplate } from '@/artifacts/bolt/utils/selectStarterTemplate';
 import { logStore } from '@/artifacts/bolt/lib/stores/logs';

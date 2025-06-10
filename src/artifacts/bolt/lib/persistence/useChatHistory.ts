@@ -1,4 +1,5 @@
-import { useLoaderData, useNavigate, useSearchParams } from '@remix-run/react';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
 import { atom } from 'nanostores';
 import { generateId, type JSONValue, type Message } from 'ai';
