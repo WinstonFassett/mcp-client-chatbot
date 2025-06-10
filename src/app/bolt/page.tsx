@@ -1,20 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Workbench } from '@/artifacts/bolt/components/workbench/Workbench.client';
-import { ActionRunner } from '@/artifacts/bolt/lib/runtime/action-runner';
+import React from 'react';
+import BoltWorkbenchWrapper from './BoltWorkbenchWrapper';
 
 export default function BoltPage() {
-  const [actionRunner] = useState(() => new ActionRunner());
-  const [chatStarted] = useState(true);
-
-  return (
-    <div className="h-screen w-screen">
-      <Workbench 
-        chatStarted={chatStarted}
-        actionRunner={actionRunner}
-        isStreaming={false}
-      />
-    </div>
-  );
+  return <BoltWorkbenchWrapper />;
 }
