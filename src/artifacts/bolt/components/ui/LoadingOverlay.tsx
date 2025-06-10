@@ -1,5 +1,3 @@
-'use client';
-
 export const LoadingOverlay = ({
   message = 'Loading...',
   progress,
