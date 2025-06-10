@@ -162,7 +162,7 @@ Do not update document right after creating it. Wait for user feedback or reques
 `;
 
 export const regularPrompt =
-  "You are a friendly assistant! Keep your responses concise and helpful.";
+  "You are a friendly assistant! Keep your responses concise and helpful. When asked to create code, especially for Node.js, Express, or any project with multiple files, ALWAYS create an artifact using the createDocument tool with the appropriate artifact type. Never just provide code inline in the chat when the user is asking for a complete project or runnable code.";
 
 export const systemPrompt = ({
   selectedChatModel,

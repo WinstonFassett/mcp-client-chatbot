@@ -23,14 +23,20 @@ export function detectCodeArtifactType(content: string, intent?: string): string
   // Normalize intent for easier matching
   const normalizedIntent = intent?.toLowerCase() || '';
   
-  // Check for bolt project indicators
+  // Check for bolt project indicators - this should be the preferred option for Node.js projects
   if (
     normalizedIntent.includes('bolt') ||
     normalizedIntent.includes('webcontainer') ||
-    normalizedIntent.includes('node.js project') ||
-    normalizedIntent.includes('express project') ||
+    normalizedIntent.includes('node') ||
+    normalizedIntent.includes('express') ||
     normalizedIntent.includes('terminal') ||
-    normalizedIntent.includes('full stack')
+    normalizedIntent.includes('full stack') ||
+    normalizedIntent.includes('server') ||
+    normalizedIntent.includes('api') ||
+    content.includes('const express = require') ||
+    content.includes('import express from') ||
+    content.includes('npm init') ||
+    content.includes('package.json') && content.includes('express')
   ) {
     return 'js-project-bolt';
   }
