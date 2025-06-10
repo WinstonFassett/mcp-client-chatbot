@@ -1,11 +1,12 @@
 'use client';
 
-import React, { Suspense } from 'react';
+import React, { Suspense, forwardRef } from 'react';
 import dynamic from 'next/dynamic';
+import type { TerminalRef } from './Terminal';
 
 // Dynamically import the Terminal component with SSR disabled
-const Terminal = dynamic(
-  () => import('./Terminal'),
+const TerminalComponent = dynamic(
+  () => import('./Terminal').then(mod => mod.Terminal),
   { ssr: false }
 );
 
@@ -18,14 +19,15 @@ const TerminalPlaceholder = () => (
   </div>
 );
 
-// Props type should match the original Terminal component
-type TerminalProps = React.ComponentProps<typeof Terminal>;
-
 // Create a wrapper component that renders the dynamically imported Terminal
-export default function DynamicTerminal(props: any) {
+const DynamicTerminal = forwardRef<TerminalRef, any>((props, ref) => {
   return (
     <Suspense fallback={<TerminalPlaceholder />}>
-      <Terminal {...props} />
+      <TerminalComponent {...props} ref={ref} />
     </Suspense>
   );
-}
+});
+
+DynamicTerminal.displayName = 'DynamicTerminal';
+
+export default DynamicTerminal;

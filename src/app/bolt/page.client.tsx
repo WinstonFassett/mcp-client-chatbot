@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Workbench } from '@/artifacts/bolt/components/workbench/Workbench.client';
 import { ActionRunner } from '@/artifacts/bolt/lib/runtime/action-runner';
 
-export default function BoltPage() {
+export default function BoltClientPage() {
   const [actionRunner] = useState(() => new ActionRunner());
   const [chatStarted] = useState(true);
 

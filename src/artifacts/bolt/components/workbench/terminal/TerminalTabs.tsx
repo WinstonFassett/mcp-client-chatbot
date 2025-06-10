@@ -150,7 +150,7 @@ export const TerminalTabs = memo(() => {
 
             if (index == 0) {
               return (
-                <Terminal
+                <DynamicTerminal
                   key={index}
                   id={`terminal_${index}`}
                   className={classNames('h-full overflow-hidden modern-scrollbar-invert', {
@@ -166,7 +166,7 @@ export const TerminalTabs = memo(() => {
               );
             } else {
               return (
-                <Terminal
+                <DynamicTerminal
                   key={index}
                   id={`terminal_${index}`}
                   className={classNames('modern-scrollbar h-full overflow-hidden', {
