@@ -6,6 +6,7 @@ import { htmlFragmentDocumentHandler } from "@/artifacts/code/html-fragment/serv
 import { imageDocumentHandler } from "@/artifacts/image/server";
 import { sheetDocumentHandler } from "@/artifacts/sheet/server";
 import { textDocumentHandler } from "@/artifacts/text/server";
+import { boltDocumentHandler } from "@/artifacts/bolt/server-handler";
 import type { ArtifactKind } from "@/components/artifact";
 import type { DataStreamWriter } from "ai";
 import type { Document } from "../db/pg/schema.pg";
@@ -111,6 +112,7 @@ export const documentHandlersByArtifactKind: Array<DocumentHandler> = [
   htmlFragmentDocumentHandler,
   imageDocumentHandler,
   sheetDocumentHandler,
+  boltDocumentHandler,
 ];
 
 export const artifactKinds = documentHandlersByArtifactKind.map(handler => handler.kind) as readonly string[];

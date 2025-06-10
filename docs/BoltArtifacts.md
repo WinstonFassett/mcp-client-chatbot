@@ -103,3 +103,58 @@ We'll follow a "lift and adapt" approach:
 3. Add necessary dependencies to our package.json
 4. Create a standalone route to test the integration
 5. Implement the bolt artifact type in our system
+
+## Implementation Journal
+
+### 2025-06-10: Initial Integration of Bolt Artifact Type
+
+#### Work Completed
+
+1. **Artifact Schema and Handler**
+   - Created `src/artifacts/bolt/server.ts` defining the bolt artifact data schema and handler
+   - Implemented the bolt artifact handler with create and update methods
+   - Defined the BoltArtifactData interface with fields for files, entryFile, dependencies, etc.
+
+2. **Client Component**
+   - Created `src/artifacts/bolt/client.tsx` with a placeholder React component
+   - Implemented tabs for editor, preview, and terminal views
+   - Added file list and content display components
+
+3. **Document Handler**
+   - Created `src/artifacts/bolt/server-handler.ts` implementing the document handler
+   - Defined default files for a simple Express.js project
+   - Implemented onCreateDocument and onUpdateDocument methods
+   - Fixed template string syntax issues in the default files
+
+4. **System Integration**
+   - Created `src/artifacts/bolt/index.ts` to export all necessary components
+   - Registered the boltDocumentHandler in the artifact system's handler array
+   - Added the bolt document handler to `documentHandlersByArtifactKind` in `src/lib/artifacts/server.ts`
+
+5. **Dependency Management**
+   - Created scripts to analyze and install required dependencies:
+     - `scripts/update-dependencies.mjs`: Compares and identifies missing dependencies
+     - `scripts/install-bolt-dependencies.sh`: Installs the required dependencies via pnpm
+   - Created `scripts/copy-bolt-components.sh` to copy core components from bolt.diy
+
+#### Next Steps
+
+1. **Component Integration**
+   - Copy and adapt WebContainer components from bolt.diy
+   - Integrate the terminal using xterm.js
+   - Set up the CodeMirror editor with proper syntax highlighting
+
+2. **File System and Preview**
+   - Implement the file system operations
+   - Set up the preview functionality with port forwarding
+
+3. **Testing and Refinement**
+   - Test the full workflow: create, edit, run, preview
+   - Fix any TypeScript errors and improve type safety
+   - Optimize performance and UI responsiveness
+
+#### Notes
+
+- Focus on getting functionality working before addressing all TypeScript errors
+- The bolt artifact is based on WebContainers which provides a full Node.js environment in the browser
+- Current implementation uses a simple Express.js project as default files
