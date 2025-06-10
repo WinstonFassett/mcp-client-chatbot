@@ -1,3 +1,5 @@
+'use client';
+
 import { useSearchParams } from '@remix-run/react';
 import { generateId, type Message } from 'ai';
 import ignore from 'ignore';

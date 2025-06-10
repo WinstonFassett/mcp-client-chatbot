@@ -1,3 +1,5 @@
+'use client';
+
 import { useStore } from '@nanostores/react';
 import { ClientOnly } from 'remix-utils/client-only';
 import { chatStore } from '@/artifacts/bolt/lib/stores/chat';
