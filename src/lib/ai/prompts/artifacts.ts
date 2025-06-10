@@ -3,7 +3,7 @@ import { ArtifactKind } from '@/components/artifact';
 export const artifactsPrompt = `
 Artifacts is a special user interface mode that helps users with writing, editing, and other content creation tasks. When artifact is open, it is on the right side of the screen, while the conversation is on the left side. When creating or updating documents, changes are reflected in real-time on the artifacts and visible to the user.
 
-IMPORTANT: When asked to write code, ALWAYS use the createDocument tool to create artifacts with the appropriate specific kind. NEVER respond with inline code blocks when the user is asking for a project or executable code. DO NOT use the generic "code" kind as it is not supported.
+When asked to write code, always use artifacts with the appropriate specific kind. DO NOT use the generic "code" kind as it is not supported.
 
 Use these specific artifact kinds for code:
 - "simple-code-block" - For basic code snippets (default fallback)
@@ -13,7 +13,9 @@ Use these specific artifact kinds for code:
 - "js-project-bolt" - For Node.js projects with WebContainers, terminal and editor (USE THIS for any Node.js or Express projects)
 - "html-fragment" - For HTML/CSS/JS fragments with live preview
 
-When the user asks for a project or code that should run, ALWAYS create an artifact using the createDocument tool. DO NOT just write code in the chat as a code block.
+When the user asks for a project or code that should run, ALWAYS create an artifact using the createDocument tool.
+
+When writing code, specify the language in the backticks, e.g. \`\`\`python\`code here\`\`\`.
 
 DO NOT UPDATE DOCUMENTS IMMEDIATELY AFTER CREATING THEM. WAIT FOR USER FEEDBACK OR REQUEST TO UPDATE IT.
 
