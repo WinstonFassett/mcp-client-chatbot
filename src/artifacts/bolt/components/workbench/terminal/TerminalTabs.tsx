@@ -1,13 +1,13 @@
 import { useStore } from '@nanostores/react';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import { Panel, type ImperativePanelHandle } from 'react-resizable-panels';
-import { IconButton } from '~/components/ui/IconButton';
-import { shortcutEventEmitter } from '~/lib/hooks';
-import { themeStore } from '~/lib/stores/theme';
-import { workbenchStore } from '~/lib/stores/workbench';
-import { classNames } from '~/utils/classNames';
+import { IconButton } from '@/artifacts/bolt/components/ui/IconButton';
+import { shortcutEventEmitter } from '@/artifacts/bolt/lib/hooks';
+import { themeStore } from '@/artifacts/bolt/lib/stores/theme';
+import { workbenchStore } from '@/artifacts/bolt/lib/stores/workbench';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
 import { Terminal, type TerminalRef } from './Terminal';
-import { createScopedLogger } from '~/utils/logger';
+import { createScopedLogger } from '@/artifacts/bolt/utils/logger';
 
 const logger = createScopedLogger('Terminal');
 

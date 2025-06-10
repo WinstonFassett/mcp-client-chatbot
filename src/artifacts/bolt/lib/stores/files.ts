@@ -2,12 +2,12 @@ import type { PathWatcherEvent, WebContainer } from '@webcontainer/api';
 import { getEncoding } from 'istextorbinary';
 import { map, type MapStore } from 'nanostores';
 import { Buffer } from 'node:buffer';
-import { path } from '~/utils/path';
-import { bufferWatchEvents } from '~/utils/buffer';
-import { WORK_DIR } from '~/utils/constants';
-import { computeFileModifications } from '~/utils/diff';
-import { createScopedLogger } from '~/utils/logger';
-import { unreachable } from '~/utils/unreachable';
+import { path } from '@/artifacts/bolt/utils/path';
+import { bufferWatchEvents } from '@/artifacts/bolt/utils/buffer';
+import { WORK_DIR } from '@/artifacts/bolt/utils/constants';
+import { computeFileModifications } from '@/artifacts/bolt/utils/diff';
+import { createScopedLogger } from '@/artifacts/bolt/utils/logger';
+import { unreachable } from '@/artifacts/bolt/utils/unreachable';
 import {
   addLockedFile,
   removeLockedFile,
@@ -19,8 +19,8 @@ import {
   isPathInLockedFolder,
   migrateLegacyLocks,
   clearCache,
-} from '~/lib/persistence/lockedFiles';
-import { getCurrentChatId } from '~/utils/fileLocks';
+} from '@/artifacts/bolt/lib/persistence/lockedFiles';
+import { getCurrentChatId } from '@/artifacts/bolt/utils/fileLocks';
 
 const logger = createScopedLogger('FilesStore');
 

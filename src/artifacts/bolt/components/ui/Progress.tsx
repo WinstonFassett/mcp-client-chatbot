@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { classNames } from '~/utils/classNames';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
 
 interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
   value?: number;

@@ -1,9 +1,9 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import type { TextSearchOptions, TextSearchOnProgressCallback, WebContainer } from '@webcontainer/api';
-import { workbenchStore } from '~/lib/stores/workbench';
-import { webcontainer } from '~/lib/webcontainer';
-import { WORK_DIR } from '~/utils/constants';
-import { debounce } from '~/utils/debounce';
+import { workbenchStore } from '@/artifacts/bolt/lib/stores/workbench';
+import { webcontainer } from '@/artifacts/bolt/lib/webcontainer';
+import { WORK_DIR } from '@/artifacts/bolt/utils/constants';
+import { debounce } from '@/artifacts/bolt/utils/debounce';
 
 interface DisplayMatch {
   path: string;

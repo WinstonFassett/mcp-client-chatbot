@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { IconButton } from '~/components/ui/IconButton';
+import { IconButton } from '@/artifacts/bolt/components/ui/IconButton';
 interface SettingsButtonProps {
   onClick: () => void;
 }

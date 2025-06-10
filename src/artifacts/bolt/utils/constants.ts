@@ -1,5 +1,5 @@
-import { LLMManager } from '~/lib/modules/llm/manager';
-import type { Template } from '~/types/template';
+import { LLMManager } from '@/artifacts/bolt/lib/modules/llm/manager';
+import type { Template } from '@/artifacts/bolt/types/template';
 
 export const WORK_DIR_NAME = 'project';
 export const WORK_DIR = `/home/${WORK_DIR_NAME}`;

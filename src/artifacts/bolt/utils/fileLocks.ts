@@ -3,7 +3,7 @@ import {
   isFileLocked as isFileLockedInternal,
   isFolderLocked as isFolderLockedInternal,
   isPathInLockedFolder,
-} from '~/lib/persistence/lockedFiles';
+} from '@/artifacts/bolt/lib/persistence/lockedFiles';
 import { createScopedLogger } from './logger';
 
 const logger = createScopedLogger('FileLocks');

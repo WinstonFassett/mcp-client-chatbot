@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { classNames } from '~/utils/classNames';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
 
 // Predefined gradient colors
 const GRADIENT_COLORS = [

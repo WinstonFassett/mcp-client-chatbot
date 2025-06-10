@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { classNames } from '~/utils/classNames';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
 import { motion } from 'framer-motion';
 import { FileIcon } from './FileIcon';
 import { Tooltip } from './Tooltip';

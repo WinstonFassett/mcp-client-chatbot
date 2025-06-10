@@ -5,28 +5,28 @@ import { memo, useCallback, useEffect, useState, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import { Popover, Transition } from '@headlessui/react';
 import { diffLines, type Change } from 'diff';
-import { ActionRunner } from '~/lib/runtime/action-runner';
-import { getLanguageFromExtension } from '~/utils/getLanguageFromExtension';
-import type { FileHistory } from '~/types/actions';
+import { ActionRunner } from '@/artifacts/bolt/lib/runtime/action-runner';
+import { getLanguageFromExtension } from '@/artifacts/bolt/utils/getLanguageFromExtension';
+import type { FileHistory } from '@/artifacts/bolt/types/actions';
 import { DiffView } from './DiffView';
 import {
   type OnChangeCallback as OnEditorChange,
   type OnScrollCallback as OnEditorScroll,
-} from '~/components/editor/codemirror/CodeMirrorEditor';
-import { IconButton } from '~/components/ui/IconButton';
-import { PanelHeaderButton } from '~/components/ui/PanelHeaderButton';
-import { Slider, type SliderOptions } from '~/components/ui/Slider';
-import { workbenchStore, type WorkbenchViewType } from '~/lib/stores/workbench';
-import { classNames } from '~/utils/classNames';
-import { cubicEasingFn } from '~/utils/easings';
-import { renderLogger } from '~/utils/logger';
+} from '@/artifacts/bolt/components/editor/codemirror/CodeMirrorEditor';
+import { IconButton } from '@/artifacts/bolt/components/ui/IconButton';
+import { PanelHeaderButton } from '@/artifacts/bolt/components/ui/PanelHeaderButton';
+import { Slider, type SliderOptions } from '@/artifacts/bolt/components/ui/Slider';
+import { workbenchStore, type WorkbenchViewType } from '@/artifacts/bolt/lib/stores/workbench';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
+import { cubicEasingFn } from '@/artifacts/bolt/utils/easings';
+import { renderLogger } from '@/artifacts/bolt/utils/logger';
 import { EditorPanel } from './EditorPanel';
 import { Preview } from './Preview';
-import useViewport from '~/lib/hooks';
-import { PushToGitHubDialog } from '~/components/@settings/tabs/connections/components/PushToGitHubDialog';
+import useViewport from '@/artifacts/bolt/lib/hooks';
+import { PushToGitHubDialog } from '@/artifacts/bolt/components/@settings/tabs/connections/components/PushToGitHubDialog';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { usePreviewStore } from '~/lib/stores/previews';
-import { chatStore } from '~/lib/stores/chat';
+import { usePreviewStore } from '@/artifacts/bolt/lib/stores/previews';
+import { chatStore } from '@/artifacts/bolt/lib/stores/chat';
 import type { ElementInfo } from './Inspector';
 
 interface WorkspaceProps {

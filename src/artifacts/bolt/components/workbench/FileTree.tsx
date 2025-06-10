@@ -1,13 +1,13 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import type { FileMap } from '~/lib/stores/files';
-import { classNames } from '~/utils/classNames';
-import { createScopedLogger, renderLogger } from '~/utils/logger';
+import type { FileMap } from '@/artifacts/bolt/lib/stores/files';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
+import { createScopedLogger, renderLogger } from '@/artifacts/bolt/utils/logger';
 import * as ContextMenu from '@radix-ui/react-context-menu';
-import type { FileHistory } from '~/types/actions';
+import type { FileHistory } from '@/artifacts/bolt/types/actions';
 import { diffLines, type Change } from 'diff';
-import { workbenchStore } from '~/lib/stores/workbench';
+import { workbenchStore } from '@/artifacts/bolt/lib/stores/workbench';
 import { toast } from 'react-toastify';
-import { path } from '~/utils/path';
+import { path } from '@/artifacts/bolt/utils/path';
 
 const logger = createScopedLogger('FileTree');
 

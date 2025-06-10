@@ -1,6 +1,6 @@
 import { WebContainer } from '@webcontainer/api';
-import { WORK_DIR_NAME } from '~/utils/constants';
-import { cleanStackTrace } from '~/utils/stacktrace';
+import { WORK_DIR_NAME } from '@/artifacts/bolt/utils/constants';
+import { cleanStackTrace } from '@/artifacts/bolt/utils/stacktrace';
 
 interface WebContainerContext {
   loaded: boolean;
@@ -32,7 +32,7 @@ if (!import.meta.env.SSR) {
       .then(async (webcontainer) => {
         webcontainerContext.loaded = true;
 
-        const { workbenchStore } = await import('~/lib/stores/workbench');
+        const { workbenchStore } = await import('@/artifacts/bolt/lib/stores/workbench');
 
         const response = await fetch('/inspector-script.js');
         const inspectorScript = await response.text();

@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
 import { memo } from 'react';
-import { classNames } from '~/utils/classNames';
-import { cubicEasingFn } from '~/utils/easings';
-import { genericMemo } from '~/utils/react';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
+import { cubicEasingFn } from '@/artifacts/bolt/utils/easings';
+import { genericMemo } from '@/artifacts/bolt/utils/react';
 
 export type SliderOptions<T> = {
   left: { value: T; text: string };

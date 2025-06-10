@@ -1,5 +1,5 @@
 import { memo, forwardRef, type ForwardedRef } from 'react';
-import { classNames } from '~/utils/classNames';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
 
 type IconSize = 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
 

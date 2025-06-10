@@ -1,8 +1,8 @@
 import type { WebContainer, WebContainerProcess } from '@webcontainer/api';
-import type { ITerminal } from '~/types/terminal';
+import type { ITerminal } from '@/artifacts/bolt/types/terminal';
 import { withResolvers } from './promises';
 import { atom } from 'nanostores';
-import { expoUrlAtom } from '~/lib/stores/qrCodeStore';
+import { expoUrlAtom } from '@/artifacts/bolt/lib/stores/qrCodeStore';
 
 export async function newShellProcess(webcontainer: WebContainer, terminal: ITerminal) {
   const args: string[] = [];

@@ -1,11 +1,11 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { AnimatePresence, motion, type Variants } from 'framer-motion';
 import { memo, useEffect, useRef, useState } from 'react';
-import type { FileMap } from '~/lib/stores/files';
-import { classNames } from '~/utils/classNames';
-import { WORK_DIR } from '~/utils/constants';
-import { cubicEasingFn } from '~/utils/easings';
-import { renderLogger } from '~/utils/logger';
+import type { FileMap } from '@/artifacts/bolt/lib/stores/files';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
+import { WORK_DIR } from '@/artifacts/bolt/utils/constants';
+import { cubicEasingFn } from '@/artifacts/bolt/utils/easings';
+import { renderLogger } from '@/artifacts/bolt/utils/logger';
 import FileTree from './FileTree';
 
 const WORK_DIR_REGEX = new RegExp(`^${WORK_DIR.split('/').slice(0, -1).join('/').replaceAll('/', '\\/')}/`);

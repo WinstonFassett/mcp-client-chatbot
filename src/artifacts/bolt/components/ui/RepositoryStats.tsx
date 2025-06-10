@@ -1,7 +1,7 @@
 import React from 'react';
 import { Badge } from './Badge';
-import { classNames } from '~/utils/classNames';
-import { formatSize } from '~/utils/formatSize';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
+import { formatSize } from '@/artifacts/bolt/utils/formatSize';
 
 interface RepositoryStatsProps {
   stats: {

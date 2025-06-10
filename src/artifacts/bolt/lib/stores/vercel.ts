@@ -1,5 +1,5 @@
 import { atom } from 'nanostores';
-import type { VercelConnection } from '~/types/vercel';
+import type { VercelConnection } from '@/artifacts/bolt/types/vercel';
 import { logStore } from './logs';
 import { toast } from 'react-toastify';
 

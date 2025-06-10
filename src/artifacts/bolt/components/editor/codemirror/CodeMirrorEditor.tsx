@@ -17,11 +17,11 @@ import {
   type Tooltip,
 } from '@codemirror/view';
 import { memo, useEffect, useRef, useState, type MutableRefObject } from 'react';
-import type { Theme } from '~/types/theme';
-import { classNames } from '~/utils/classNames';
-import { debounce } from '~/utils/debounce';
-import { createScopedLogger, renderLogger } from '~/utils/logger';
-import { isFileLocked, getCurrentChatId } from '~/utils/fileLocks';
+import type { Theme } from '@/artifacts/bolt/types/theme';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
+import { debounce } from '@/artifacts/bolt/utils/debounce';
+import { createScopedLogger, renderLogger } from '@/artifacts/bolt/utils/logger';
+import { isFileLocked, getCurrentChatId } from '@/artifacts/bolt/utils/fileLocks';
 import { BinaryContent } from './BinaryContent';
 import { getTheme, reconfigureTheme } from './cm-theme';
 import { indentKeyBinding } from './indent';

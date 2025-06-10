@@ -9,21 +9,21 @@ import {
   type OnChangeCallback as OnEditorChange,
   type OnSaveCallback as OnEditorSave,
   type OnScrollCallback as OnEditorScroll,
-} from '~/components/editor/codemirror/CodeMirrorEditor';
-import { PanelHeader } from '~/components/ui/PanelHeader';
-import { PanelHeaderButton } from '~/components/ui/PanelHeaderButton';
-import type { FileMap } from '~/lib/stores/files';
-import type { FileHistory } from '~/types/actions';
-import { themeStore } from '~/lib/stores/theme';
-import { WORK_DIR } from '~/utils/constants';
-import { renderLogger } from '~/utils/logger';
-import { isMobile } from '~/utils/mobile';
+} from '@/artifacts/bolt/components/editor/codemirror/CodeMirrorEditor';
+import { PanelHeader } from '@/artifacts/bolt/components/ui/PanelHeader';
+import { PanelHeaderButton } from '@/artifacts/bolt/components/ui/PanelHeaderButton';
+import type { FileMap } from '@/artifacts/bolt/lib/stores/files';
+import type { FileHistory } from '@/artifacts/bolt/types/actions';
+import { themeStore } from '@/artifacts/bolt/lib/stores/theme';
+import { WORK_DIR } from '@/artifacts/bolt/utils/constants';
+import { renderLogger } from '@/artifacts/bolt/utils/logger';
+import { isMobile } from '@/artifacts/bolt/utils/mobile';
 import { FileBreadcrumb } from './FileBreadcrumb';
 import { FileTree } from './FileTree';
 import { DEFAULT_TERMINAL_SIZE, TerminalTabs } from './terminal/TerminalTabs';
-import { workbenchStore } from '~/lib/stores/workbench';
+import { workbenchStore } from '@/artifacts/bolt/lib/stores/workbench';
 import { Search } from './Search'; // <-- Ensure Search is imported
-import { classNames } from '~/utils/classNames'; // <-- Import classNames if not already present
+import { classNames } from '@/artifacts/bolt/utils/classNames'; // <-- Import classNames if not already present
 import { LockManager } from './LockManager'; // <-- Import LockManager
 
 interface EditorPanelProps {

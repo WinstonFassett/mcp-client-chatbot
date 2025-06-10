@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { classNames } from '~/utils/classNames';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 

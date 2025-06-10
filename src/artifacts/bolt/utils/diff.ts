@@ -1,5 +1,5 @@
 import { createTwoFilesPatch } from 'diff';
-import type { FileMap } from '~/lib/stores/files';
+import type { FileMap } from '@/artifacts/bolt/lib/stores/files';
 import { MODIFICATIONS_TAG_NAME, WORK_DIR } from './constants';
 
 export const modificationsRegex = new RegExp(

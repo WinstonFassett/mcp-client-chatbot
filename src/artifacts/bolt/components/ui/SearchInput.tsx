@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { classNames } from '~/utils/classNames';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
 import { Input } from './Input';
 import { motion, AnimatePresence } from 'framer-motion';
 

@@ -1,10 +1,10 @@
 import { atom, map, type MapStore, type ReadableAtom, type WritableAtom } from 'nanostores';
-import type { EditorDocument, ScrollPosition } from '~/components/editor/codemirror/CodeMirrorEditor';
-import { ActionRunner } from '~/lib/runtime/action-runner';
-import type { ActionCallbackData, ArtifactCallbackData } from '~/lib/runtime/message-parser';
-import { webcontainer } from '~/lib/webcontainer';
-import type { ITerminal } from '~/types/terminal';
-import { unreachable } from '~/utils/unreachable';
+import type { EditorDocument, ScrollPosition } from '@/artifacts/bolt/components/editor/codemirror/CodeMirrorEditor';
+import { ActionRunner } from '@/artifacts/bolt/lib/runtime/action-runner';
+import type { ActionCallbackData, ArtifactCallbackData } from '@/artifacts/bolt/lib/runtime/message-parser';
+import { webcontainer } from '@/artifacts/bolt/lib/webcontainer';
+import type { ITerminal } from '@/artifacts/bolt/types/terminal';
+import { unreachable } from '@/artifacts/bolt/utils/unreachable';
 import { EditorStore } from './editor';
 import { FilesStore, type FileMap } from './files';
 import { PreviewsStore } from './previews';
@@ -12,12 +12,12 @@ import { TerminalStore } from './terminal';
 import JSZip from 'jszip';
 import fileSaver from 'file-saver';
 import { Octokit, type RestEndpointMethodTypes } from '@octokit/rest';
-import { path } from '~/utils/path';
-import { extractRelativePath } from '~/utils/diff';
-import { description } from '~/lib/persistence';
+import { path } from '@/artifacts/bolt/utils/path';
+import { extractRelativePath } from '@/artifacts/bolt/utils/diff';
+import { description } from '@/artifacts/bolt/lib/persistence';
 import Cookies from 'js-cookie';
-import { createSampler } from '~/utils/sampler';
-import type { ActionAlert, DeployAlert, SupabaseAlert } from '~/types/actions';
+import { createSampler } from '@/artifacts/bolt/utils/sampler';
+import type { ActionAlert, DeployAlert, SupabaseAlert } from '@/artifacts/bolt/types/actions';
 
 const { saveAs } = fileSaver;
 

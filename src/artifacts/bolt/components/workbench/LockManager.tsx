@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { workbenchStore } from '~/lib/stores/workbench';
-import { classNames } from '~/utils/classNames';
-import { Checkbox } from '~/components/ui/Checkbox';
-import { toast } from '~/components/ui/use-toast';
+import { workbenchStore } from '@/artifacts/bolt/lib/stores/workbench';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
+import { Checkbox } from '@/artifacts/bolt/components/ui/Checkbox';
+import { toast } from '@/artifacts/bolt/components/ui/use-toast';
 
 interface LockedItem {
   path: string;

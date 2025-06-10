@@ -1,5 +1,5 @@
 import React from 'react';
-import { classNames } from '~/utils/classNames';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
 import { Button } from './Button';
 import { motion } from 'framer-motion';
 

@@ -1,7 +1,7 @@
 import { atom, computed, map, type MapStore, type WritableAtom } from 'nanostores';
-import type { EditorDocument, ScrollPosition } from '~/components/editor/codemirror/CodeMirrorEditor';
+import type { EditorDocument, ScrollPosition } from '@/artifacts/bolt/components/editor/codemirror/CodeMirrorEditor';
 import type { FileMap, FilesStore } from './files';
-import { createScopedLogger } from '~/utils/logger';
+import { createScopedLogger } from '@/artifacts/bolt/utils/logger';
 
 export type EditorDocuments = Record<string, EditorDocument>;
 

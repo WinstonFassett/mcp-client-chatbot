@@ -1,5 +1,5 @@
 import { atom } from 'nanostores';
-import type { SupabaseUser, SupabaseStats, SupabaseApiKey, SupabaseCredentials } from '~/types/supabase';
+import type { SupabaseUser, SupabaseStats, SupabaseApiKey, SupabaseCredentials } from '@/artifacts/bolt/types/supabase';
 
 export interface SupabaseProject {
   id: string;

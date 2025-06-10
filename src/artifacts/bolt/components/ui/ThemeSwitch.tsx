@@ -1,6 +1,6 @@
 import { useStore } from '@nanostores/react';
 import { memo, useEffect, useState } from 'react';
-import { themeStore, toggleTheme } from '~/lib/stores/theme';
+import { themeStore, toggleTheme } from '@/artifacts/bolt/lib/stores/theme';
 import { IconButton } from './IconButton';
 
 interface ThemeSwitchProps {

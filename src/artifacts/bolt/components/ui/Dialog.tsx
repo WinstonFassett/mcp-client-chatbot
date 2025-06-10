@@ -1,8 +1,8 @@
 import * as RadixDialog from '@radix-ui/react-dialog';
 import { motion, type Variants } from 'framer-motion';
 import React, { memo, type ReactNode, useState, useEffect } from 'react';
-import { classNames } from '~/utils/classNames';
-import { cubicEasingFn } from '~/utils/easings';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
+import { cubicEasingFn } from '@/artifacts/bolt/utils/easings';
 import { IconButton } from './IconButton';
 import { Button } from './Button';
 import { FixedSizeList } from 'react-window';

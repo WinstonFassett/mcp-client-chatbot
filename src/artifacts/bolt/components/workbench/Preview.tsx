@@ -1,11 +1,11 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from '@nanostores/react';
-import { IconButton } from '~/components/ui/IconButton';
-import { workbenchStore } from '~/lib/stores/workbench';
+import { IconButton } from '@/artifacts/bolt/components/ui/IconButton';
+import { workbenchStore } from '@/artifacts/bolt/lib/stores/workbench';
 import { PortDropdown } from './PortDropdown';
 import { ScreenshotSelector } from './ScreenshotSelector';
-import { expoUrlAtom } from '~/lib/stores/qrCodeStore';
-import { ExpoQrModal } from '~/components/workbench/ExpoQrModal';
+import { expoUrlAtom } from '@/artifacts/bolt/lib/stores/qrCodeStore';
+import { ExpoQrModal } from '@/artifacts/bolt/components/workbench/ExpoQrModal';
 import type { ElementInfo } from './Inspector';
 
 type ResizeSide = 'left' | 'right' | null;

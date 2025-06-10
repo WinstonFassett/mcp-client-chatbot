@@ -1,5 +1,5 @@
 import * as SeparatorPrimitive from '@radix-ui/react-separator';
-import { classNames } from '~/utils/classNames';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
 
 interface SeparatorProps {
   className?: string;

@@ -1,16 +1,16 @@
 import { memo, useMemo, useState, useEffect, useCallback } from 'react';
 import { useStore } from '@nanostores/react';
-import { workbenchStore } from '~/lib/stores/workbench';
-import type { FileMap } from '~/lib/stores/files';
-import type { EditorDocument } from '~/components/editor/codemirror/CodeMirrorEditor';
+import { workbenchStore } from '@/artifacts/bolt/lib/stores/workbench';
+import type { FileMap } from '@/artifacts/bolt/lib/stores/files';
+import type { EditorDocument } from '@/artifacts/bolt/components/editor/codemirror/CodeMirrorEditor';
 import { diffLines, type Change } from 'diff';
 import { getHighlighter } from 'shiki';
-import '~/styles/diff-view.css';
-import { diffFiles, extractRelativePath } from '~/utils/diff';
-import { ActionRunner } from '~/lib/runtime/action-runner';
-import type { FileHistory } from '~/types/actions';
-import { getLanguageFromExtension } from '~/utils/getLanguageFromExtension';
-import { themeStore } from '~/lib/stores/theme';
+import '@/artifacts/bolt/styles/diff-view.css';
+import { diffFiles, extractRelativePath } from '@/artifacts/bolt/utils/diff';
+import { ActionRunner } from '@/artifacts/bolt/lib/runtime/action-runner';
+import type { FileHistory } from '@/artifacts/bolt/types/actions';
+import { getLanguageFromExtension } from '@/artifacts/bolt/utils/getLanguageFromExtension';
+import { themeStore } from '@/artifacts/bolt/lib/stores/theme';
 
 interface CodeComparisonProps {
   beforeCode: string;

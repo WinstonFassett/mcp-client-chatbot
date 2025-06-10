@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { classNames } from '~/utils/classNames';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
 
 const badgeVariants = cva(
   'inline-flex items-center gap-1 transition-colors focus:outline-none focus:ring-2 focus:ring-bolt-elements-ring focus:ring-offset-2',

@@ -1,6 +1,6 @@
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 import { forwardRef, type ForwardedRef, type ReactElement } from 'react';
-import { classNames } from '~/utils/classNames';
+import { classNames } from '@/artifacts/bolt/utils/classNames';
 
 // Original WithTooltip component
 interface WithTooltipProps {
