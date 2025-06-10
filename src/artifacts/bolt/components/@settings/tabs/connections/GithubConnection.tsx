@@ -380,11 +380,11 @@ export default function GitHubConnection() {
         }
       } else {
         // Check for environment variable token
-        const envToken = import.meta.env.VITE_GITHUB_ACCESS_TOKEN;
+        const envToken = process.env.VITE_GITHUB_ACCESS_TOKEN;
 
         if (envToken) {
           // Check if token type is specified in environment variables
-          const envTokenType = import.meta.env.VITE_GITHUB_TOKEN_TYPE;
+          const envTokenType = process.env.VITE_GITHUB_TOKEN_TYPE;
           console.log('Environment token type:', envTokenType);
 
           const tokenType =

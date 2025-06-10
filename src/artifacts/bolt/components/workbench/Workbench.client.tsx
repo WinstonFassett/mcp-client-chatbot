@@ -23,7 +23,7 @@ import { renderLogger } from '@/artifacts/bolt/utils/logger';
 import { EditorPanel } from './EditorPanel';
 import { Preview } from './Preview';
 import useViewport from '@/artifacts/bolt/lib/hooks';
-import { PushToGitHubDialog } from '@/artifacts/bolt/components/@settings/tabs/connections/components/PushToGitHubDialog';
+// import { PushToGitHubDialog } from '@/artifacts/bolt/components/@settings/tabs/connections/components/PushToGitHubDialog';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { usePreviewStore } from '@/artifacts/bolt/lib/stores/previews';
 import { chatStore } from '@/artifacts/bolt/lib/stores/chat';
@@ -495,7 +495,7 @@ export const Workbench = memo(
               </div>
             </div>
           </div>
-          <PushToGitHubDialog
+          {/* <PushToGitHubDialog
             isOpen={isPushDialogOpen}
             onClose={() => setIsPushDialogOpen(false)}
             onPush={async (repoName, username, token, isPrivate) => {
@@ -519,7 +519,7 @@ export const Workbench = memo(
                 throw error;
               }
             }}
-          />
+          /> */}
         </motion.div>
       )
     );

@@ -67,9 +67,9 @@ export function RepositorySelectionDialog({ isOpen, onClose, onSelect }: Reposit
     const savedConnection = getLocalStorage('github_connection');
 
     // If no connection exists but environment variables are set, create a connection
-    if (!savedConnection && import.meta.env.VITE_GITHUB_ACCESS_TOKEN) {
-      const token = import.meta.env.VITE_GITHUB_ACCESS_TOKEN;
-      const tokenType = import.meta.env.VITE_GITHUB_TOKEN_TYPE === 'fine-grained' ? 'fine-grained' : 'classic';
+    if (!savedConnection && process.env.VITE_GITHUB_ACCESS_TOKEN) {
+      const token = process.env.VITE_GITHUB_ACCESS_TOKEN;
+      const tokenType = process.env.VITE_GITHUB_TOKEN_TYPE === 'fine-grained' ? 'fine-grained' : 'classic';
 
       // Fetch GitHub user info to initialize the connection
       fetch('https://api.github.com/user', {
@@ -296,11 +296,11 @@ export function RepositorySelectionDialog({ isOpen, onClose, onSelect }: Reposit
           Accept: 'application/vnd.github.v3+json',
           Authorization: `Bearer ${connection.token}`,
         };
-      } else if (import.meta.env.VITE_GITHUB_ACCESS_TOKEN) {
+      } else if (process.env.VITE_GITHUB_ACCESS_TOKEN) {
         // Use token from environment variables
         headers = {
           Accept: 'application/vnd.github.v3+json',
-          Authorization: `Bearer ${import.meta.env.VITE_GITHUB_ACCESS_TOKEN}`,
+          Authorization: `Bearer ${process.env.VITE_GITHUB_ACCESS_TOKEN}`,
         };
       }
 

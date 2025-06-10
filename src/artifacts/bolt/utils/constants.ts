@@ -9,7 +9,7 @@ export const PROVIDER_REGEX = /\[Provider: (.*?)\]\n\n/;
 export const DEFAULT_MODEL = 'claude-3-5-sonnet-latest';
 export const PROMPT_COOKIE_KEY = 'cachedPrompt';
 
-const llmManager = LLMManager.getInstance(import.meta.env);
+const llmManager = LLMManager.getInstance(process.env);
 
 export const PROVIDER_LIST = llmManager.getAllProviders();
 export const DEFAULT_PROVIDER = llmManager.getDefaultProvider();

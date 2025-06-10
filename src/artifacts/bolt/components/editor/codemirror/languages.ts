@@ -78,13 +78,13 @@ export const supportedLanguages = [
       return import('@codemirror/lang-markdown').then((module) => module.markdown());
     },
   }),
-  LanguageDescription.of({
-    name: 'Wasm',
-    extensions: ['wat'],
-    async load() {
-      return import('@codemirror/lang-wast').then((module) => module.wast());
-    },
-  }),
+  // LanguageDescription.of({
+  //   name: 'Wasm',
+  //   extensions: ['wat'],
+  //   async load() {
+  //     return import('@codemirror/lang-wast').then((module) => module.wast());
+  //   },
+  // }),
   LanguageDescription.of({
     name: 'Python',
     extensions: ['py'],
@@ -92,13 +92,13 @@ export const supportedLanguages = [
       return import('@codemirror/lang-python').then((module) => module.python());
     },
   }),
-  LanguageDescription.of({
-    name: 'C++',
-    extensions: ['cpp'],
-    async load() {
-      return import('@codemirror/lang-cpp').then((module) => module.cpp());
-    },
-  }),
+  // LanguageDescription.of({
+  //   name: 'C++',
+  //   extensions: ['cpp'],
+  //   async load() {
+  //     return import('@codemirror/lang-cpp').then((module) => module.cpp());
+  //   },
+  // }),
 ];
 
 export async function getLanguage(fileName: string) {

@@ -229,11 +229,11 @@ const ServiceStatusTab = () => {
       }
 
       // Get the API key from environment variables
-      const apiKey = (import.meta.env[envKey] as string) || null;
+      const apiKey = (process.env[envKey] as string) || null;
 
       // Special handling for providers with base URLs
       if (provider === 'Together' && apiKey) {
-        const baseUrl = import.meta.env.TOGETHER_API_BASE_URL;
+        const baseUrl = process.env.TOGETHER_API_BASE_URL;
 
         if (!baseUrl) {
           return null;
@@ -255,7 +255,7 @@ const ServiceStatusTab = () => {
 
     // Handle special cases for providers with base URLs
     let updatedConfig = { ...config };
-    const togetherBaseUrl = import.meta.env.TOGETHER_API_BASE_URL;
+    const togetherBaseUrl = process.env.TOGETHER_API_BASE_URL;
 
     if (provider === 'Together' && togetherBaseUrl) {
       updatedConfig = {

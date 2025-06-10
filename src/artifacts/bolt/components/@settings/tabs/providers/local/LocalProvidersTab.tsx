@@ -87,7 +87,7 @@ export default function LocalProvidersTab() {
       .map(([key, value]) => {
         const provider = value as IProviderConfig;
         const envKey = providerBaseUrlEnvKeys[key]?.baseUrlKey;
-        const envUrl = envKey ? (import.meta.env[envKey] as string | undefined) : undefined;
+        const envUrl = envKey ? (process.env[envKey] as string | undefined) : undefined;
 
         // Set base URL if provided by environment
         if (envUrl && !provider.settings.baseUrl) {

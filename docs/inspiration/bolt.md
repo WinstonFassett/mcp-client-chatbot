@@ -51,7 +51,7 @@ export let webcontainer: Promise<WebContainer> = new Promise(() => {
   // noop for ssr
 });
 
-if (!import.meta.env.SSR) {
+if (!process.env.SSR) {
   webcontainer =
     import.meta.hot?.data.webcontainer ??
     Promise.resolve()
