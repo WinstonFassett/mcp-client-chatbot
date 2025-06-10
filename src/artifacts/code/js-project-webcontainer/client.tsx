@@ -19,7 +19,8 @@ import { FileExplorer } from "./file-explorer";
 import { CodeEditor } from "./code-editor";
 import { WebTerminal } from "./terminal";
 import { Preview } from "./preview";
-import { mountFiles } from "./webcontainer-manager";
+import { getWebContainerInstance } from "./webcontainer-manager";
+import { WebContainerDiagnostic } from "./diagnostic";
 
 // Import types
 import type { FC } from "react";
@@ -327,7 +328,21 @@ function WebContainerWrapper({ content }: { content: string }) {
         }
         
         // Mount files to WebContainer
-        await mountFiles(files);
+        const webcontainer = await getWebContainerInstance();
+        
+        // Convert files to WebContainer format
+        const fileSystemTree: Record<string, any> = {};
+        
+        // Process each file
+        Object.entries(files).forEach(([path, content]) => {
+          if (typeof content === 'string') {
+            fileSystemTree[path] = {
+              file: { contents: content }
+            };
+          }
+        });
+        
+        await webcontainer.mount(fileSystemTree);
         
         setIsLoading(false);
       } catch (err: any) {
@@ -377,7 +392,7 @@ function WebContainerWrapper({ content }: { content: string }) {
   
   if (error) {
     return (
-      <div className="w-full h-[500px] flex items-center justify-center">
+      <div className="w-full h-[500px] flex flex-col items-center justify-center overflow-auto">
         <div className="text-center max-w-md p-4">
           <div className="text-red-500 font-bold mb-2">⚠️ {error}</div>
           {errorDetails && (
@@ -385,7 +400,7 @@ function WebContainerWrapper({ content }: { content: string }) {
               {errorDetails}
             </div>
           )}
-          <div className="flex gap-2 justify-center">
+          <div className="flex gap-2 justify-center mb-4">
             <button 
               onClick={() => {
                 toast.info('Restarting WebContainer...');
@@ -405,6 +420,11 @@ function WebContainerWrapper({ content }: { content: string }) {
             >
               Help
             </button>
+          </div>
+          
+          <div className="mt-4 border-t pt-4">
+            <h3 className="font-bold mb-2">Diagnostics</h3>
+            <WebContainerDiagnostic />
           </div>
         </div>
       </div>

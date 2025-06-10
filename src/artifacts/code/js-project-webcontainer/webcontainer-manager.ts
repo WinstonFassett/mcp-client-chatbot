@@ -21,21 +21,48 @@ export async function getWebContainerInstance(): Promise<WebContainer> {
     return webcontainerInstance;
   }
   
-  // Check for cross-origin isolation
-  if (!isCrossOriginIsolated()) {
-    isWebContainerSupported = false;
-    throw new Error(
-      'WebContainer requires cross-origin isolation. ' +
-      'The server needs to send the following headers: ' +
-      'Cross-Origin-Opener-Policy: same-origin, ' +
-      'Cross-Origin-Embedder-Policy: require-corp'
-    );
-  }
-  
   try {
+    // Check for cross-origin isolation
+    if (!isCrossOriginIsolated()) {
+      console.warn('Cross-origin isolation not detected. Headers may not be applied correctly.');
+      
+      // On localhost, we'll try to proceed anyway
+      const isLocalhost = typeof window !== 'undefined' && 
+        (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+      
+      if (!isLocalhost) {
+        isWebContainerSupported = false;
+        throw new Error(
+          'WebContainer requires cross-origin isolation. ' +
+          'The server needs to send the following headers: ' +
+          'Cross-Origin-Opener-Policy: same-origin, ' +
+          'Cross-Origin-Embedder-Policy: require-corp, ' +
+          'Cross-Origin-Resource-Policy: cross-origin'
+        );
+      }
+    }
+    
     // Dynamically import WebContainer API to avoid SSR issues
     const { WebContainer } = await import('@webcontainer/api');
-    webcontainerInstance = await WebContainer.boot();
+    
+    // Try to boot the WebContainer with a timeout
+    // Using credentialless COEP option like the working bolt.diy project
+    const bootPromise = WebContainer.boot({
+      coep: 'credentialless',
+      forwardPreviewErrors: true, // Enable error forwarding from iframes
+    });
+    
+    // Set a timeout to detect if boot is hanging
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => {
+        reject(new Error('WebContainer boot timed out. This may indicate a browser compatibility issue.'));
+      }, 10000); // 10 second timeout
+    });
+    
+    // Race between boot and timeout
+    webcontainerInstance = await Promise.race([bootPromise, timeoutPromise]);
+    
+    console.log('WebContainer booted successfully!');
     return webcontainerInstance;
   } catch (error) {
     console.error('Failed to boot WebContainer:', error);
@@ -115,7 +142,7 @@ export async function startDevServer(): Promise<{ url: string; output: string }>
     const packageJson = JSON.parse(packageJsonContent);
     
     // Determine which script to run
-    let command = 'npm';
+    const command = 'npm';
     let args = ['start'];
     
     if (packageJson.scripts) {

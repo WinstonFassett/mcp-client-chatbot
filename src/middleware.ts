@@ -28,6 +28,11 @@ export async function middleware(request: NextRequest) {
   if (!toolChoiceCookie) {
     response.cookies.set("tool-choice", "auto");
   }
+  
+  // Add cross-origin isolation headers for WebContainers
+  response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
+  response.headers.set('Cross-Origin-Embedder-Policy', 'require-corp');
+  response.headers.set('Cross-Origin-Resource-Policy', 'cross-origin');
 
   return response;
 }
