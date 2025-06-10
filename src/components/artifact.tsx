@@ -24,6 +24,7 @@ import { pythonFileArtifact } from "@/artifacts/code/python-file-pyodide/client"
 import { jsProjectArtifact } from "@/artifacts/code/js-project-sandpack/client";
 import { jsProjectWebcontainerArtifact } from "@/artifacts/code/js-project-webcontainer";
 import { htmlFragmentArtifact } from "@/artifacts/code/html-fragment/client";
+import { boltArtifact } from "@/artifacts/bolt/client";
 import equal from "fast-deep-equal";
 import { UseChatHelpers } from "@ai-sdk/react";
 
@@ -36,6 +37,7 @@ export const artifactDefinitions = [
   htmlFragmentArtifact,
   imageArtifact,
   sheetArtifact,
+  boltArtifact,
 ];
 // Import the artifactKinds from server.ts to ensure consistency
 import { artifactKinds } from "@/lib/artifacts/server";

@@ -89,7 +89,7 @@ export function DocumentPreview({
     : artifact.status === "streaming"
       ? {
           title: artifact.title,
-          kind: artifact.kind as "text" | "simple-code-block" | "python-file-pyodide" | "js-project-sandpack" | "html-fragment" | "image" | "sheet",
+          kind: artifact.kind as "text" | "simple-code-block" | "python-file-pyodide" | "js-project-sandpack" | "js-project-webcontainer" | "js-project-bolt" | "html-fragment" | "image" | "sheet",
           content: artifact.content,
           id: artifact.documentId,
           createdAt: new Date(),

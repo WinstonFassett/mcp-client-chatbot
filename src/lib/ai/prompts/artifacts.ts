@@ -10,6 +10,7 @@ Use these specific artifact kinds for code:
 - "python-file-pyodide" - For Python code that can be executed with Pyodide
 - "js-project-sandpack" - For JavaScript/TypeScript projects with multiple files
 - "js-project-webcontainer" - For full-stack Node.js projects with terminal and live preview
+- "js-project-bolt" - For Node.js projects with WebContainers, terminal and editor
 - "html-fragment" - For HTML/CSS/JS fragments with live preview
 
 When writing code, specify the language in the backticks, e.g. \`\`\`python\`code here\`\`\`.

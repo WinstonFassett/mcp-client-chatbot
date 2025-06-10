@@ -68,7 +68,7 @@ export const DocumentSchema = pgTable("document", {
   updatedAt: timestamp("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
   title: text("title").notNull(),
   content: text("content"),
-  kind: varchar("kind", { enum: ["text", "simple-code-block", "python-file-pyodide", "js-project-sandpack", "html-fragment", "image", "sheet"] })
+  kind: varchar("kind", { enum: ["text", "simple-code-block", "python-file-pyodide", "js-project-sandpack", "js-project-webcontainer", "js-project-bolt", "html-fragment", "image", "sheet"] })
     .notNull()
     .default("text"),
   userId: uuid("user_id")

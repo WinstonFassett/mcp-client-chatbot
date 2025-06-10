@@ -6,15 +6,16 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import { Artifact } from "@/components/create-artifact";
+import { CopyIcon, MessageSquare as MessageIcon, Terminal as LogsIcon } from "lucide-react";
 
 // This is a placeholder component until we fully integrate the bolt components
 export function BoltArtifact({ 
-  data, 
-  onUpdate 
+  data 
 }: { 
   data: BoltArtifactData; 
-  onUpdate?: (data: BoltArtifactData) => void;
 }) {
+  // Container reference for future WebContainer integration
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("editor");
@@ -104,3 +105,68 @@ export function BoltArtifact({
     </Card>
   );
 }
+
+interface Metadata {
+  entryFile: string;
+}
+
+export const boltArtifact = new Artifact<"js-project-bolt", Metadata>({
+  kind: "js-project-bolt",
+  description:
+    "Full-stack Node.js project with WebContainers, terminal, and live preview.",
+  initialize: async ({ setMetadata }) => {
+    setMetadata({
+      entryFile: "index.js",
+    });
+  },
+  onStreamPart: ({ streamPart, setArtifact }) => {
+    if (streamPart.type === "code-delta") {
+      // Update only the content string
+      setArtifact((currentArtifact) => {
+        return {
+          ...currentArtifact,
+          content: typeof streamPart.content === 'string' ? streamPart.content : JSON.stringify(streamPart.content)
+        };
+      });
+    }
+  },
+  content: ({ content }) => {
+    try {
+      const data = JSON.parse(content) as BoltArtifactData;
+      return <BoltArtifact data={data} />;
+    } catch (e) {
+      return <div>Error parsing bolt artifact data</div>;
+    }
+  },
+  actions: [
+    {
+      icon: <CopyIcon size={18} />,
+      description: "Copy code to clipboard",
+      onClick: async ({ content }) => {
+        await navigator.clipboard.writeText(content);
+      },
+    },
+  ],
+  toolbar: [
+    {
+      icon: <MessageIcon />,
+      description: "Explain code",
+      onClick: ({ appendMessage }) => {
+        appendMessage({
+          role: "user",
+          content: "Can you explain how this code works?",
+        });
+      },
+    },
+    {
+      icon: <LogsIcon />,
+      description: "Add logs",
+      onClick: ({ appendMessage }) => {
+        appendMessage({
+          role: "user",
+          content: "Can you add logging to help debug this code?",
+        });
+      },
+    },
+  ],
+});
