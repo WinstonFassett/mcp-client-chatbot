@@ -9,6 +9,7 @@ Use these specific artifact kinds for code:
 - "simple-code-block" - For basic code snippets (default fallback)
 - "python-file-pyodide" - For Python code that can be executed with Pyodide
 - "js-project-sandpack" - For JavaScript/TypeScript projects with multiple files
+- "js-project-webcontainer" - For full-stack Node.js projects with terminal and live preview
 - "html-fragment" - For HTML/CSS/JS fragments with live preview
 
 When writing code, specify the language in the backticks, e.g. \`\`\`python\`code here\`\`\`.

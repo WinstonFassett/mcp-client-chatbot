@@ -1,6 +1,7 @@
 import { simpleCodeDocumentHandler } from "@/artifacts/code/server";
 import { pythonFileDocumentHandler } from "@/artifacts/code/python-file-pyodide/server";
 import { jsProjectDocumentHandler } from "@/artifacts/code/js-project-sandpack/server";
+import { jsProjectWebcontainerHandler } from "@/artifacts/code/js-project-webcontainer/server";
 import { htmlFragmentDocumentHandler } from "@/artifacts/code/html-fragment/server";
 import { imageDocumentHandler } from "@/artifacts/image/server";
 import { sheetDocumentHandler } from "@/artifacts/sheet/server";
@@ -106,6 +107,7 @@ export const documentHandlersByArtifactKind: Array<DocumentHandler> = [
   simpleCodeDocumentHandler,
   pythonFileDocumentHandler,
   jsProjectDocumentHandler,
+  jsProjectWebcontainerHandler,
   htmlFragmentDocumentHandler,
   imageDocumentHandler,
   sheetDocumentHandler,

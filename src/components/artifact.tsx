@@ -22,6 +22,7 @@ import { sheetArtifact } from "@/artifacts/sheet/client";
 import { textArtifact } from "@/artifacts/text/client";
 import { pythonFileArtifact } from "@/artifacts/code/python-file-pyodide/client";
 import { jsProjectArtifact } from "@/artifacts/code/js-project-sandpack/client";
+import { jsProjectWebcontainerArtifact } from "@/artifacts/code/js-project-webcontainer";
 import { htmlFragmentArtifact } from "@/artifacts/code/html-fragment/client";
 import equal from "fast-deep-equal";
 import { UseChatHelpers } from "@ai-sdk/react";
@@ -31,6 +32,7 @@ export const artifactDefinitions = [
   simpleCodeArtifact,
   pythonFileArtifact,
   jsProjectArtifact,
+  jsProjectWebcontainerArtifact,
   htmlFragmentArtifact,
   imageArtifact,
   sheetArtifact,

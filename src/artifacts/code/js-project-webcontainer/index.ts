@@ -1,0 +1,1 @@
+export { jsProjectWebcontainerArtifact } from './client';
