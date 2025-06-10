@@ -136,13 +136,14 @@ button:focus-visible {
   },
   express: {
     "/package.json": `{
-  "name": "express-app",
+  "name": "example-app",
   "type": "module",
-  "scripts": {
-    "start": "node index.js"
-  },
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "latest",
+    "nodemon": "latest"
+  },
+  "scripts": {
+    "start": "nodemon --watch './' index.js"
   }
 }`,
     "/index.js": `import express from 'express';
