@@ -25,3 +25,9 @@
 [submodule "inspiration/openchat"]
 	path = inspiration/openchat
 	url = https://github.com/murabcd/openchat
+[submodule "inspiration/bolt.new"]
+	path = inspiration/bolt.new
+	url = https://github.com/stackblitz/bolt.new
+[submodule "inspiration/bolt.diy"]
+	path = inspiration/bolt.diy
+	url = https://github.com/stackblitz-labs/bolt.diy.git
