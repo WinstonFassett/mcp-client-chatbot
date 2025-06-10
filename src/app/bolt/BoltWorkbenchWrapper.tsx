@@ -8,7 +8,8 @@ import { WORK_DIR_NAME } from '@/artifacts/bolt/utils/constants';
 import { useGit } from '@/artifacts/bolt/lib/hooks/useGit';
 import { generateId, type Message } from 'ai';
 import { escapeBoltTags } from '@/artifacts/bolt/utils/projectCommands';
-import { useChatHistory } from '@/artifacts/bolt/lib/persistence';
+// Commented out for now until chat integration is needed
+// import { useChatHistory } from '@/artifacts/bolt/lib/persistence';
 
 /**
  * This component wraps the Bolt Workbench and handles all the browser-specific initialization
@@ -22,7 +23,11 @@ export default function BoltWorkbenchWrapper() {
   const [showDebug, setShowDebug] = useState(false);
   const [bootstrapped, setBootstrapped] = useState(false);
   const { ready: gitReady, gitClone } = useGit();
-  const { ready: historyReady, importChat } = useChatHistory();
+  // Commented out for now until chat integration is needed
+  // const { ready: historyReady, importChat } = useChatHistory();
+  // Using stub values for now
+  const historyReady = true; // Stub value
+  const importChat = async () => { console.log('Chat import stubbed'); }; // Stub function
   
   // Add a debug overlay that can be toggled with a keyboard shortcut
   useEffect(() => {
@@ -144,7 +149,9 @@ export default function BoltWorkbenchWrapper() {
 
   
   // Bootstrap a project automatically for testing
+  // Always declare the hook, but conditionally execute its logic
   useEffect(() => {
+    // Early return if conditions aren't met
     if (!actionRunner || !gitReady || !historyReady || bootstrapped) {
       return;
     }
@@ -175,6 +182,7 @@ export default function BoltWorkbenchWrapper() {
           })
           .filter((f) => f.content);
         
+        // Create a message with all the file contents - currently unused but kept for future chat integration
         const filesMessage: Message = {
           role: 'assistant',
           content: `Cloning the repo ${repoUrl} into ${workdir}
@@ -192,8 +200,10 @@ ${escapeBoltTags(file.content)}
           createdAt: new Date(),
         };
         
-        // Import the chat with the cloned files
-        await importChat(`Test Project: Next.js with shadcn/ui`, [filesMessage], { gitUrl: repoUrl });
+        // Import the chat with the cloned files - currently stubbed
+        // await importChat(`Test Project: Next.js with shadcn/ui`, [filesMessage], { gitUrl: repoUrl });
+        console.log('Chat import would happen here, but is stubbed for now');
+        console.log('Project bootstrapped with:', repoUrl);
         
         setDebugInfo('Project bootstrapped successfully');
         setBootstrapped(true);
