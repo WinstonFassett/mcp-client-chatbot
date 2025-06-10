@@ -3,12 +3,12 @@ import { generateId, type Message } from 'ai';
 import ignore from 'ignore';
 import { useEffect, useState } from 'react';
 import { ClientOnly } from 'remix-utils/client-only';
-import { BaseChat } from '~/components/chat/BaseChat';
-import { Chat } from '~/components/chat/Chat.client';
-import { useGit } from '~/lib/hooks/useGit';
-import { useChatHistory } from '~/lib/persistence';
-import { createCommandsMessage, detectProjectCommands, escapeBoltTags } from '~/utils/projectCommands';
-import { LoadingOverlay } from '~/components/ui/LoadingOverlay';
+import { BaseChat } from '@/artifacts/bolt/components/chat/BaseChat';
+import { Chat } from '@/artifacts/bolt/components/chat/Chat.client';
+import { useGit } from '@/artifacts/bolt/lib/hooks/useGit';
+import { useChatHistory } from '@/artifacts/bolt/lib/persistence';
+import { createCommandsMessage, detectProjectCommands, escapeBoltTags } from '@/artifacts/bolt/utils/projectCommands';
+import { LoadingOverlay } from '@/artifacts/bolt/components/ui/LoadingOverlay';
 import { toast } from 'react-toastify';
 
 const IGNORE_PATTERNS = [

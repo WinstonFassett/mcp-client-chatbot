@@ -1,4 +1,4 @@
-import { createScopedLogger } from '~/utils/logger';
+import { createScopedLogger } from '@/artifacts/bolt/utils/logger';
 
 const logger = createScopedLogger('LockedFiles');
 

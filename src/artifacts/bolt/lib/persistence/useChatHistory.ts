@@ -3,8 +3,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { atom } from 'nanostores';
 import { generateId, type JSONValue, type Message } from 'ai';
 import { toast } from 'react-toastify';
-import { workbenchStore } from '~/lib/stores/workbench';
-import { logStore } from '~/lib/stores/logs'; // Import logStore
+import { workbenchStore } from '@/artifacts/bolt/lib/stores/workbench';
+import { logStore } from '@/artifacts/bolt/lib/stores/logs'; // Import logStore
 import {
   getMessages,
   getNextId,
@@ -17,11 +17,11 @@ import {
   setSnapshot,
   type IChatMetadata,
 } from './db';
-import type { FileMap } from '~/lib/stores/files';
+import type { FileMap } from '@/artifacts/bolt/lib/stores/files';
 import type { Snapshot } from './types';
-import { webcontainer } from '~/lib/webcontainer';
-import { detectProjectCommands, createCommandActionsString } from '~/utils/projectCommands';
-import type { ContextAnnotation } from '~/types/context';
+import { webcontainer } from '@/artifacts/bolt/lib/webcontainer';
+import { detectProjectCommands, createCommandActionsString } from '@/artifacts/bolt/utils/projectCommands';
+import type { ContextAnnotation } from '@/artifacts/bolt/types/context';
 
 export interface ChatHistoryItem {
   id: string;
