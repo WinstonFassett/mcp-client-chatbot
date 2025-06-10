@@ -10,10 +10,10 @@ interface DebugWorkbenchProps {
 
 export default function DebugWorkbench({ actionRunner }: DebugWorkbenchProps) {
   return (
-    <div className="debug-workbench-wrapper border-4 border-yellow-500 p-4 h-full">
+    <div className="debug-workbench-wrapper border-4 border-yellow-500 p-4 h-full flex flex-col">
       <h3 className="text-white text-xl mb-4">Debug Workbench</h3>
       
-      <div className="border-4 border-purple-500 p-4 h-[80%] overflow-visible">
+      <div className="flex 1 border-4 border-purple-500 p-4 flex-1 overflow-visible relative">
         <Workbench 
           chatStarted={true}
           actionRunner={actionRunner}

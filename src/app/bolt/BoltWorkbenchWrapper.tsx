@@ -139,11 +139,11 @@ export default function BoltWorkbenchWrapper() {
   return (
     <div className="h-screen w-screen relative border-4 border-red-500" style={{ background: '#222', minHeight: '100vh' }}>
       {/* Debug container with explicit dimensions */}
-      <div className="border-4 border-green-500 h-[80vh] w-[80vw] m-auto">
+      <div className="border-4 border-green-500 h-[95vh] w-[95vw] m-auto flex flex-col">
         <h2 className="text-white text-2xl p-4">Debug Container</h2>
         
         {/* Workbench with explicit styles */}
-        <div className="border-4 border-blue-500 h-[70vh] overflow-visible">
+        <div className="border-4 border-blue-500 flex-1 overflow-visible">
           <DebugWorkbench actionRunner={actionRunner} />
         </div>
       </div>
