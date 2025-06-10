@@ -1,3 +1,5 @@
+'use client';
+
 import { memo, useMemo, useState, useEffect, useCallback } from 'react';
 import { useStore } from '@nanostores/react';
 import { workbenchStore } from '@/artifacts/bolt/lib/stores/workbench';

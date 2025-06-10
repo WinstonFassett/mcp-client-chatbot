@@ -1,3 +1,5 @@
+'use client';
+
 // import { useStore } from '@nanostores/react';
 // import { TooltipProvider } from '@radix-ui/react-tooltip';
 // import WithTooltip from '@/artifacts/bolt/components/ui/Tooltip';

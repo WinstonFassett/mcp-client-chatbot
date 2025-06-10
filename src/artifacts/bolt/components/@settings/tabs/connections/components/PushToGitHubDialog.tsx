@@ -1,3 +1,5 @@
+'use client';
+
 import * as Dialog from '@radix-ui/react-dialog';
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';

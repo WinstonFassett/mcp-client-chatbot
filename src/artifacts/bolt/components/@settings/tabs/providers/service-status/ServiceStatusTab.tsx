@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import type { ServiceStatus } from './types';
 import { ProviderStatusCheckerFactory } from './provider-factory';

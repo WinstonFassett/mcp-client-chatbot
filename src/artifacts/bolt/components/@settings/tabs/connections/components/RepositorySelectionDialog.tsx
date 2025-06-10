@@ -1,3 +1,5 @@
+'use client';
+
 import type { GitHubRepoInfo, GitHubContent, RepositoryStats, GitHubUserResponse } from '@/artifacts/bolt/types/GitHub';
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';

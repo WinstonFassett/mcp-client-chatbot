@@ -1,3 +1,5 @@
+'use client';
+
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { type ReactNode } from 'react';
 import { classNames } from '@/artifacts/bolt/utils/classNames';

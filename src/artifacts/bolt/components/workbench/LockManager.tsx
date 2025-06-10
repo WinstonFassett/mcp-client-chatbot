@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { workbenchStore } from '@/artifacts/bolt/lib/stores/workbench';
 import { classNames } from '@/artifacts/bolt/utils/classNames';

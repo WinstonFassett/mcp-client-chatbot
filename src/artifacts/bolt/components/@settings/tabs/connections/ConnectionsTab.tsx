@@ -1,3 +1,5 @@
+'use client';
+
 import { motion } from 'framer-motion';
 import React, { Suspense, useState } from 'react';
 import { classNames } from '@/artifacts/bolt/utils/classNames';

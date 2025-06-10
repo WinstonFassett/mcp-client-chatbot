@@ -1,3 +1,5 @@
+'use client';
+
 import { useDrag, useDrop } from 'react-dnd';
 import { motion } from 'framer-motion';
 import { classNames } from '@/artifacts/bolt/utils/classNames';

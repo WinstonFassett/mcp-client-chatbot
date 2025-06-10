@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState, useCallback } from 'react';
 import { Switch } from '@/artifacts/bolt/components/ui/Switch';
 import { useSettings } from '@/artifacts/bolt/lib/hooks/useSettings';

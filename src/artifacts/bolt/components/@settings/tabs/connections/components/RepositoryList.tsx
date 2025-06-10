@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useContext } from 'react';
 import type { GitHubRepoInfo } from '@/artifacts/bolt/types/GitHub';
 import { EmptyState, StatusIndicator } from '@/artifacts/bolt/components/ui';

@@ -1,3 +1,5 @@
+'use client';
+
 import { memo, useEffect, useRef } from 'react';
 import type { PreviewInfo } from '@/artifacts/bolt/lib/stores/previews';
 

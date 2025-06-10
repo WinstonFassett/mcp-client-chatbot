@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext } from 'react';
 
 // Create a context to share the setShowAuthDialog function with child components

@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Dialog, DialogTitle, DialogDescription, DialogRoot } from '@/artifacts/bolt/components/ui/Dialog';
 import { useStore } from '@nanostores/react';

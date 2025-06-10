@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { classNames } from '@/artifacts/bolt/utils/classNames';

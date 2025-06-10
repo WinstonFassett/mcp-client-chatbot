@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { classNames } from '@/artifacts/bolt/utils/classNames';

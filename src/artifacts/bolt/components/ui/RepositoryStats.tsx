@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Badge } from './Badge';
 import { classNames } from '@/artifacts/bolt/utils/classNames';

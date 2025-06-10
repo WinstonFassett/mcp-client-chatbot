@@ -1,3 +1,5 @@
+'use client';
+
 import { memo } from 'react';
 import { IconButton } from '@/artifacts/bolt/components/ui/IconButton';
 interface SettingsButtonProps {

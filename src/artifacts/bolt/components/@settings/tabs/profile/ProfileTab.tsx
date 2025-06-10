@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useCallback } from 'react';
 import { useStore } from '@nanostores/react';
 import { classNames } from '@/artifacts/bolt/utils/classNames';

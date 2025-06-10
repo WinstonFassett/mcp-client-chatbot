@@ -1,3 +1,5 @@
+'use client';
+
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 import { forwardRef, type ForwardedRef, type ReactElement } from 'react';
 import { classNames } from '@/artifacts/bolt/utils/classNames';

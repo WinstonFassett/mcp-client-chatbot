@@ -1,3 +1,5 @@
+'use client';
+
 // Remove unused imports
 import React, { memo, useCallback } from 'react';
 import { motion } from 'framer-motion';

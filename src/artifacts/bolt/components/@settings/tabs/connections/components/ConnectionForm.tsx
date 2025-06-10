@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect } from 'react';
 import { classNames } from '@/artifacts/bolt/utils/classNames';
 import type { GitHubAuthState } from '@/artifacts/bolt/components/@settings/tabs/connections/types/GitHub';

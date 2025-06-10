@@ -1,3 +1,5 @@
+'use client';
+
 import React, { forwardRef } from 'react';
 import { classNames } from '@/artifacts/bolt/utils/classNames';
 import { Input } from './Input';

@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { Button } from '@/artifacts/bolt/components/ui/Button';

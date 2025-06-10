@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import { useEffect, useState, useCallback } from 'react';
 import { classNames } from '@/artifacts/bolt/utils/classNames';

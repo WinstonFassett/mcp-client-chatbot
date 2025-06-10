@@ -1,3 +1,5 @@
+'use client';
+
 import { memo, forwardRef, type ForwardedRef } from 'react';
 import { classNames } from '@/artifacts/bolt/utils/classNames';
 
