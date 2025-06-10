@@ -1,0 +1,39 @@
+/* Import all original Bolt styles */
+@import '../../artifacts/bolt/styles/variables.scss';
+@import '../../artifacts/bolt/styles/z-index.scss';
+@import '../../artifacts/bolt/styles/animations.scss';
+@import '../../artifacts/bolt/styles/components/terminal.scss';
+@import '../../artifacts/bolt/styles/components/resize-handle.scss';
+@import '../../artifacts/bolt/styles/components/code.scss';
+@import '../../artifacts/bolt/styles/components/editor.scss';
+@import '../../artifacts/bolt/styles/components/toast.scss';
+@import '../../artifacts/bolt/styles/index.scss';
+@import '../../artifacts/bolt/styles/diff-view.css';
+
+/* Import xterm styles */
+@import '@xterm/xterm/css/xterm.css';
+
+/* Import react-toastify styles */
+@import 'react-toastify/dist/ReactToastify.css';
+
+/* Fix for Workbench width issue */
+.z-workbench {
+  width: 100% !important;
+  min-width: 100% !important;
+  height: 100% !important;
+}
+
+/* Debug styles */
+.debug-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px;
+  z-index: 9999;
+  font-family: monospace;
+  max-width: 80%;
+  max-height: 80%;
+  overflow: auto;
+}

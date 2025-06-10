@@ -1,3 +1,5 @@
+import './bolt-styles.css';
+
 export default function BoltLayout({
   children,
 }: {
