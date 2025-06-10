@@ -4,10 +4,32 @@ import { WebContainer } from '@webcontainer/api';
 
 // Singleton pattern for WebContainer instance
 let webcontainerInstance: WebContainer | null = null;
+let isWebContainerSupported = true;
+
+// Check if the environment supports cross-origin isolation
+export function isCrossOriginIsolated(): boolean {
+  if (typeof window === 'undefined') return false;
+  return !!(window.crossOriginIsolated);
+}
 
 export async function getWebContainerInstance(): Promise<WebContainer> {
+  if (!isWebContainerSupported) {
+    throw new Error('WebContainer is not supported in this environment. Cross-origin isolation is required.');
+  }
+  
   if (webcontainerInstance) {
     return webcontainerInstance;
+  }
+  
+  // Check for cross-origin isolation
+  if (!isCrossOriginIsolated()) {
+    isWebContainerSupported = false;
+    throw new Error(
+      'WebContainer requires cross-origin isolation. ' +
+      'The server needs to send the following headers: ' +
+      'Cross-Origin-Opener-Policy: same-origin, ' +
+      'Cross-Origin-Embedder-Policy: require-corp'
+    );
   }
   
   try {
@@ -17,6 +39,7 @@ export async function getWebContainerInstance(): Promise<WebContainer> {
     return webcontainerInstance;
   } catch (error) {
     console.error('Failed to boot WebContainer:', error);
+    isWebContainerSupported = false;
     throw error;
   }
 }
@@ -116,8 +139,18 @@ export async function startDevServer(): Promise<{ url: string; output: string }>
       })
     );
     
-    // Wait for server to be ready
-    const url = await webcontainer.waitForPort(3000);
+    // Wait for server to be ready - default port for most dev servers
+    // TypeScript definition fix: WebContainer.waitForPort is available at runtime
+    // but might not be in the type definitions
+    let url = '';
+    try {
+      // Try with type assertion as a workaround
+      url = await (webcontainer as any).waitForPort(3000);
+    } catch (portError) {
+      console.warn('Could not wait for port 3000:', portError);
+      // Fallback to a generic URL
+      url = 'http://localhost:3000';
+    }
     
     return { url, output };
   } catch (error) {

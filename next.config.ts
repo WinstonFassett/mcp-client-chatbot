@@ -12,6 +12,28 @@ export default () => {
     eslint: {
       ignoreDuringBuilds: false,
     },
+    // Add headers for cross-origin isolation (required for WebContainers)
+    async headers() {
+      return [
+        {
+          source: '/(.*)',
+          headers: [
+            {
+              key: 'Cross-Origin-Opener-Policy',
+              value: 'same-origin',
+            },
+            {
+              key: 'Cross-Origin-Embedder-Policy',
+              value: 'require-corp',
+            },
+            {
+              key: 'Cross-Origin-Resource-Policy',
+              value: 'cross-origin',
+            },
+          ],
+        },
+      ];
+    },
     webpack: (config) => {
       config.watchOptions = {
         ...(config.watchOptions || {}),

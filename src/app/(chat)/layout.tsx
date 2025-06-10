@@ -65,10 +65,10 @@ export default function ChatLayout({
 
   return (
     <>
-      <Script
+      {/* <Script
         src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"
         strategy="beforeInteractive"
-      />
+      /> */}
       <SidebarProvider>
         <AppSidebar />
         <main className="relative w-full flex flex-col h-screen">

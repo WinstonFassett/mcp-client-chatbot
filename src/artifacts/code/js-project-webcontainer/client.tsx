@@ -288,21 +288,69 @@ function WebContainerWrapper({ content }: { content: string }) {
   const [fileContent, setFileContent] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [errorDetails, setErrorDetails] = useState<string | null>(null);
   
   // Initialize WebContainer with files
   useEffect(() => {
-    const initWebContainer = async () => {
+    const initWebContainer = async (retryCount = 0) => {
       try {
         setIsLoading(true);
         setError(null);
+        setErrorDetails(null);
+        
+        // Check if we're in a browser environment
+        if (typeof window === 'undefined') {
+          throw new Error('WebContainers can only run in browser environments');
+        }
+        
+        // Check for cross-origin isolation
+        if (window.crossOriginIsolated !== true) {
+          // Special handling for localhost - WebContainers should work on localhost even without the headers
+          const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+          
+          if (isLocalhost) {
+            console.log('Running on localhost - attempting to proceed despite cross-origin isolation not being detected');
+            // Continue with initialization on localhost
+          } else {
+            // We've added the headers in next.config.ts, but they might not be applied yet
+            // Wait a moment and retry if this is the first attempt
+            if (retryCount < 2) {
+              console.log(`Cross-origin isolation not detected, retrying (${retryCount + 1}/2)...`);
+              setTimeout(() => initWebContainer(retryCount + 1), 1500);
+              return;
+            }
+            
+            throw new Error(
+              'WebContainer requires cross-origin isolation. The server needs to send specific security headers.'
+            );
+          }
+        }
         
         // Mount files to WebContainer
         await mountFiles(files);
         
         setIsLoading(false);
-      } catch (err) {
+      } catch (err: any) {
         console.error('Failed to initialize WebContainer:', err);
-        setError('Failed to initialize WebContainer. WebContainers may not be supported in this browser.');
+        
+        if (err.message?.includes('cross-origin isolation')) {
+          setError('Cross-Origin Isolation Required');
+          setErrorDetails(
+            'WebContainers require cross-origin isolation. The development server needs the following headers:\n' +
+            '- Cross-Origin-Opener-Policy: same-origin\n' +
+            '- Cross-Origin-Embedder-Policy: require-corp\n\n' +
+            'These headers have been added to next.config.ts. Please restart the development server.'
+          );
+        } else if (err.message?.includes('Unable to create more instances')) {
+          setError('WebContainer Instance Limit Reached');
+          setErrorDetails(
+            'Only one WebContainer instance can be active at a time. Please refresh the page to reset the WebContainer.'
+          );
+        } else {
+          setError('WebContainer Initialization Failed');
+          setErrorDetails(err.message || 'WebContainers may not be supported in this browser.');
+        }
+        
         setIsLoading(false);
       }
     };
@@ -330,14 +378,34 @@ function WebContainerWrapper({ content }: { content: string }) {
   if (error) {
     return (
       <div className="w-full h-[500px] flex items-center justify-center">
-        <div className="text-center text-red-500">
-          <div className="mb-2">⚠️ {error}</div>
-          <button 
-            onClick={() => window.location.reload()}
-            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Retry
-          </button>
+        <div className="text-center max-w-md p-4">
+          <div className="text-red-500 font-bold mb-2">⚠️ {error}</div>
+          {errorDetails && (
+            <div className="text-sm mb-4 text-gray-700 dark:text-gray-300 whitespace-pre-line">
+              {errorDetails}
+            </div>
+          )}
+          <div className="flex gap-2 justify-center">
+            <button 
+              onClick={() => {
+                toast.info('Restarting WebContainer...');
+                window.location.reload();
+              }}
+              className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Restart
+            </button>
+            <button
+              onClick={() => {
+                toast.info('You may need to restart your dev server for the CORS headers to take effect');
+                // Open a new tab with instructions
+                window.open('https://webcontainers.io/guides/configuring-headers', '_blank');
+              }}
+              className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
+            >
+              Help
+            </button>
+          </div>
         </div>
       </div>
     );
