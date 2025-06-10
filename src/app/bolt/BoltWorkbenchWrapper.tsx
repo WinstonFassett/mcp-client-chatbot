@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, Component, ErrorInfo } from 'react';
-import { Workbench } from '@/artifacts/bolt/components/workbench/Workbench.client';
 import { ActionRunner } from '@/artifacts/bolt/lib/runtime/action-runner';
+import DebugWorkbench from './DebugWorkbench';
 import { webcontainer } from '@/artifacts/bolt/lib/webcontainer';
 import { WORK_DIR_NAME } from '@/artifacts/bolt/utils/constants';
 
@@ -137,12 +137,16 @@ export default function BoltWorkbenchWrapper() {
 
   
   return (
-    <div className="h-screen w-screen relative">
-      <Workbench 
-        chatStarted={true}
-        actionRunner={actionRunner}
-        isStreaming={false}
-      />
+    <div className="h-screen w-screen relative border-4 border-red-500" style={{ background: '#222', minHeight: '100vh' }}>
+      {/* Debug container with explicit dimensions */}
+      <div className="border-4 border-green-500 h-[80vh] w-[80vw] m-auto">
+        <h2 className="text-white text-2xl p-4">Debug Container</h2>
+        
+        {/* Workbench with explicit styles */}
+        <div className="border-4 border-blue-500 h-[70vh] overflow-visible">
+          <DebugWorkbench actionRunner={actionRunner} />
+        </div>
+      </div>
       
       {/* Debug overlay */}
       {showDebug && (
@@ -152,8 +156,11 @@ export default function BoltWorkbenchWrapper() {
         </div>
       )}
       
-      {/* Small indicator that debug is available */}
-      <div className="absolute bottom-2 right-2 text-xs text-gray-500">
+      <div className="fixed top-0 left-0 p-2 text-white text-xs bg-black bg-opacity-50 z-50">
+        Press Ctrl+D for debug info
+      </div>
+      
+      <div className="absolute bottom-0 left-0 p-2 text-white text-xs bg-black bg-opacity-50 z-50">
         Press Ctrl+D for debug info
       </div>
     </div>
