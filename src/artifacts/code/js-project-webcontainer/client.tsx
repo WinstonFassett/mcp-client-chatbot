@@ -19,7 +19,7 @@ import { FileExplorer } from "./file-explorer";
 import { CodeEditor } from "./code-editor";
 import { WebTerminal } from "./terminal";
 import { Preview } from "./preview";
-import { getWebContainerInstance, mountFiles, startDevServer } from "./webcontainer-manager";
+import { getWebContainerInstance, mountFiles, startDevServer, installDependencies } from "./webcontainer-manager";
 import { WebContainerDiagnostic } from "./diagnostic";
 
 // Import types
@@ -313,6 +313,15 @@ function WebContainerWrapper({ content }: { content: string }) {
           
           // Mount the files
           await mountFiles(files);
+          
+          // Install dependencies
+          console.log('Installing dependencies...');
+          const { success, output } = await installDependencies();
+          if (!success) {
+            console.error('Failed to install dependencies:', output);
+            throw new Error(`Failed to install dependencies: ${output}`);
+          }
+          console.log('Dependencies installed successfully');
           
           // Start the dev server
           const { url } = await startDevServer();
