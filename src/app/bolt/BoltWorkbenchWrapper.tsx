@@ -15,6 +15,19 @@ export default function BoltWorkbenchWrapper() {
   const [actionRunner, setActionRunner] = useState<ActionRunner | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<string>('Initializing...');
+  const [showDebug, setShowDebug] = useState(false);
+  
+  // Add a debug overlay that can be toggled with a keyboard shortcut
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'D' && e.ctrlKey) {
+        setShowDebug(prev => !prev);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
   
   // Initialize the WebContainer and ActionRunner
   useEffect(() => {
@@ -121,19 +134,7 @@ export default function BoltWorkbenchWrapper() {
     );
   }
   
-  // Add a debug overlay that can be toggled with a keyboard shortcut
-  const [showDebug, setShowDebug] = useState(false);
-  
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'D' && e.ctrlKey) {
-        setShowDebug(prev => !prev);
-      }
-    };
-    
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+
   
   return (
     <div className="h-screen w-screen relative">
