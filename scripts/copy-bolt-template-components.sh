@@ -10,6 +10,7 @@ BOLT_DEST="/Users/winston/dev/personal/try/mcp-client-chatbot/src/artifacts/bolt
 mkdir -p "$BOLT_DEST/components/chat"
 mkdir -p "$BOLT_DEST/components/header"
 mkdir -p "$BOLT_DEST/components/git"
+mkdir -p "$BOLT_DEST/components/ui/BackgroundRays"
 mkdir -p "$BOLT_DEST/lib/hooks"
 mkdir -p "$BOLT_DEST/lib/persistence"
 mkdir -p "$BOLT_DEST/utils"
@@ -29,7 +30,7 @@ cp -r "$BOLT_SRC/app/components/git/GitUrlImport.client.tsx" "$BOLT_DEST/compone
 
 # Copy UI components
 echo "Copying UI components..."
-cp -r "$BOLT_SRC/app/components/ui/BackgroundRays.tsx" "$BOLT_DEST/components/ui/"
+cp -r "$BOLT_SRC/app/components/ui/BackgroundRays/index.tsx" "$BOLT_DEST/components/ui/BackgroundRays/"
 cp -r "$BOLT_SRC/app/components/ui/LoadingOverlay.tsx" "$BOLT_DEST/components/ui/"
 
 # Copy hooks
@@ -38,7 +39,7 @@ cp -r "$BOLT_SRC/app/lib/hooks/useGit.ts" "$BOLT_DEST/lib/hooks/"
 
 # Copy persistence
 echo "Copying persistence..."
-cp -r "$BOLT_SRC/app/lib/persistence.ts" "$BOLT_DEST/lib/"
+cp -r "$BOLT_SRC/app/lib/persistence" "$BOLT_DEST/lib/"
 
 # Copy utilities
 echo "Copying utilities..."
