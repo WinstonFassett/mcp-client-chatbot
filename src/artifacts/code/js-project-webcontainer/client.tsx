@@ -19,7 +19,7 @@ import { FileExplorer } from "./file-explorer";
 import { CodeEditor } from "./code-editor";
 import { WebTerminal } from "./terminal";
 import { Preview } from "./preview";
-import { getWebContainerInstance } from "./webcontainer-manager";
+import { getWebContainerInstance, mountFiles, startDevServer } from "./webcontainer-manager";
 import { WebContainerDiagnostic } from "./diagnostic";
 
 // Import types
@@ -290,19 +290,13 @@ function WebContainerWrapper({ content }: { content: string }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
+  const [serverUrl, setServerUrl] = useState<string>("");
   
-  // Keep track of initialization attempts to prevent infinite loops
-  const [initAttempted, setInitAttempted] = useState(false);
-  
-  // Initialize WebContainer with files
+  // Initialize WebContainer with files - only once
   useEffect(() => {
-    // Skip if we've already attempted initialization and got an error
-    if (initAttempted && error) {
-      console.log('Skipping WebContainer initialization due to previous error');
-      return;
-    }
+    let isMounted = true;
     
-    const initWebContainer = async (retryCount = 0) => {
+    const initWebContainer = async () => {
       try {
         setIsLoading(true);
         setError(null);
@@ -313,61 +307,30 @@ function WebContainerWrapper({ content }: { content: string }) {
           throw new Error('WebContainers can only run in browser environments');
         }
         
-        // Check for cross-origin isolation
-        if (window.crossOriginIsolated !== true) {
-          // Special handling for localhost - WebContainers should work on localhost even without the headers
-          const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-          
-          if (isLocalhost) {
-            console.log('Running on localhost - attempting to proceed despite cross-origin isolation not being detected');
-            // Continue with initialization on localhost
-          } else {
-            // We've added the headers in next.config.ts, but they might not be applied yet
-            // Wait a moment and retry if this is the first attempt
-            if (retryCount < 2) {
-              console.log(`Cross-origin isolation not detected, retrying (${retryCount + 1}/2)...`);
-              setTimeout(() => initWebContainer(retryCount + 1), 1500);
-              return;
-            }
-            
-            throw new Error(
-              'WebContainer requires cross-origin isolation. The server needs to send specific security headers.'
-            );
-          }
-        }
-        
         try {
-          // Mount files to WebContainer
-          const webcontainer = await getWebContainerInstance();
+          // Get the WebContainer instance (already initialized at module level)
+          await getWebContainerInstance();
           
-          // Use a simpler file structure - the WebContainer API expects a specific format
-          const fileSystemTree: Record<string, any> = {};
+          // Mount the files
+          await mountFiles(files);
           
-          // Create a root directory first
-          fileSystemTree['/'] = { directory: {} };
+          // Start the dev server
+          const { url } = await startDevServer();
           
-          // Add files directly to root (simplified approach)
-          Object.entries(files).forEach(([path, content]) => {
-            if (typeof content === 'string') {
-              // Remove leading slash if present
-              const normalizedPath = path.startsWith('/') ? path.substring(1) : path;
-              
-              // Add file content
-              fileSystemTree[normalizedPath] = { file: { contents: content } };
-            }
-          });
-          
-          console.log('Mounting files:', fileSystemTree);
-          await webcontainer.mount(fileSystemTree);
-          
-          setIsLoading(false);
-        } catch (mountError: any) {
-          console.error('File mounting error:', mountError);
-          throw new Error(`Failed to mount files: ${mountError.message}`);
+          if (isMounted) {
+            setServerUrl(url);
+            setIsLoading(false);
+          }
+        } catch (error: any) {
+          console.error('WebContainer operation failed:', error);
+          if (isMounted) {
+            throw error;
+          }
         }
       } catch (err: any) {
         console.error('Failed to initialize WebContainer:', err);
-        setInitAttempted(true); // Mark that we've attempted initialization
+        
+        if (!isMounted) return;
         
         if (err.message?.includes('cross-origin isolation')) {
           setError('Cross-Origin Isolation Required');
@@ -398,7 +361,11 @@ function WebContainerWrapper({ content }: { content: string }) {
     };
     
     initWebContainer();
-  }, [files, error, initAttempted]);
+    
+    return () => {
+      isMounted = false;
+    };
+  }, []); // Empty dependency array - run only once
   
   // Handle file selection
   const handleFileSelect = useCallback((path: string, content: string) => {
@@ -506,11 +473,13 @@ function WebContainerWrapper({ content }: { content: string }) {
             </div>
           </div>
         )}
-        
+
         {activeTab === 'preview' && (
-          <Preview className="h-full" />
+          <div className="h-full">
+            <Preview url={serverUrl} />
+          </div>
         )}
-        
+
         {activeTab === 'terminal' && (
           <WebTerminal className="h-full" />
         )}

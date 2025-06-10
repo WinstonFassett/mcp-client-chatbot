@@ -5,14 +5,23 @@ import { startDevServer } from './webcontainer-manager';
 
 interface PreviewProps {
   className?: string;
+  url?: string;
 }
 
-export function Preview({ className = '' }: PreviewProps) {
-  const [url, setUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+export function Preview({ className = '', url: propUrl }: PreviewProps) {
+  const [url, setUrl] = useState<string | null>(propUrl || null);
+  const [loading, setLoading] = useState(!propUrl);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // If URL is provided via props, use it directly
+    if (propUrl) {
+      setUrl(propUrl);
+      setLoading(false);
+      return;
+    }
+    
+    // Otherwise, try to start the dev server
     const initPreview = async () => {
       try {
         setLoading(true);
@@ -29,7 +38,7 @@ export function Preview({ className = '' }: PreviewProps) {
     };
     
     initPreview();
-  }, []);
+  }, [propUrl]);
 
   if (loading) {
     return (

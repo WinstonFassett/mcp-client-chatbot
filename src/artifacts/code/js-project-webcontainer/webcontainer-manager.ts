@@ -1,89 +1,54 @@
 "use client";
 
 import { WebContainer } from '@webcontainer/api';
+import type { FileSystemTree } from '@webcontainer/api';
 
-// Singleton pattern for WebContainer instance
-let webcontainerInstance: WebContainer | null = null;
-let webcontainerPromise: Promise<WebContainer> | null = null;
-let isWebContainerSupported = true;
-
-// Check if the environment supports cross-origin isolation
-export function isCrossOriginIsolated(): boolean {
-  if (typeof window === 'undefined') return false;
-  return !!(window.crossOriginIsolated);
+// Context to track WebContainer state
+interface WebContainerContext {
+  loaded: boolean;
 }
 
-export async function getWebContainerInstance(): Promise<WebContainer> {
-  if (!isWebContainerSupported) {
-    throw new Error('WebContainer is not supported in this environment. Cross-origin isolation is required.');
-  }
-  
-  // Return existing instance if available
-  if (webcontainerInstance) {
-    return webcontainerInstance;
-  }
-  
-  // Return existing promise if we're already booting
-  if (webcontainerPromise) {
-    return webcontainerPromise;
-  }
-  
-  // Create a new promise for booting the WebContainer
-  webcontainerPromise = (async () => {
-    try {
-      // Check for cross-origin isolation
-      if (!isCrossOriginIsolated()) {
-        console.warn('Cross-origin isolation not detected. Headers may not be applied correctly.');
+// Module-level singleton for WebContainer
+// This is the key to preventing React re-render issues
+export let webcontainerPromise: Promise<WebContainer> | null = null;
+export const webcontainerContext: WebContainerContext = {
+  loaded: false
+};
+
+// Initialize the WebContainer immediately on module load (client-side only)
+if (typeof window !== 'undefined') {
+  // Only initialize once
+  if (!webcontainerPromise) {
+    console.log('Initializing WebContainer at module level');
+    
+    webcontainerPromise = (async () => {
+      try {
+        // Import WebContainer API
+        const { WebContainer } = await import('@webcontainer/api');
         
-        // On localhost, we'll try to proceed anyway
-        const isLocalhost = typeof window !== 'undefined' && 
-          (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+        // Boot with credentialless COEP option
+        const instance = await WebContainer.boot({
+          coep: 'credentialless',
+          forwardPreviewErrors: true
+        });
         
-        if (!isLocalhost) {
-          isWebContainerSupported = false;
-          throw new Error(
-            'WebContainer requires cross-origin isolation. ' +
-            'The server needs to send the following headers: ' +
-            'Cross-Origin-Opener-Policy: same-origin, ' +
-            'Cross-Origin-Embedder-Policy: require-corp, ' +
-            'Cross-Origin-Resource-Policy: cross-origin'
-          );
-        }
+        console.log('WebContainer booted successfully!');
+        webcontainerContext.loaded = true;
+        
+        return instance;
+      } catch (error) {
+        console.error('Failed to boot WebContainer:', error);
+        throw error;
       }
-      
-      // Dynamically import WebContainer API to avoid SSR issues
-      const { WebContainer } = await import('@webcontainer/api');
-      
-      // Try to boot the WebContainer with a timeout
-      // Using credentialless COEP option like the working bolt.diy project
-      const bootPromise = WebContainer.boot({
-        coep: 'credentialless',
-        forwardPreviewErrors: true, // Enable error forwarding from iframes
-      });
-      
-      // Set a timeout to detect if boot is hanging
-      const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => {
-          reject(new Error('WebContainer boot timed out. This may indicate a browser compatibility issue.'));
-        }, 10000); // 10 second timeout
-      });
-      
-      // Race between boot and timeout
-      const instance = await Promise.race([bootPromise, timeoutPromise]);
-      
-      // Store the instance
-      webcontainerInstance = instance;
-      
-      console.log('WebContainer booted successfully!');
-      return instance;
-    } catch (error) {
-      console.error('Failed to boot WebContainer:', error);
-      isWebContainerSupported = false;
-      // Clear the promise so we can try again
-      webcontainerPromise = null;
-      throw error;
-    }
-  })();
+    })();
+  }
+}
+
+// Simple getter that doesn't create new instances
+export async function getWebContainerInstance(): Promise<WebContainer> {
+  if (!webcontainerPromise) {
+    throw new Error('WebContainer is not initialized or not supported in this environment');
+  }
   
   return webcontainerPromise;
 }
@@ -91,31 +56,25 @@ export async function getWebContainerInstance(): Promise<WebContainer> {
 export async function mountFiles(files: Record<string, string>): Promise<void> {
   const webcontainer = await getWebContainerInstance();
   
-  // Convert string content to file entries for WebContainer
-  const fileEntries: Record<string, any> = {};
-  
-  for (const [path, content] of Object.entries(files)) {
-    // Skip the leading slash if present
-    const normalizedPath = path.startsWith('/') ? path.substring(1) : path;
+  try {
+    // Convert files to proper FileSystemTree format
+    const fileTree: Record<string, any> = {};
     
-    // Handle directory creation
-    const parts = normalizedPath.split('/');
-    let currentPath = '';
+    // Process files
+    Object.entries(files).forEach(([path, content]) => {
+      // Normalize path (remove leading slash if present)
+      const normalizedPath = path.startsWith('/') ? path.substring(1) : path;
+      fileTree[normalizedPath] = { file: { contents: content } };
+    });
     
-    for (let i = 0; i < parts.length - 1; i++) {
-      const part = parts[i];
-      if (part) {
-        currentPath = currentPath ? `${currentPath}/${part}` : part;
-        fileEntries[currentPath] = { directory: {} };
-      }
-    }
-    
-    // Add file content
-    fileEntries[normalizedPath] = { file: { contents: content } };
+    // Mount all files at once
+    console.log('Mounting files:', Object.keys(fileTree));
+    await webcontainer.mount(fileTree);
+    console.log('All files mounted successfully');
+  } catch (error) {
+    console.error('Error mounting files:', error);
+    throw error;
   }
-  
-  // Mount the file system
-  await webcontainer.mount(fileEntries);
 }
 
 export async function runCommand(command: string, args: string[] = []): Promise<{ exitCode: number; output: string }> {
@@ -155,7 +114,7 @@ export async function startDevServer(): Promise<{ url: string; output: string }>
   
   try {
     // Check if package.json exists and has a start script
-    const packageJsonContent = await webcontainer.fs.readFile('/package.json', 'utf-8');
+    const packageJsonContent = await webcontainer.fs.readFile('package.json', 'utf-8');
     const packageJson = JSON.parse(packageJsonContent);
     
     // Determine which script to run
@@ -179,27 +138,19 @@ export async function startDevServer(): Promise<{ url: string; output: string }>
       new WritableStream({
         write(data) {
           output += data;
+          console.log(data); // Log server output in real-time
         }
       })
     );
     
-    // Wait for server to be ready - default port for most dev servers
-    // TypeScript definition fix: WebContainer.waitForPort is available at runtime
-    // but might not be in the type definitions
-    let url = '';
-    try {
-      // Try with type assertion as a workaround
-      url = await (webcontainer as any).waitForPort(3000);
-    } catch (portError) {
-      console.warn('Could not wait for port 3000:', portError);
-      // Fallback to a generic URL
-      url = 'http://localhost:3000';
-    }
+    // For dev server, just return a standard URL
+    // WebContainer doesn't have waitForPort in its type definitions
+    const url = 'http://localhost:3000';
     
     return { url, output };
   } catch (error) {
     console.error('Failed to start dev server:', error);
-    throw error;
+    return { url: '', output: String(error) };
   }
 }
 
