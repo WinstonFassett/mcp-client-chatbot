@@ -291,8 +291,17 @@ function WebContainerWrapper({ content }: { content: string }) {
   const [error, setError] = useState<string | null>(null);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
   
+  // Keep track of initialization attempts to prevent infinite loops
+  const [initAttempted, setInitAttempted] = useState(false);
+  
   // Initialize WebContainer with files
   useEffect(() => {
+    // Skip if we've already attempted initialization and got an error
+    if (initAttempted && error) {
+      console.log('Skipping WebContainer initialization due to previous error');
+      return;
+    }
+    
     const initWebContainer = async (retryCount = 0) => {
       try {
         setIsLoading(true);
@@ -327,26 +336,38 @@ function WebContainerWrapper({ content }: { content: string }) {
           }
         }
         
-        // Mount files to WebContainer
-        const webcontainer = await getWebContainerInstance();
-        
-        // Convert files to WebContainer format
-        const fileSystemTree: Record<string, any> = {};
-        
-        // Process each file
-        Object.entries(files).forEach(([path, content]) => {
-          if (typeof content === 'string') {
-            fileSystemTree[path] = {
-              file: { contents: content }
-            };
-          }
-        });
-        
-        await webcontainer.mount(fileSystemTree);
-        
-        setIsLoading(false);
+        try {
+          // Mount files to WebContainer
+          const webcontainer = await getWebContainerInstance();
+          
+          // Use a simpler file structure - the WebContainer API expects a specific format
+          const fileSystemTree: Record<string, any> = {};
+          
+          // Create a root directory first
+          fileSystemTree['/'] = { directory: {} };
+          
+          // Add files directly to root (simplified approach)
+          Object.entries(files).forEach(([path, content]) => {
+            if (typeof content === 'string') {
+              // Remove leading slash if present
+              const normalizedPath = path.startsWith('/') ? path.substring(1) : path;
+              
+              // Add file content
+              fileSystemTree[normalizedPath] = { file: { contents: content } };
+            }
+          });
+          
+          console.log('Mounting files:', fileSystemTree);
+          await webcontainer.mount(fileSystemTree);
+          
+          setIsLoading(false);
+        } catch (mountError: any) {
+          console.error('File mounting error:', mountError);
+          throw new Error(`Failed to mount files: ${mountError.message}`);
+        }
       } catch (err: any) {
         console.error('Failed to initialize WebContainer:', err);
+        setInitAttempted(true); // Mark that we've attempted initialization
         
         if (err.message?.includes('cross-origin isolation')) {
           setError('Cross-Origin Isolation Required');
@@ -361,6 +382,12 @@ function WebContainerWrapper({ content }: { content: string }) {
           setErrorDetails(
             'Only one WebContainer instance can be active at a time. Please refresh the page to reset the WebContainer.'
           );
+        } else if (err.message?.includes('invalid file name') || err.message?.includes('Failed to mount')) {
+          setError('File Mounting Error');
+          setErrorDetails(
+            `There was an error mounting the files to the WebContainer: ${err.message}\n\n` +
+            'This may be due to an issue with the file format or naming conventions.'
+          );
         } else {
           setError('WebContainer Initialization Failed');
           setErrorDetails(err.message || 'WebContainers may not be supported in this browser.');
@@ -371,7 +398,7 @@ function WebContainerWrapper({ content }: { content: string }) {
     };
     
     initWebContainer();
-  }, [files]);
+  }, [files, error, initAttempted]);
   
   // Handle file selection
   const handleFileSelect = useCallback((path: string, content: string) => {

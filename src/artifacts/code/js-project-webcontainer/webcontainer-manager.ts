@@ -4,6 +4,7 @@ import { WebContainer } from '@webcontainer/api';
 
 // Singleton pattern for WebContainer instance
 let webcontainerInstance: WebContainer | null = null;
+let webcontainerPromise: Promise<WebContainer> | null = null;
 let isWebContainerSupported = true;
 
 // Check if the environment supports cross-origin isolation
@@ -17,58 +18,74 @@ export async function getWebContainerInstance(): Promise<WebContainer> {
     throw new Error('WebContainer is not supported in this environment. Cross-origin isolation is required.');
   }
   
+  // Return existing instance if available
   if (webcontainerInstance) {
     return webcontainerInstance;
   }
   
-  try {
-    // Check for cross-origin isolation
-    if (!isCrossOriginIsolated()) {
-      console.warn('Cross-origin isolation not detected. Headers may not be applied correctly.');
-      
-      // On localhost, we'll try to proceed anyway
-      const isLocalhost = typeof window !== 'undefined' && 
-        (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-      
-      if (!isLocalhost) {
-        isWebContainerSupported = false;
-        throw new Error(
-          'WebContainer requires cross-origin isolation. ' +
-          'The server needs to send the following headers: ' +
-          'Cross-Origin-Opener-Policy: same-origin, ' +
-          'Cross-Origin-Embedder-Policy: require-corp, ' +
-          'Cross-Origin-Resource-Policy: cross-origin'
-        );
-      }
-    }
-    
-    // Dynamically import WebContainer API to avoid SSR issues
-    const { WebContainer } = await import('@webcontainer/api');
-    
-    // Try to boot the WebContainer with a timeout
-    // Using credentialless COEP option like the working bolt.diy project
-    const bootPromise = WebContainer.boot({
-      coep: 'credentialless',
-      forwardPreviewErrors: true, // Enable error forwarding from iframes
-    });
-    
-    // Set a timeout to detect if boot is hanging
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => {
-        reject(new Error('WebContainer boot timed out. This may indicate a browser compatibility issue.'));
-      }, 10000); // 10 second timeout
-    });
-    
-    // Race between boot and timeout
-    webcontainerInstance = await Promise.race([bootPromise, timeoutPromise]);
-    
-    console.log('WebContainer booted successfully!');
-    return webcontainerInstance;
-  } catch (error) {
-    console.error('Failed to boot WebContainer:', error);
-    isWebContainerSupported = false;
-    throw error;
+  // Return existing promise if we're already booting
+  if (webcontainerPromise) {
+    return webcontainerPromise;
   }
+  
+  // Create a new promise for booting the WebContainer
+  webcontainerPromise = (async () => {
+    try {
+      // Check for cross-origin isolation
+      if (!isCrossOriginIsolated()) {
+        console.warn('Cross-origin isolation not detected. Headers may not be applied correctly.');
+        
+        // On localhost, we'll try to proceed anyway
+        const isLocalhost = typeof window !== 'undefined' && 
+          (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+        
+        if (!isLocalhost) {
+          isWebContainerSupported = false;
+          throw new Error(
+            'WebContainer requires cross-origin isolation. ' +
+            'The server needs to send the following headers: ' +
+            'Cross-Origin-Opener-Policy: same-origin, ' +
+            'Cross-Origin-Embedder-Policy: require-corp, ' +
+            'Cross-Origin-Resource-Policy: cross-origin'
+          );
+        }
+      }
+      
+      // Dynamically import WebContainer API to avoid SSR issues
+      const { WebContainer } = await import('@webcontainer/api');
+      
+      // Try to boot the WebContainer with a timeout
+      // Using credentialless COEP option like the working bolt.diy project
+      const bootPromise = WebContainer.boot({
+        coep: 'credentialless',
+        forwardPreviewErrors: true, // Enable error forwarding from iframes
+      });
+      
+      // Set a timeout to detect if boot is hanging
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          reject(new Error('WebContainer boot timed out. This may indicate a browser compatibility issue.'));
+        }, 10000); // 10 second timeout
+      });
+      
+      // Race between boot and timeout
+      const instance = await Promise.race([bootPromise, timeoutPromise]);
+      
+      // Store the instance
+      webcontainerInstance = instance;
+      
+      console.log('WebContainer booted successfully!');
+      return instance;
+    } catch (error) {
+      console.error('Failed to boot WebContainer:', error);
+      isWebContainerSupported = false;
+      // Clear the promise so we can try again
+      webcontainerPromise = null;
+      throw error;
+    }
+  })();
+  
+  return webcontainerPromise;
 }
 
 export async function mountFiles(files: Record<string, string>): Promise<void> {
