@@ -52,13 +52,14 @@ For example:
 
 ---filepath:/package.json
 {
-  "name": "webcontainer-project",
+  "name": "example-app",
   "type": "module",
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "latest",
+    "nodemon": "latest"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "nodemon --watch './' index.js"
   }
 }
 
