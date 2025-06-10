@@ -1,0 +1,100 @@
+<!DOCTYPE html><html lang="en" data-theme="dark"><head><!--remix-island-start--><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta property="og:type" content="object"/><meta property="og:site_name" content="bolt.new"/><meta property="og:title" content="bolt.new"/><meta property="og:image" content="https://bolt.new/static/social_preview_index.jpg"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="bolt.new"/><meta name="twitter:description" content="Prompt, run, edit &amp; deploy apps"/><meta name="twitter:image" content="https://bolt.new/static/social_preview_index.jpg"/><meta name="twitter:site" content="@StackBlitz"/><meta name="bolt-version" content="db67de7"/><link rel="stylesheet" href="/assets/root-qtvMmM7R.css"/><link rel="stylesheet" href="/assets/LightRays-apN2LHcc.css"/><link rel="icon" href="/static/favicon.svg" type="image/svg+xml"/><link rel="stylesheet" href="/assets/ReactToastify-Bh76j7cs.css"/><link rel="stylesheet" href="/assets/tailwind-compat-Bwh-BmjE.css"/><link rel="stylesheet" href="/assets/index-SaXBfDi6.css"/><link rel="stylesheet" href="/assets/xterm-LZoznX6r.css"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"/><link rel="stylesheet" href="/assets/_index-BX_twXnp.css"/><script>(function createWorkaroundGlobal() {
+  window["__name"] = () => {
+  };
+})();</script><script>(function blockDOMMutations() {
+  const observer = new MutationObserver((mutations) => {
+    observer.disconnect();
+    mutations.reverse().forEach((mutation) => {
+      if (mutation.type === "childList") {
+        mutation.addedNodes.forEach((node) => {
+          if ([document.head, document.body, document.documentElement].includes(node.parentNode)) {
+            return;
+          }
+          if (node.parentNode) {
+            node.parentNode.removeChild(node);
+          }
+        });
+        mutation.removedNodes.forEach((node) => {
+          if (mutation.previousSibling) {
+            mutation.target.insertBefore(node, mutation.previousSibling.nextSibling);
+          } else if (mutation.target) {
+            mutation.target.appendChild(node);
+          }
+        });
+      }
+      if (mutation.type === "attributes") {
+        const { target, attributeName, oldValue } = mutation;
+        if (attributeName) {
+          if (oldValue === null) {
+            target.removeAttribute(attributeName);
+          } else {
+            target.setAttribute(attributeName, oldValue);
+          }
+        }
+      }
+      if (mutation.type === "characterData") {
+        mutation.target.data = mutation.oldValue ?? "";
+      }
+    });
+    observe();
+  });
+  function observe() {
+    observer.observe(document, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeOldValue: true,
+      characterData: true,
+      characterDataOldValue: true
+    });
+  }
+  __name(observe, "observe");
+  window.addEventListener("DOMContentLoaded", observe);
+  window.__allowDOMMutations = () => {
+    observer.disconnect();
+  };
+})();</script><script>(function themeCode(storageKey, defaultTheme) {
+  if (window.location.pathname !== "/figma") {
+    setBoltTheme();
+  }
+  function setBoltTheme() {
+    const htmlElement = document.querySelector("html");
+    const localTheme = localStorage.getItem(storageKey);
+    const metaElement = document.querySelector("meta[name=bolt-theme]");
+    let theme = metaElement?.content ?? localTheme ?? defaultTheme;
+    htmlElement.setAttribute("data-theme-option", theme);
+    if (theme === "system") {
+      const prefersDark2 = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      theme = prefersDark2 ? "dark" : "light";
+    }
+    htmlElement.setAttribute("data-theme", theme);
+  }
+  __name(setBoltTheme, "setBoltTheme");
+})("bolt_theme", "dark");</script><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-58KJM59B');</script><!--remix-island-end--></head><body><div id="root" class="w-full h-full"><div class="flex flex-col h-full w-full bg-bolt-elements-background-depth-1"><header class="flex shrink-0 select-none selection-accent items-center bg-bolt-elements-background-depth-1 pl-5 pr-4 border-b h-[var(--header-height)] border-transparent"><div class="flex grow-1 basis-60 items-center gap-2 z-logo text-bolt-elements-textPrimary"><a href="/" class="text-2xl font-semibold text-accent flex items-center"><span class="i-bolt:logos-bolt?mask w-[46px] inline-block"></span></a></div><div class="flex grow-1 basis-60 justify-end items-center gap-3"></div></header><div class="_BaseChat_1dk13_1 relative flex h-full w-full overflow-hidden bg-bolt-elements-background-depth-1" data-chat-visible="true"><div class="flex overflow-auto size-full flex-col relative"><div class="_Chat_1dk13_5 selection-accent flex flex-col flex-grow"><div class="flex flex-col mt-[22vh] mx-[var(--chat-padding)]"><h1 class="text-[44px] text-center font-semibold text-bolt-elements-textPrimary tracking-tight">What do you want to build?</h1><p class="mb-6 text-center text-bolt-elements-textSecondary"><span>Create stunning apps &amp; websites by chatting with AI.</span></p></div><div class=""><div class="relative px-[var(--chat-padding)] bg-bolt-elements-background-depth-1 w-full max-w-chat mx-auto z-prompt"><div class="relative shadow-xs rounded-[0.375rem] p-[1px] overflow-clip"><div class="absolute inset-0 bg-bolt-elements-prompt-border -z-1"></div><div class="_PromptContainer_1vk4q_1 absolute top-0 left-0 right-0 h-[136px] rounded-[calc(0.375rem-1px)] -z-1"></div><div class="absolute top-0 left-[10px] h-px w-[100px] bg-gradient-to-r from-accent-300/0 via-accent-300 to-accent-300/0 mix-blend-overlay"></div><div class="bg-bolt-elements-prompt-background rounded-[calc(0.375rem-1px)]"><div class="border-b-px border-transparent"></div><div class="relative select-none"><textarea class="w-full pl-4 pt-4 pr-16 focus:outline-none resize-none text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary bg-transparent text-sm" style="min-height:76px;max-height:200px" placeholder="How can Bolt help you today?" translate="no"></textarea></div><div class="flex justify-between text-sm p-4 pt-2"><div class="flex gap-1 items-center"><input type="file" aria-hidden="true" tabindex="-1" style="display:none;visibility:hidden" accept=".jpg,.jpeg,.png,.gif,.webp,.svg,.pdf,.txt,.doc,.docx,.py,.ipynb,.js,.mjs,.cjs,.jsx,.html,.css,.scss,.sass,.ts,.tsx,.java,.cs,.php,.c,.cc,.cpp,.cxx,.h,.hh,.hpp,.rs,.swift,.go,.rb,.kt,.kts,.scala,.sh,.bash,.zsh,.bat,.csv,.log,.ini,.cfg,.config,.json,.yaml,.yml,.toml,.lua,.sql,.md,.tex,.latex,.asm,.ino,.s" multiple=""/><button class="flex items-center text-bolt-elements-item-contentDefault bg-transparent rounded-md disabled:cursor-not-allowed enabled:hover:text-bolt-elements-item-contentActive enabled:hover:bg-bolt-elements-item-backgroundActive p-1" aria-label="Upload files" data-state="closed"><div class="i-ph:link-simple text-xl"></div></button><button class="flex items-center text-bolt-elements-item-contentDefault bg-transparent rounded-md disabled:cursor-not-allowed enabled:hover:text-bolt-elements-item-contentActive enabled:hover:bg-bolt-elements-item-backgroundActive p-1 opacity-30" disabled="" data-state="closed"><div class="i-bolt:stars text-xl"></div></button></div><div class="flex items-center gap-3"></div></div></div></div><div class="pb-[var(--chat-padding)]"></div></div></div></div><footer class="flex flex-wrap gap-3 ml-auto pl-10 pb-2 pt-32 px-4 items-center justify-center text-sm text-bolt-elements-textSecondary"><button class="flex items-center justify-center shrink-0 min-w-0 max-w-full rounded-md focus-visible:outline-2 disabled:op-50 relative disabled:cursor-not-allowed gap-2 text-sm px-0 h-6 focus-visible:outline-bolt-ds-brandHighlight bg-transparent [&amp;:hover:where(:not(:disabled))]:text-bolt-ds-textPrimary text-bolt-elements-textSecondary" type="button" data-state="closed"><span class="truncate">Pricing</span></button><a href="/blog" target="_blank" class="hover:text-bolt-elements-textPrimary transition-theme">Blog</a><a href="https://support.bolt.new" target="_blank" class="hover:text-bolt-elements-textPrimary transition-theme">Documentation</a><a href="https://support.bolt.new" target="_blank" class="hover:text-bolt-elements-textPrimary transition-theme">Help Center</a><span class="dot"></span><a href="https://stackblitz.com/careers" target="_blank" class="hover:text-bolt-elements-textPrimary transition-theme">Careers</a><a href="https://stackblitz.com/terms-of-service" target="_blank" class="hover:text-bolt-elements-textPrimary transition-theme">Terms</a><a href="https://stackblitz.com/privacy-policy" target="_blank" class="hover:text-bolt-elements-textPrimary transition-theme">Privacy</a><a href="https://stackblitz.com" class="_StackBlitzLogo_1dk13_23 hover:text-bolt-elements-textPrimary transition-theme" target="_blank"></a></footer></div></div></div><script>((STORAGE_KEY2, restoreKey) => {
+    if (!window.history.state || !window.history.state.key) {
+      let key2 = Math.random().toString(32).slice(2);
+      window.history.replaceState({
+        key: key2
+      }, "");
+    }
+    try {
+      let positions = JSON.parse(sessionStorage.getItem(STORAGE_KEY2) || "{}");
+      let storedY = positions[restoreKey || window.history.state.key];
+      if (typeof storedY === "number") {
+        window.scrollTo(0, storedY);
+      }
+    } catch (error3) {
+      console.error(error3);
+      sessionStorage.removeItem(STORAGE_KEY2);
+    }
+  })("positions", null)</script><link rel="modulepreload" href="/assets/manifest-7157f308.js"/><link rel="modulepreload" href="/assets/entry.client-LCQsZhKu.js"/><link rel="modulepreload" href="/assets/components-DwxDXfvw.js"/><link rel="modulepreload" href="/assets/analytics.client-Dn4BywHX.js"/><link rel="modulepreload" href="/assets/constants-CecglnYs.js"/><link rel="modulepreload" href="/assets/LightRays.client-hpYY5cNF.js"/><link rel="modulepreload" href="/assets/projects-DcvbBLPk.js"/><link rel="modulepreload" href="/assets/ErrorBoundary-BPOibTBD.js"/><link rel="modulepreload" href="/assets/login-dYx1BRHJ.js"/><link rel="modulepreload" href="/assets/LoadingDots-BEV9J_Du.js"/><link rel="modulepreload" href="/assets/token-Dp5om_LL.js"/><link rel="modulepreload" href="/assets/description-NqYnA1W3.js"/><link rel="modulepreload" href="/assets/tslib.es6-ChmJQI-w.js"/><link rel="modulepreload" href="/assets/github-CAz49R6q.js"/><link rel="modulepreload" href="/assets/useProjectVisibility-CEFFuo2N.js"/><link rel="modulepreload" href="/assets/root-CDu6HH85.js"/><link rel="modulepreload" href="/assets/_index-Vow7pqfO.js"/><link rel="modulepreload" href="/assets/animationVariants-BG8qrNHY.js"/><link rel="modulepreload" href="/assets/stripe-0_oJWGM4.js"/><link rel="modulepreload" href="/assets/client-error-IkPBAjXH.js"/><link rel="modulepreload" href="/assets/api-76xBK2xm.js"/><link rel="modulepreload" href="/assets/prepare-body-Bv_59rh4.js"/><link rel="modulepreload" href="/assets/client-github-DuvlWuJ-.js"/><link rel="modulepreload" href="/assets/ConnectToFigmaDialog-B5ypkGuY.js"/><link rel="modulepreload" href="/assets/index-BbP3371Q.js"/><link rel="modulepreload" href="/assets/overlay-IvLw2I8T.js"/><link rel="modulepreload" href="/assets/_index-D26ikF2M.js"/><script>window.__remixContext = {"basename":"/","future":{"v3_fetcherPersist":true,"v3_relativeSplatPath":true,"v3_throwAbortReason":true,"v3_singleFetch":false,"v3_lazyRouteDiscovery":false,"unstable_optimizeDeps":false},"isSpaMode":false,"state":{"loaderData":{"root":{},"routes/_index":{"loggedIn":false}},"actionData":null,"errors":null}};</script><script type="module" async="">import "/assets/manifest-7157f308.js";
+import * as route0 from "/assets/root-CDu6HH85.js";
+import * as route1 from "/assets/_index-D26ikF2M.js";
+
+window.__remixRouteModules = {"root":route0,"routes/_index":route1};
+
+import("/assets/entry.client-LCQsZhKu.js");</script></div></body></html>

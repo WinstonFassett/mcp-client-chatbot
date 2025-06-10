@@ -66,9 +66,7 @@ import App from './App.jsx'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
     <App />
-  </React.StrictMode>,
 )`,
     "/src/App.jsx": `import { useState } from 'react'
 import './App.css'
@@ -283,6 +281,13 @@ function parseMultiFileContent(content: string) {
 
 // WebContainerWrapper component to handle the WebContainer UI
 function WebContainerWrapper({ content }: { content: string }) {
+  // Use a ref to track initialization state - this persists across re-renders and effect re-runs
+  const initRef = useCallback(() => {
+    // This function will only be created once
+    const initialized = { current: false };
+    return initialized;
+  }, [])();
+  
   const { files } = parseMultiFileContent(content);
   const [activeTab, setActiveTab] = useState<"code" | "preview" | "terminal">("code");
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
@@ -295,6 +300,24 @@ function WebContainerWrapper({ content }: { content: string }) {
   // Initialize WebContainer with files - only once
   useEffect(() => {
     let isMounted = true;
+    
+    // Only initialize if we haven't already
+    if (initRef.current) {
+      console.log('WebContainer already initialized, skipping');
+      // Make sure to update loading state even if we're skipping initialization
+      setIsLoading(false);
+      
+      // Get the current server URL if it exists
+      startDevServer().then(({ url }) => {
+        if (isMounted && url) {
+          setServerUrl(url);
+        }
+      });
+      return;
+    }
+    
+    // Mark as initialized immediately to prevent double initialization
+    initRef.current = true;
     
     const initWebContainer = async () => {
       try {
@@ -312,6 +335,7 @@ function WebContainerWrapper({ content }: { content: string }) {
           await getWebContainerInstance();
           
           // Mount the files
+          console.log('Mounting files...');
           await mountFiles(files);
           
           // Install dependencies

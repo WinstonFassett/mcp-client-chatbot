@@ -109,7 +109,17 @@ export async function installDependencies(): Promise<{ success: boolean; output:
   }
 }
 
+// Track if the server is already running to prevent duplicate starts
+let isServerRunning = false;
+let serverUrl = '';
+
 export async function startDevServer(): Promise<{ url: string; output: string }> {
+  // If server is already running, return the existing URL
+  if (isServerRunning && serverUrl) {
+    console.log('Dev server already running at:', serverUrl);
+    return { url: serverUrl, output: 'Server already running' };
+  }
+  
   const webcontainer = await getWebContainerInstance();
   
   try {
@@ -129,27 +139,49 @@ export async function startDevServer(): Promise<{ url: string; output: string }>
       }
     }
     
+    console.log(`Starting dev server with command: ${command} ${args.join(' ')}`);
+    
     // Start the server
     const serverProcess = await webcontainer.spawn(command, args);
     
     // Collect output
     let output = '';
+    let portFound = false;
+    let port = 3000; // Default port
+    
     serverProcess.output.pipeTo(
       new WritableStream({
         write(data) {
           output += data;
           console.log(data); // Log server output in real-time
+          
+          // Try to extract port information from server output
+          if (!portFound) {
+            const portMatch = data.match(/localhost:(\d+)/);
+            if (portMatch && portMatch[1]) {
+              port = parseInt(portMatch[1], 10);
+              portFound = true;
+              console.log(`Detected server running on port: ${port}`);
+            }
+          }
         }
       })
     );
     
-    // For dev server, just return a standard URL
-    // WebContainer doesn't have waitForPort in its type definitions
-    const url = 'http://localhost:3000';
+    // Wait a bit for the server to start
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
-    return { url, output };
+    // The correct URL format for accessing WebContainer services
+    // This is the key to fixing the preview
+    serverUrl = `/_webcontainer/${port}/`;
+    console.log('WebContainer server URL:', serverUrl);
+    
+    isServerRunning = true;
+    return { url: serverUrl, output };
   } catch (error) {
     console.error('Failed to start dev server:', error);
+    isServerRunning = false;
+    serverUrl = '';
     return { url: '', output: String(error) };
   }
 }

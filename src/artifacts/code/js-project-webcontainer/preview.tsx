@@ -89,7 +89,7 @@ export function Preview({ className = '', url: propUrl }: PreviewProps) {
         </button>
       </div>
       <iframe 
-        src="/_webcontainer/3000/" 
+        src={url} 
         className="w-full h-[calc(100%-40px)]"
         sandbox="allow-scripts allow-same-origin allow-forms"
         title="Preview"
