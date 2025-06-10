@@ -3,6 +3,6 @@ export interface Document {
   createdAt: Date;
   title: string;
   content: string | null;
-  kind: 'text' | 'code' | 'image' | 'sheet';
+  kind: 'text' | 'simple-code-block' | 'python-file-pyodide' | 'js-project-sandpack' | 'html-fragment' | 'image' | 'sheet';
   userId: string;
 }

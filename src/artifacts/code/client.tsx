@@ -95,9 +95,8 @@ interface Metadata {
 
 // This is the simple code artifact implementation that will be used as a fallback
 // It's based on the Python implementation but renamed to be more specific
-// @ts-ignore - This is used for reference and compatibility
-export const _legacyCodeArtifact = new Artifact<"code", Metadata>({
-  kind: "code",
+export const _legacyCodeArtifact = new Artifact<"simple-code-block", Metadata>({
+  kind: "simple-code-block",
   description:
     "Useful for code generation; Code execution is only available for python code.",
   initialize: async ({ setMetadata }) => {

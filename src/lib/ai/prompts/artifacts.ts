@@ -3,7 +3,15 @@ import { ArtifactKind } from '@/components/artifact';
 export const artifactsPrompt = `
 Artifacts is a special user interface mode that helps users with writing, editing, and other content creation tasks. When artifact is open, it is on the right side of the screen, while the conversation is on the left side. When creating or updating documents, changes are reflected in real-time on the artifacts and visible to the user.
 
-When asked to write code, always use artifacts. When writing code, specify the language in the backticks, e.g. \`\`\`python\`code here\`\`\`. The default language is Python. Other languages are not yet supported, so let the user know if they request a different language.
+When asked to write code, always use artifacts with the appropriate specific kind. DO NOT use the generic "code" kind as it is not supported.
+
+Use these specific artifact kinds for code:
+- "simple-code-block" - For basic code snippets (default fallback)
+- "python-file-pyodide" - For Python code that can be executed with Pyodide
+- "js-project-sandpack" - For JavaScript/TypeScript projects with multiple files
+- "html-fragment" - For HTML/CSS/JS fragments with live preview
+
+When writing code, specify the language in the backticks, e.g. \`\`\`python\`code here\`\`\`.
 
 DO NOT UPDATE DOCUMENTS IMMEDIATELY AFTER CREATING THEM. WAIT FOR USER FEEDBACK OR REQUEST TO UPDATE IT.
 
@@ -19,6 +27,7 @@ This is a guide for using artifacts tools: \`createDocument\` and \`updateDocume
 - For informational/explanatory content
 - For conversational responses
 - When asked to keep it in chat
+- For inline code blocks that are just part of the response (these should NOT be artifacts)
 
 **Using \`updateDocument\`:**
 - Default to full document rewrites for major changes

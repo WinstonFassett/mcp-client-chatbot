@@ -24,13 +24,16 @@ export const createDocument = ({ session, dataStream }: CreateDocumentProps) =>
     }),
     execute: async ({ title, kind }) => {
       dataStream.writeData({
-        type: 'kind',
-        content: kind,
-      });
-
-      dataStream.writeData({
         type: 'title',
         content: title,
+      });
+
+      // Handle 'code' as an alias for 'simple-code-block' for backward compatibility
+      const normalizedKind = kind === 'code' ? 'simple-code-block' : kind;
+      
+      dataStream.writeData({
+        type: 'kind',
+        content: normalizedKind,
       });
 
       dataStream.writeData({
@@ -38,7 +41,7 @@ export const createDocument = ({ session, dataStream }: CreateDocumentProps) =>
         content: '',
       });
 
-      const documentHandler = documentHandlersByArtifactKind.find(h => h.kind === kind);
+      const documentHandler = documentHandlersByArtifactKind.find(h => h.kind === normalizedKind);
 
       if (!documentHandler) {
         throw new Error(`Invalid document kind: ${kind}. Must be one of: ${documentHandlersByArtifactKind.map(h => h.kind).join(', ')}`);

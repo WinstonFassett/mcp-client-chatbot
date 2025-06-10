@@ -89,7 +89,7 @@ export function DocumentPreview({
     : artifact.status === "streaming"
       ? {
           title: artifact.title,
-          kind: artifact.kind,
+          kind: artifact.kind as "text" | "simple-code-block" | "python-file-pyodide" | "js-project-sandpack" | "html-fragment" | "image" | "sheet",
           content: artifact.content,
           id: artifact.documentId,
           createdAt: new Date(),
@@ -253,7 +253,7 @@ const DocumentContent = ({ document }: { document: Document }) => {
     "h-[257px] overflow-y-scroll border rounded-b-2xl dark:bg-muted border-t-0 dark:border-zinc-700",
     {
       "p-4 sm:px-14 sm:py-16": document.kind === "text",
-      "p-0": document.kind === "code",
+      "p-0": document.kind === "simple-code-block" || document.kind === "python-file-pyodide" || document.kind === "js-project-sandpack" || document.kind === "html-fragment",
     },
   );
 
@@ -270,7 +270,7 @@ const DocumentContent = ({ document }: { document: Document }) => {
     <div className={containerClassName}>
       {document.kind === "text" ? (
         <Editor {...commonProps} onSaveContent={() => {}} />
-      ) : document.kind === "code" ? (
+      ) : document.kind === "simple-code-block" || document.kind === "python-file-pyodide" || document.kind === "js-project-sandpack" || document.kind === "html-fragment" ? (
         <div className="flex flex-1 relative w-full">
           <div className="absolute inset-0">
             <CodeEditor {...commonProps} onSaveContent={() => {}} />

@@ -12,7 +12,7 @@ export class DocumentRepository {
       .values({
         title,
         content,
-        kind: kind as 'text' | 'code' | 'image' | 'sheet',
+        kind: kind as 'text' | 'simple-code-block' | 'python-file-pyodide' | 'js-project-sandpack' | 'html-fragment' | 'image' | 'sheet',
         userId
       })
       .returning();

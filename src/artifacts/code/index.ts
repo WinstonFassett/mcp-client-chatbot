@@ -17,32 +17,61 @@ export { pythonFileArtifact as simpleCodeArtifact } from './python-file-pyodide/
 
 // Detect the appropriate code artifact type based on content and intent
 export function detectCodeArtifactType(content: string, intent?: string): string {
-  // Check for multi-file JavaScript project indicators
-  if (content.includes('---filepath:') || 
-      (intent && intent.toLowerCase().includes('javascript project'))) {
+  // Normalize intent for easier matching
+  const normalizedIntent = intent?.toLowerCase() || '';
+  
+  // Check for TypeScript/JavaScript project indicators
+  if (
+    content.includes('---filepath:') || 
+    content.includes('package.json') ||
+    normalizedIntent.includes('typescript project') ||
+    normalizedIntent.includes('javascript project') ||
+    normalizedIntent.includes('react project') ||
+    normalizedIntent.includes('vue project') ||
+    normalizedIntent.includes('next.js') ||
+    normalizedIntent.includes('sandpack')
+  ) {
     return 'js-project-sandpack';
   }
   
   // Check for HTML fragment indicators
-  if (content.includes('<!DOCTYPE html>') || 
-      content.includes('<html>') || 
-      content.includes('<body>') ||
-      (content.includes('<style>') && content.includes('<script>')) ||
-      (intent && intent.toLowerCase().includes('html'))) {
+  if (
+    content.includes('<!DOCTYPE html>') || 
+    content.includes('<html>') || 
+    content.includes('<body>') ||
+    (content.includes('<style>') && content.includes('<script>')) ||
+    normalizedIntent.includes('html') ||
+    normalizedIntent.includes('web page') ||
+    normalizedIntent.includes('css') ||
+    normalizedIntent.includes('webpage')
+  ) {
     return 'html-fragment';
   }
   
-  // Default to python if we detect python imports or syntax
-  if (content.includes('import numpy') || 
-      content.includes('import pandas') ||
-      content.includes('def ') ||
-      content.includes('print(') ||
-      content.includes('matplotlib')) {
+  // Check for Python code indicators
+  if (
+    // Python imports
+    content.includes('import ') || 
+    content.includes('from ') ||
+    // Python syntax
+    content.includes('def ') || 
+    content.includes('class ') || 
+    content.includes('print(') || 
+    content.includes('if __name__') ||
+    // Python libraries
+    normalizedIntent.includes('python') ||
+    normalizedIntent.includes('numpy') ||
+    normalizedIntent.includes('pandas') ||
+    normalizedIntent.includes('matplotlib') ||
+    normalizedIntent.includes('tensorflow') ||
+    normalizedIntent.includes('pytorch') ||
+    normalizedIntent.includes('scikit')
+  ) {
     return 'python-file-pyodide';
   }
   
-  // Default to python-file as fallback for backward compatibility
-  return 'python-file-pyodide';
+  // Default to simple code block for any other code
+  return 'simple-code-block';
 }
 
 // Get the appropriate artifact based on type
