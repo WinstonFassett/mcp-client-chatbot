@@ -5,12 +5,15 @@ import { jsProjectArtifact } from './js-project-sandpack/client';
 // @ts-ignore - These modules will be created later
 import { htmlFragmentArtifact } from './html-fragment/client';
 import { Artifact } from '@/components/create-artifact';
+// Import the bolt artifact
+import { boltArtifact } from '../bolt/client';
 
 // Server-side handlers
 import { simpleCodeDocumentHandler } from "./server";
 import { pythonFileDocumentHandler } from "./python-file-pyodide/server";
 import { jsProjectDocumentHandler } from "./js-project-sandpack/server";
 import { htmlFragmentDocumentHandler } from "./html-fragment/server";
+import { boltDocumentHandler } from "../bolt/server-handler";
 
 // Export the simpleCodeArtifact for backward compatibility
 export { pythonFileArtifact as simpleCodeArtifact } from './python-file-pyodide/client';
@@ -19,6 +22,18 @@ export { pythonFileArtifact as simpleCodeArtifact } from './python-file-pyodide/
 export function detectCodeArtifactType(content: string, intent?: string): string {
   // Normalize intent for easier matching
   const normalizedIntent = intent?.toLowerCase() || '';
+  
+  // Check for bolt project indicators
+  if (
+    normalizedIntent.includes('bolt') ||
+    normalizedIntent.includes('webcontainer') ||
+    normalizedIntent.includes('node.js project') ||
+    normalizedIntent.includes('express project') ||
+    normalizedIntent.includes('terminal') ||
+    normalizedIntent.includes('full stack')
+  ) {
+    return 'js-project-bolt';
+  }
   
   // Check for TypeScript/JavaScript project indicators
   if (
@@ -77,6 +92,8 @@ export function detectCodeArtifactType(content: string, intent?: string): string
 // Get the appropriate artifact based on type
 export function getCodeArtifact(type: string): Artifact<any, any> {
   switch (type) {
+    case 'js-project-bolt':
+      return boltArtifact;
     case 'js-project-sandpack':
       return jsProjectArtifact;
     case 'html-fragment':
@@ -92,7 +109,8 @@ export const clientArtifacts = {
   'simple-code-block': pythonFileArtifact, // Fallback for backward compatibility
   'python-file-pyodide': pythonFileArtifact,
   'js-project-sandpack': jsProjectArtifact,
-  'html-fragment': htmlFragmentArtifact
+  'html-fragment': htmlFragmentArtifact,
+  'js-project-bolt': boltArtifact
 };
 
 // Export all document handlers
@@ -100,5 +118,6 @@ export const documentHandlers = {
   'simple-code-block': simpleCodeDocumentHandler,
   'python-file-pyodide': pythonFileDocumentHandler,
   'js-project-sandpack': jsProjectDocumentHandler,
-  'html-fragment': htmlFragmentDocumentHandler
+  'html-fragment': htmlFragmentDocumentHandler,
+  'js-project-bolt': boltDocumentHandler
 };

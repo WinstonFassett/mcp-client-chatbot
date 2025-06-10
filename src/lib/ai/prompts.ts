@@ -214,6 +214,8 @@ export const updateDocumentPrompt = (
     type === "simple-code-block" || 
     type === "python-file-pyodide" || 
     type === "js-project-sandpack" || 
+    type === "js-project-webcontainer" || 
+    type === "js-project-bolt" || 
     type === "html-fragment"
   ) {
     // Customize prompt based on specific code artifact type
@@ -223,6 +225,10 @@ export const updateDocumentPrompt = (
       prompt = "Improve the following Python code snippet based on the given prompt. Make sure it's compatible with Pyodide execution environment.";
     } else if (type === "js-project-sandpack") {
       prompt = "Improve the following JavaScript project based on the given prompt. Maintain proper file structure and dependencies.";
+    } else if (type === "js-project-webcontainer") {
+      prompt = "Improve the following Node.js project based on the given prompt. This project runs in WebContainers with full Node.js environment, terminal access, and live preview.";
+    } else if (type === "js-project-bolt") {
+      prompt = "Improve the following Node.js project based on the given prompt. This project runs in WebContainers with full Node.js environment, terminal access, and editor support.";
     } else if (type === "html-fragment") {
       prompt = "Improve the following HTML fragment based on the given prompt. Include any necessary CSS and JavaScript.";
     }
