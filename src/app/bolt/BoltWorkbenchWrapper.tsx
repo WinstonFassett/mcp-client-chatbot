@@ -35,6 +35,7 @@ export default function BoltWorkbenchWrapper() {
   const historyReady = true; // Stub value
   const importChat = async () => { console.log('Chat import stubbed'); }; // Stub function
   const bootstrapRef = useRef(false);
+  const initRef = useRef(false);
 
   // Add a debug overlay that can be toggled with a keyboard shortcut
   useEffect(() => {
@@ -57,23 +58,28 @@ export default function BoltWorkbenchWrapper() {
   // Initialize the WebContainer and ActionRunner
   useEffect(() => {
     let isMounted = true;
+    
     const initWebContainer = async () => {
+      // Prevent double initialization in development mode
+      if (initRef.current) return;
+      initRef.current = true;
+      
       try {
         setDebugInfo('Starting WebContainer initialization...');
-        console.log('Starting WebContainer initialization...');
-        setDebugInfo('Creating shell terminal...');
-        const dummyShellTerminal = () => {
-          return {
-            write: (data: string) => console.log('Terminal output:', data),
-            clear: () => console.log('Terminal cleared'),
-            // Add other required methods
-          } as any;
+        
+        // Don't create a dummy terminal here, it will be set by TerminalTabs
+        const dummyTerminal = {
+          write: (data: string) => console.log('Terminal output:', data),
+          clear: () => console.log('Terminal cleared'),
+          onData: () => {},
+          cols: 80,
+          rows: 15,
         };
+
         setDebugInfo('Creating ActionRunner...');
-        console.log('Creating ActionRunner with webcontainer:', webcontainer);
         const runner = new ActionRunner(
-          webcontainer, // Use the pre-configured webcontainer promise
-          dummyShellTerminal,
+          webcontainer,
+          dummyTerminal,
           (alert) => {
             console.log('Action alert:', alert);
             setDebugInfo(`Action alert: ${JSON.stringify(alert)}`);
@@ -87,68 +93,28 @@ export default function BoltWorkbenchWrapper() {
             setDebugInfo(`Deploy alert: ${JSON.stringify(alert)}`);
           }
         );
-        setDebugInfo('ActionRunner created successfully');
-        console.log('ActionRunner created successfully:', runner);
+
         if (isMounted) {
+          workbenchStore.setActionRunner(runner);
           setActionRunner(runner);
           setIsLoading(false);
           setDebugInfo('Ready to render Workbench');
         }
       } catch (err) {
         console.error('Failed to initialize WebContainer:', err);
-        setDebugInfo(`Error: ${err instanceof Error ? err.message : String(err)}`);
         if (isMounted) {
-          setError(`Failed to initialize WebContainer: ${err instanceof Error ? err.message : String(err)}`);
+          setError('Failed to initialize WebContainer. Please try refreshing the page.');
           setIsLoading(false);
         }
       }
     };
+
     initWebContainer();
+
     return () => {
       isMounted = false;
     };
   }, []);
-
-  // Helper function to run a command in the WebContainer
-  const runCommand = async (command: string, args: string[] = []): Promise<{ exitCode: number; output: string }> => {
-    try {
-      const webcontainerInstance = await webcontainer;
-      const fullCommand = `${command} ${args.join(' ')}`;
-      console.log(`Running command: ${fullCommand}`);
-      
-      // Make terminal visible
-      workbenchStore.toggleTerminal(true);
-      
-      // Get terminal instance - this is already attached in TerminalTabs.tsx
-      const boltShell = workbenchStore.boltTerminal;
-      const terminal = boltShell ? boltShell.terminal : null;
-      
-      // Spawn the process in the WebContainer
-      const process = await webcontainerInstance.spawn(command, args);
-      
-      // Collect output
-      let output = '';
-      process.output.pipeTo(
-        new WritableStream({
-          write(data) {
-            output += data;
-            // Write to terminal if available
-            if (terminal) {
-              terminal.write(data);
-            }
-          }
-        })
-      );
-      
-      // Wait for process to exit
-      const exitCode = await process.exit;
-      
-      return { exitCode, output };
-    } catch (error) {
-      console.error(`Error running command ${command}:`, error);
-      return { exitCode: 1, output: error instanceof Error ? error.message : String(error) };
-    }
-  };
 
   // Initialize the WebContainer once
   useEffect(() => {
@@ -199,6 +165,7 @@ export default function BoltWorkbenchWrapper() {
           // Now that the server is ready, switch to preview tab
           workbenchStore.currentView.set('preview');
         });
+        
         // Chat import would happen here
         // For now, we'll just clone a sample repo
         const repoUrl = 'https://github.com/xKevIsDev/bolt-nextjs-shadcn-template.git';
@@ -258,15 +225,22 @@ export default function BoltWorkbenchWrapper() {
         // Make terminal visible before running commands
         workbenchStore.toggleTerminal(true);
         
+        // Wait a moment for the terminal to be fully visible and initialized
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
         // Run setup command in the visible terminal
         if (projectCommands.setupCommand) {
           console.log(`Running setup command: ${projectCommands.setupCommand}`);
-          const [cmd, ...args] = projectCommands.setupCommand.split(' ');
-          const result = await runCommand(cmd, args);
           
-          if (result.exitCode !== 0) {
-            throw new Error(`Setup command failed with exit code ${result.exitCode}: ${result.output}`);
+          // IMPORTANT: Pass the entire command as a single string to runCommand
+          // Do NOT split it into command and args
+          const setupResult = await runCommand(projectCommands.setupCommand);
+          
+          if (setupResult.exitCode !== 0) {
+            throw new Error(`Setup command failed with exit code ${setupResult.exitCode}: ${setupResult.output}`);
           }
+          
+          console.log('Setup command completed successfully');
         }
         
         // Run start command in the visible terminal
@@ -274,14 +248,15 @@ export default function BoltWorkbenchWrapper() {
           console.log(`Running start command: ${projectCommands.startCommand}`);
           
           try {
-            // Run the start command using our terminal-integrated function
-            const [cmd, ...args] = projectCommands.startCommand.split(' ');
-            const result = await runCommand(cmd, args);
+            // IMPORTANT: Pass the entire command as a single string to runCommand
+            // Do NOT split it into command and args
+            const startResult = await runCommand(projectCommands.startCommand);
             
-            if (result.exitCode !== 0) {
-              throw new Error(`Start command failed with exit code ${result.exitCode}: ${result.output}`);
+            if (startResult.exitCode !== 0) {
+              throw new Error(`Start command failed with exit code ${startResult.exitCode}: ${startResult.output}`);
             }
             
+            console.log('Start command initiated successfully');
             // Only switch to preview tab after server is ready
             // This happens in the server-ready event handler
           } catch (error) {
@@ -335,6 +310,9 @@ export default function BoltWorkbenchWrapper() {
     
     // No need for cleanup as we're using refs to track state
   }, [gitReady, historyReady]);
+  
+  // REMOVED: The terminal initialization effect that was causing an infinite loop
+  // We'll rely on the terminal being properly initialized by TerminalTabs.tsx
 
   // REMOVED the setupRunning check that was blocking the workbench from showing
   // We want to show the workbench as soon as files are ready, even if setup is still running

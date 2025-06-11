@@ -58,6 +58,10 @@ export class WorkbenchStore {
   modifiedFiles = new Set<string>();
   artifactIdList: string[] = [];
   #globalExecutionQueue = Promise.resolve();
+  actionRunner: WritableAtom<ActionRunner | null> = import.meta.hot?.data.actionRunner ?? atom<ActionRunner | null>(null);
+  shouldRunNpmInstall = false;
+  shouldRunDev = false;
+
   constructor() {
     if (import.meta.hot) {
       import.meta.hot.data.artifacts = this.artifacts;
@@ -67,6 +71,7 @@ export class WorkbenchStore {
       import.meta.hot.data.actionAlert = this.actionAlert;
       import.meta.hot.data.supabaseAlert = this.supabaseAlert;
       import.meta.hot.data.deployAlert = this.deployAlert;
+      import.meta.hot.data.actionRunner = this.actionRunner;
 
       // Ensure binary files are properly preserved across hot reloads
       const filesMap = this.files.get();
@@ -111,7 +116,7 @@ export class WorkbenchStore {
   get showTerminal() {
     return this.#terminalStore.showTerminal;
   }
-  get boltTerminal() {
+  get terminal() {
     return this.#terminalStore.boltTerminal;
   }
   get alert() {
@@ -340,120 +345,6 @@ export class WorkbenchStore {
     return this.#filesStore.isFolderLocked(folderPath);
   }
 
-  async createFile(filePath: string, content: string | Uint8Array = '') {
-    try {
-      const success = await this.#filesStore.createFile(filePath, content);
-
-      if (success) {
-        this.setSelectedFile(filePath);
-
-        /*
-         * For empty files, we need to ensure they're not marked as unsaved
-         * Only check for empty string, not empty Uint8Array
-         */
-        if (typeof content === 'string' && content === '') {
-          const newUnsavedFiles = new Set(this.unsavedFiles.get());
-          newUnsavedFiles.delete(filePath);
-          this.unsavedFiles.set(newUnsavedFiles);
-        }
-      }
-
-      return success;
-    } catch (error) {
-      console.error('Failed to create file:', error);
-      throw error;
-    }
-  }
-
-  async createFolder(folderPath: string) {
-    try {
-      return await this.#filesStore.createFolder(folderPath);
-    } catch (error) {
-      console.error('Failed to create folder:', error);
-      throw error;
-    }
-  }
-
-  async deleteFile(filePath: string) {
-    try {
-      const currentDocument = this.currentDocument.get();
-      const isCurrentFile = currentDocument?.filePath === filePath;
-
-      const success = await this.#filesStore.deleteFile(filePath);
-
-      if (success) {
-        const newUnsavedFiles = new Set(this.unsavedFiles.get());
-
-        if (newUnsavedFiles.has(filePath)) {
-          newUnsavedFiles.delete(filePath);
-          this.unsavedFiles.set(newUnsavedFiles);
-        }
-
-        if (isCurrentFile) {
-          const files = this.files.get();
-          let nextFile: string | undefined = undefined;
-
-          for (const [path, dirent] of Object.entries(files)) {
-            if (dirent?.type === 'file') {
-              nextFile = path;
-              break;
-            }
-          }
-
-          this.setSelectedFile(nextFile);
-        }
-      }
-
-      return success;
-    } catch (error) {
-      console.error('Failed to delete file:', error);
-      throw error;
-    }
-  }
-
-  async deleteFolder(folderPath: string) {
-    try {
-      const currentDocument = this.currentDocument.get();
-      const isInCurrentFolder = currentDocument?.filePath?.startsWith(folderPath + '/');
-
-      const success = await this.#filesStore.deleteFolder(folderPath);
-
-      if (success) {
-        const unsavedFiles = this.unsavedFiles.get();
-        const newUnsavedFiles = new Set<string>();
-
-        for (const file of unsavedFiles) {
-          if (!file.startsWith(folderPath + '/')) {
-            newUnsavedFiles.add(file);
-          }
-        }
-
-        if (newUnsavedFiles.size !== unsavedFiles.size) {
-          this.unsavedFiles.set(newUnsavedFiles);
-        }
-
-        if (isInCurrentFolder) {
-          const files = this.files.get();
-          let nextFile: string | undefined = undefined;
-
-          for (const [path, dirent] of Object.entries(files)) {
-            if (dirent?.type === 'file') {
-              nextFile = path;
-              break;
-            }
-          }
-
-          this.setSelectedFile(nextFile);
-        }
-      }
-
-      return success;
-    } catch (error) {
-      console.error('Failed to delete folder:', error);
-      throw error;
-    }
-  }
-
   abortAllActions() {
     // TODO: what do we wanna do and how do we wanna recover from this?
   }
@@ -480,7 +371,7 @@ export class WorkbenchStore {
       type,
       runner: new ActionRunner(
         webcontainer,
-        () => this.boltTerminal,
+        () => this.terminal,
         (alert) => {
           if (this.#reloadedMessages.has(messageId)) {
             return;
@@ -715,7 +606,6 @@ export class WorkbenchStore {
   //             repo: repoName,
   //             private: isPrivate,
   //           });
-
   //           console.log('Repository visibility updated successfully');
   //           repo = updatedRepo;
   //           visibilityJustChanged = true;
@@ -865,6 +755,137 @@ export class WorkbenchStore {
   //     throw error; // Rethrow the error for further handling
   //   }
   // }
+  setTerminal(terminal: ITerminal) {
+    this.#terminalStore.setTerminal(terminal);
+  }
+
+  setActionRunner(runner: ActionRunner) {
+    this.actionRunner.set(runner);
+  }
+
+  setShouldRunNpmInstall(value: boolean) {
+    this.shouldRunNpmInstall = value;
+  }
+
+  setShouldRunDev(value: boolean) {
+    this.shouldRunDev = value;
+  }
+
+  async createFile(filePath: string, content: string | Uint8Array = '') {
+    try {
+      const success = await this.#filesStore.createFile(filePath, content);
+
+      if (success) {
+        this.setSelectedFile(filePath);
+
+        /*
+         * For empty files, we need to ensure they're not marked as unsaved
+         * Only check for empty string, not empty Uint8Array
+         */
+        if (typeof content === 'string' && content === '') {
+          const newUnsavedFiles = new Set(this.unsavedFiles.get());
+          newUnsavedFiles.delete(filePath);
+          this.unsavedFiles.set(newUnsavedFiles);
+        }
+      }
+
+      return success;
+    } catch (error) {
+      console.error('Failed to create file:', error);
+      throw error;
+    }
+  }
+
+  async createFolder(folderPath: string) {
+    try {
+      return await this.#filesStore.createFolder(folderPath);
+    } catch (error) {
+      console.error('Failed to create folder:', error);
+      throw error;
+    }
+  }
+
+  async deleteFile(filePath: string) {
+    try {
+      const currentDocument = this.currentDocument.get();
+      const isCurrentFile = currentDocument?.filePath === filePath;
+
+      const success = await this.#filesStore.deleteFile(filePath);
+
+      if (success) {
+        const newUnsavedFiles = new Set(this.unsavedFiles.get());
+
+        if (newUnsavedFiles.has(filePath)) {
+          newUnsavedFiles.delete(filePath);
+          this.unsavedFiles.set(newUnsavedFiles);
+        }
+
+        if (isCurrentFile) {
+          const files = this.files.get();
+          let nextFile: string | undefined = undefined;
+
+          for (const [path, dirent] of Object.entries(files)) {
+            if (dirent?.type === 'file') {
+              nextFile = path;
+              break;
+            }
+          }
+
+          this.setSelectedFile(nextFile);
+        }
+      }
+
+      return success;
+    } catch (error) {
+      console.error('Failed to delete file:', error);
+      throw error;
+    }
+  }
+
+  async deleteFolder(folderPath: string) {
+    try {
+      const currentDocument = this.currentDocument.get();
+      const isInCurrentFolder = currentDocument?.filePath?.startsWith(folderPath + '/');
+
+      const success = await this.#filesStore.deleteFolder(folderPath);
+
+      if (success) {
+        const unsavedFiles = this.unsavedFiles.get();
+        const newUnsavedFiles = new Set<string>();
+
+        for (const file of unsavedFiles) {
+          if (!file.startsWith(folderPath + '/')) {
+            newUnsavedFiles.add(file);
+          }
+        }
+
+        if (newUnsavedFiles.size !== unsavedFiles.size) {
+          this.unsavedFiles.set(newUnsavedFiles);
+        }
+
+        if (isInCurrentFolder) {
+          const files = this.files.get();
+          let nextFile: string | undefined = undefined;
+
+          for (const [path, dirent] of Object.entries(files)) {
+            if (dirent?.type === 'file') {
+              nextFile = path;
+              break;
+            }
+          }
+
+          this.setSelectedFile(nextFile);
+        }
+      }
+
+      return success;
+    } catch (error) {
+      console.error('Failed to delete folder:', error);
+      throw error;
+    }
+  }
+
+  // ... rest of the code remains the same ...
 }
 
 export const workbenchStore = new WorkbenchStore();

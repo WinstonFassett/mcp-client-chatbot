@@ -20,13 +20,53 @@ export const DEFAULT_TERMINAL_SIZE = 25;
 export const TerminalTabs = memo(() => {
   const showTerminal = useStore(workbenchStore.showTerminal);
   const theme = useStore(themeStore);
+  const actionRunner = useStore(workbenchStore.actionRunner);
+  const terminal = useStore(workbenchStore.terminal);
 
   const terminalRefs = useRef<Array<TerminalRef | null>>([]);
   const terminalPanelRef = useRef<ImperativePanelHandle>(null);
   const terminalToggledByShortcut = useRef(false);
+  const hasRunInitialCommands = useRef(false);
 
   const [activeTerminal, setActiveTerminal] = useState(0);
   const [terminalCount, setTerminalCount] = useState(1);
+
+  // Handle running initial commands when the terminal is ready
+  useEffect(() => {
+    const runInitialCommands = async () => {
+      if (!actionRunner || !terminal || hasRunInitialCommands.current) return;
+      
+      hasRunInitialCommands.current = true;
+      
+      try {
+        // Run npm install if needed
+        if (workbenchStore.shouldRunNpmInstall) {
+          terminal.write('\r\n$ npm install\r\n');
+          await actionRunner.runCommand('npm install');
+          workbenchStore.setShouldRunNpmInstall(false);
+        }
+
+        // Run dev server if needed
+        if (workbenchStore.shouldRunDev) {
+          terminal.write('\r\n$ npm run dev\r\n');
+          await actionRunner.runCommand('npm run dev');
+          workbenchStore.setShouldRunDev(false);
+        }
+      } catch (error) {
+        console.error('Error running initial commands:', error);
+      }
+    };
+
+    runInitialCommands();
+  }, [actionRunner, terminal]);
+
+  // Initialize the terminal when the component mounts
+  useEffect(() => {
+    if (actionRunner) {
+      // The terminal will be initialized by the DynamicTerminal component
+      // which will call workbenchStore.setBoltTerminal when it's ready
+    }
+  }, [actionRunner]);
 
   const addTerminal = () => {
     if (terminalCount < MAX_TERMINALS) {
