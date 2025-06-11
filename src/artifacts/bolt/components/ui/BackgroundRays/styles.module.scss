@@ -17,11 +17,11 @@
   z-index: 0;
   //   background-color: transparent;
 
-  :global(html[data-theme='dark']) & {
+  :global(html[data-theme*='-dark']) & {
     mix-blend-mode: screen;
   }
 
-  :global(html[data-theme='light']) & {
+  :global(html:not([data-theme*='-dark'])) & {
     mix-blend-mode: multiply;
   }
 }
@@ -30,11 +30,11 @@
   position: absolute;
   border-radius: 100%;
 
-  :global(html[data-theme='dark']) & {
+  :global(html[data-theme*='-dark']) & {
     mix-blend-mode: screen;
   }
 
-  :global(html[data-theme='light']) & {
+  :global(html:not([data-theme*='-dark'])) & {
     mix-blend-mode: multiply;
     opacity: 0.4;
   }

@@ -1,6 +1,7 @@
 /* Color Tokens Light Theme */
 :root,
-:root[data-theme='light'] {
+:root[data-theme='light'],
+:root:not([data-theme*='-dark']) {
   --bolt-elements-borderColor: theme('colors.alpha.gray.10');
   --bolt-elements-borderColorActive: theme('colors.accent.600');
 
@@ -8,6 +9,12 @@
   --bolt-elements-bg-depth-2: theme('colors.gray.50');
   --bolt-elements-bg-depth-3: theme('colors.gray.200');
   --bolt-elements-bg-depth-4: theme('colors.alpha.gray.5');
+  
+  /* Map bg-depth to background-depth for component compatibility */
+  --bolt-elements-background-depth-1: var(--bolt-elements-bg-depth-1);
+  --bolt-elements-background-depth-2: var(--bolt-elements-bg-depth-2);
+  --bolt-elements-background-depth-3: var(--bolt-elements-bg-depth-3);
+  --bolt-elements-background-depth-4: var(--bolt-elements-bg-depth-4);
 
   --bolt-elements-textPrimary: theme('colors.gray.950');
   --bolt-elements-textSecondary: theme('colors.gray.600');
@@ -107,8 +114,8 @@
 }
 
 /* Color Tokens Dark Theme */
-:root,
-:root[data-theme='dark'] {
+:root[data-theme='dark'],
+:root[data-theme*='-dark'] {
   --bolt-elements-borderColor: theme('colors.alpha.white.10');
   --bolt-elements-borderColorActive: theme('colors.accent.500');
 
@@ -116,6 +123,12 @@
   --bolt-elements-bg-depth-2: theme('colors.gray.900');
   --bolt-elements-bg-depth-3: theme('colors.gray.800');
   --bolt-elements-bg-depth-4: theme('colors.alpha.white.5');
+  
+  /* Map bg-depth to background-depth for component compatibility */
+  --bolt-elements-background-depth-1: var(--bolt-elements-bg-depth-1);
+  --bolt-elements-background-depth-2: var(--bolt-elements-bg-depth-2);
+  --bolt-elements-background-depth-3: var(--bolt-elements-bg-depth-3);
+  --bolt-elements-background-depth-4: var(--bolt-elements-bg-depth-4);
 
   --bolt-elements-textPrimary: theme('colors.white');
   --bolt-elements-textSecondary: theme('colors.gray.400');
@@ -212,6 +225,9 @@
   --bolt-terminal-brightWhite: #f1f1f0;
   --modern-scrollbar-thumb-background: rgba(100, 100, 100, 0.3); // Example dark theme color (adjust as needed)
   --modern-scrollbar-thumb-backgroundHover: rgba(10, 10, 10, 0.8);
+  
+  /* Ensure dark mode for code editor */
+  color-scheme: dark;
 }
 
 /*
