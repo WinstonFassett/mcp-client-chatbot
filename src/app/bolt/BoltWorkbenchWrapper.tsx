@@ -3,9 +3,11 @@
 import React, { useState, useEffect, useRef, Component, ErrorInfo } from 'react';
 import { ActionRunner } from '@/artifacts/bolt/lib/runtime/action-runner';
 import DebugWorkbench from './DebugWorkbench';
+import { WebContainer } from '@webcontainer/api';
+import { useGit } from '@/artifacts/bolt/lib/hooks/useGit';
+import { workbenchStore } from '@/artifacts/bolt/lib/stores/workbench';
 import { webcontainer } from '@/artifacts/bolt/lib/webcontainer';
 import { WORK_DIR_NAME } from '@/artifacts/bolt/utils/constants';
-import { useGit } from '@/artifacts/bolt/lib/hooks/useGit';
 import { generateId, type Message } from 'ai';
 import { escapeBoltTags, detectProjectCommands, createCommandsMessage } from '@/artifacts/bolt/utils/projectCommands';
 
@@ -32,6 +34,7 @@ export default function BoltWorkbenchWrapper() {
   // const { ready: historyReady, importChat } = useChatHistory();
   const historyReady = true; // Stub value
   const importChat = async () => { console.log('Chat import stubbed'); }; // Stub function
+  const bootstrapRef = useRef(false);
 
   // Add a debug overlay that can be toggled with a keyboard shortcut
   useEffect(() => {
@@ -42,6 +45,20 @@ export default function BoltWorkbenchWrapper() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+  
+  // Initialize the component
+  useEffect(() => {
+    // Only run once
+    if (bootstrapRef.current) return;
+    bootstrapRef.current = true;
+    
+    // Show the terminal by default
+    try {
+      workbenchStore.toggleTerminal(true);
+    } catch (e) {
+      console.warn('Could not show terminal:', e);
+    }
   }, []);
 
   // Initialize the WebContainer and ActionRunner
@@ -99,11 +116,18 @@ export default function BoltWorkbenchWrapper() {
     };
   }, []);
 
-  // Helper function to run commands in the WebContainer
+  // Helper function to run a command in the WebContainer
   const runCommand = async (command: string, args: string[] = []): Promise<{ exitCode: number; output: string }> => {
     try {
       const webcontainerInstance = await webcontainer;
       console.log(`Running command: ${command} ${args.join(' ')}`);
+      
+      // Try to show the terminal
+      try {
+        workbenchStore.toggleTerminal(true);
+      } catch (e) {
+        console.warn('Could not show terminal:', e);
+      }
       
       // Spawn the process in the WebContainer
       const process = await webcontainerInstance.spawn(command, args);
@@ -114,6 +138,19 @@ export default function BoltWorkbenchWrapper() {
         new WritableStream({
           write(data) {
             output += data;
+            console.log(`Command output: ${data}`);
+            
+            // Try to write to the terminal if available
+            try {
+              const boltTerminal = workbenchStore.terminalStore.boltTerminal;
+              if (boltTerminal) {
+                boltTerminal.writeToTerminal(data).catch(e => {
+                  console.warn('Could not write to terminal:', e);
+                });
+              }
+            } catch (e) {
+              console.warn('Terminal not available:', e);
+            }
           }
         })
       );
@@ -149,23 +186,8 @@ export default function BoltWorkbenchWrapper() {
     });
   }, []); // Empty dependency array ensures this runs only once
 
-  // Bootstrap the project when WebContainer and Git are ready
-  useEffect(() => {
-    // Skip if we've already triggered bootstrap
-    if (didTriggerBootstrapRef.current) {
-      return;
-    }
-    
-    // Wait for all dependencies to be ready
-    if (!gitReady || !historyReady) {
-      return;
-    }
-    
-    // Mark as triggered to prevent duplicate runs
-    didTriggerBootstrapRef.current = true;
-    
-    // Define the bootstrap function
-    const bootstrapProject = async () => {
+  // Define the bootstrap function outside of useEffect
+  const bootstrapProject = async () => {
       console.log('Starting project bootstrap...');
       setSetupRunning(true);
 
@@ -253,55 +275,26 @@ export default function BoltWorkbenchWrapper() {
           if (result.exitCode !== 0) {
             throw new Error(`Setup command failed with exit code ${result.exitCode}: ${result.output}`);
           }
-          
-          console.log('Setup command completed successfully');
         }
         
         // Run start command
         if (projectCommands.startCommand) {
           console.log(`Running start command: ${projectCommands.startCommand}`);
+          setDebugInfo(prev => prev + `\nRunning start command: ${projectCommands.startCommand}`);
           
           try {
-            // Parse the command - handle npm commands specially
-            let cmd: string;
-            let args: string[];
+            // Run the start command using our terminal-integrated function
+            const [cmd, ...args] = projectCommands.startCommand.split(' ');
+            const result = await runCommand(cmd, args);
             
-            if (projectCommands.startCommand.startsWith('npm ')) {
-              cmd = 'npm';
-              args = projectCommands.startCommand.slice(4).trim().split(' ');
-            } else {
-              [cmd, ...args] = projectCommands.startCommand.split(' ');
+            if (result.exitCode !== 0) {
+              throw new Error(`Start command failed with exit code ${result.exitCode}: ${result.output}`);
             }
-            
-            console.log(`Parsed command: ${cmd} with args:`, args);
-            
-            // Start the dev server directly using spawn
-            const serverProcess = await webcontainerInstance.spawn(cmd, args);
-            
-            // Collect and log output
-            serverProcess.output.pipeTo(
-              new WritableStream({
-                write(data) {
-                  console.log(`Server output: ${data}`);
-                }
-              })
-            );
-            
-            // Handle server exit
-            serverProcess.exit.then(exitCode => {
-              if (exitCode !== 0) {
-                console.error(`Server process exited with code ${exitCode}`);
-                setSetupError(`Server process exited with code ${exitCode}`);
-                setSetupRunning(false);
-              }
-            });
-            
-            // The server-ready event will handle setting the preview URL
-            console.log('Waiting for server-ready event...');
           } catch (error) {
-            console.error('Error starting server:', error);
-            setSetupError(`Error starting server: ${error instanceof Error ? error.message : String(error)}`);
+            console.error('Error running start command:', error);
+            setSetupError(`Error running start command: ${error instanceof Error ? error.message : String(error)}`);
             setSetupRunning(false);
+            return;
           }
         } else {
           setSetupRunning(false);
@@ -318,12 +311,40 @@ export default function BoltWorkbenchWrapper() {
         // Display a more user-friendly error in the UI
         setError(`Failed to bootstrap project: ${errorMessage}`);
       }
-    };
+  };
+  
+  // Bootstrap the project when WebContainer and Git are ready
+  useEffect(() => {
+    // Skip if we've already triggered bootstrap
+    if (didTriggerBootstrapRef.current) {
+      return;
+    }
     
-    bootstrapProject();
+    // Wait for all dependencies to be ready
+    if (!gitReady || !historyReady) {
+      return;
+    }
+    
+    console.log('All dependencies ready, starting bootstrap process');
+    
+    // Mark as triggered to prevent duplicate runs
+    didTriggerBootstrapRef.current = true;
+    
+    // Show the terminal by default
+    try {
+      workbenchStore.toggleTerminal(true);
+    } catch (e) {
+      console.warn('Could not show terminal:', e);
+    }
+    
+    // Start the bootstrap process
+    bootstrapProject().catch(error => {
+      console.error('Bootstrap process failed:', error);
+      setError(`Bootstrap process failed: ${error instanceof Error ? error.message : String(error)}`);
+    });
     
     // No need for cleanup as we're using refs to track state
-  }, [actionRunner, gitReady, historyReady, gitClone]);
+  }, [gitReady, historyReady]);
 
   if (setupRunning) {
     return (
@@ -381,7 +402,7 @@ export default function BoltWorkbenchWrapper() {
           </div>
         </div>
         
-        {/* Just show the workbench, no split view */}
+        {/* Just show the workbench, terminal will be shown automatically */}
         <div className="flex-1 overflow-auto">
           <DebugWorkbench actionRunner={actionRunner} />
         </div>
