@@ -52,13 +52,6 @@ export default function BoltWorkbenchWrapper() {
     // Only run once
     if (bootstrapRef.current) return;
     bootstrapRef.current = true;
-    
-    // Show the terminal by default
-    try {
-      workbenchStore.toggleTerminal(true);
-    } catch (e) {
-      console.warn('Could not show terminal:', e);
-    }
   }, []);
 
   // Initialize the WebContainer and ActionRunner
@@ -120,14 +113,15 @@ export default function BoltWorkbenchWrapper() {
   const runCommand = async (command: string, args: string[] = []): Promise<{ exitCode: number; output: string }> => {
     try {
       const webcontainerInstance = await webcontainer;
-      console.log(`Running command: ${command} ${args.join(' ')}`);
+      const fullCommand = `${command} ${args.join(' ')}`;
+      console.log(`Running command: ${fullCommand}`);
       
-      // Try to show the terminal
-      try {
-        workbenchStore.toggleTerminal(true);
-      } catch (e) {
-        console.warn('Could not show terminal:', e);
-      }
+      // Make terminal visible
+      workbenchStore.toggleTerminal(true);
+      
+      // Get terminal instance - this is already attached in TerminalTabs.tsx
+      const boltShell = workbenchStore.boltTerminal;
+      const terminal = boltShell ? boltShell.terminal : null;
       
       // Spawn the process in the WebContainer
       const process = await webcontainerInstance.spawn(command, args);
@@ -138,18 +132,9 @@ export default function BoltWorkbenchWrapper() {
         new WritableStream({
           write(data) {
             output += data;
-            console.log(`Command output: ${data}`);
-            
-            // Try to write to the terminal if available
-            try {
-              const boltTerminal = workbenchStore.terminalStore.boltTerminal;
-              if (boltTerminal) {
-                boltTerminal.writeToTerminal(data).catch(e => {
-                  console.warn('Could not write to terminal:', e);
-                });
-              }
-            } catch (e) {
-              console.warn('Terminal not available:', e);
+            // Write to terminal if available
+            if (terminal) {
+              terminal.write(data);
             }
           }
         })
@@ -330,12 +315,7 @@ export default function BoltWorkbenchWrapper() {
     // Mark as triggered to prevent duplicate runs
     didTriggerBootstrapRef.current = true;
     
-    // Show the terminal by default
-    try {
-      workbenchStore.toggleTerminal(true);
-    } catch (e) {
-      console.warn('Could not show terminal:', e);
-    }
+    // Terminal is already visible in the UI
     
     // Start the bootstrap process
     bootstrapProject().catch(error => {
