@@ -180,46 +180,114 @@ export class BoltShell {
   }
 
   async executeCommand(sessionId: string, command: string, abort?: () => void): Promise<ExecutionResult> {
+    console.log(`[DEBUG][${sessionId}] executeCommand called with command:`, command);
+    
     if (!this.process || !this.terminal) {
-      return undefined;
+      console.error(`[DEBUG][${sessionId}] Terminal or process not available`);
+      return { output: 'Terminal not available', exitCode: 1 };
     }
 
     const state = this.executionState.get();
+    console.log(`[DEBUG][${sessionId}] Current execution state:`, state);
 
     if (state?.active && state.abort) {
+      console.log(`[DEBUG][${sessionId}] Aborting previous command`);
       state.abort();
     }
 
-    /*
-     * interrupt the current execution
-     *  this.#shellInputStream?.write('\x03');
-     */
-    this.terminal.input('\x03');
-    await this.waitTillOscCode('prompt');
-
-    if (state && state.executionPrms) {
-      await state.executionPrms;
-    }
-
-    //start a new execution
-    this.terminal.input(command.trim() + '\n');
-
-    //wait for the execution to finish
-    const executionPromise = this.getCurrentExecutionResult();
-    this.executionState.set({ sessionId, active: true, executionPrms: executionPromise, abort });
-
-    const resp = await executionPromise;
-    this.executionState.set({ sessionId, active: false });
-
-    if (resp) {
+    try {
+      console.log(`[DEBUG][${sessionId}] Sending Ctrl+C to interrupt any running command`);
+      // Send Ctrl+C to interrupt any running command
+      this.terminal.input('\x03');
+      
+      // Wait for prompt with a timeout
+      console.log(`[DEBUG][${sessionId}] Waiting for prompt (with timeout)`);
       try {
-        resp.output = cleanTerminalOutput(resp.output);
+        await Promise.race([
+          this.waitTillOscCode('prompt'),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Prompt timeout')), 3000))
+        ]);
+        console.log(`[DEBUG][${sessionId}] Got prompt`);
       } catch (error) {
-        console.log('failed to format terminal output', error);
+        console.warn(`[DEBUG][${sessionId}] Could not detect prompt, continuing anyway:`, error);
+        // Continue even if we can't detect the prompt
       }
-    }
+      
+      if (state && state.executionPrms) {
+        console.log(`[DEBUG][${sessionId}] Waiting for previous command to complete`);
+        await state.executionPrms;
+      }
 
-    return resp;
+      console.log(`[DEBUG][${sessionId}] Creating new execution promise`);
+      const { promise, resolve, reject } = withResolvers<ExecutionResult>();
+      
+      // Set up the execution state
+      this.executionState.set({
+        sessionId,
+        active: true,
+        executionPrms: promise,
+        abort: () => {
+          console.log(`[DEBUG][${sessionId}] Abort requested`);
+          reject(new Error('Command aborted'));
+        },
+      });
+
+      console.log(`[DEBUG][${sessionId}] Sending command to terminal:`, JSON.stringify(command));
+      this.terminal.input(`${command}\r`);
+      
+      console.log(`[DEBUG][${sessionId}] Setting up output collection`);
+      let output = '';
+      const outputListener = (data: string) => {
+        console.log(`[DEBUG][${sessionId}] Terminal output:`, JSON.stringify(data));
+        output += data;
+      };
+      
+      this.terminal.onData(outputListener);
+      
+      console.log(`[DEBUG][${sessionId}] Waiting for command to complete`);
+      
+      // Wait for the command to complete or timeout after 30 seconds
+      const exitCode = await Promise.race([
+        new Promise<number>((resolveExitCode) => {
+          const checkComplete = () => {
+            // Check for prompt or command end
+            if (output.includes('$ ') || output.includes('> ') || output.includes('\r\n')) {
+              console.log(`[DEBUG][${sessionId}] Command output complete`);
+              resolveExitCode(0);
+            } else {
+              setTimeout(checkComplete, 100);
+            }
+          };
+          checkComplete();
+        }),
+        new Promise<number>((_, reject) => 
+          setTimeout(() => reject(new Error('Command timeout')), 30000)
+        )
+      ]);
+      
+      console.log(`[DEBUG][${sessionId}] Command completed with exit code`, exitCode);
+      
+      // Clean up
+      this.terminal.offData(outputListener);
+      this.executionState.set(undefined);
+      
+      const result = { 
+        output: cleanTerminalOutput(output), 
+        exitCode: exitCode as number 
+      };
+      
+      resolve(result);
+      return result;
+      
+    } catch (error) {
+      console.error(`[DEBUG][${sessionId}] Error in executeCommand:`, error);
+      const errorResult = { 
+        output: error instanceof Error ? error.message : String(error), 
+        exitCode: 1 
+      };
+      this.executionState.set(undefined);
+      return errorResult;
+    }
   }
 
   async getCurrentExecutionResult(): Promise<ExecutionResult> {

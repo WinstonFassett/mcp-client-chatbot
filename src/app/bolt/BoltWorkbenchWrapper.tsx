@@ -168,7 +168,7 @@ export default function BoltWorkbenchWrapper() {
         
         // Chat import would happen here
         // For now, we'll just clone a sample repo
-        const repoUrl = 'https://github.com/xKevIsDev/bolt-nextjs-shadcn-template.git';
+        const repoUrl = 'https://github.com/xKevIsDev/vanilla-vite-template.git';
         console.log(`Cloning ${repoUrl}...`);
         
         // Clone the repository
@@ -223,48 +223,52 @@ export default function BoltWorkbenchWrapper() {
         console.log('Detected project commands:', projectCommands);
         
         // Make terminal visible before running commands
+        console.log('[DEBUG] Making terminal visible');
         workbenchStore.toggleTerminal(true);
         
-        // Wait a moment for the terminal to be fully visible and initialized
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Run setup command in the visible terminal
-        if (projectCommands.setupCommand) {
-          console.log(`Running setup command: ${projectCommands.setupCommand}`);
-          
-          // IMPORTANT: Pass the entire command as a single string to runCommand
-          // Do NOT split it into command and args
-          const setupResult = await runCommand(projectCommands.setupCommand);
-          
-          if (setupResult.exitCode !== 0) {
-            throw new Error(`Setup command failed with exit code ${setupResult.exitCode}: ${setupResult.output}`);
-          }
-          
-          console.log('Setup command completed successfully');
-        }
-        
-        // Run start command in the visible terminal
-        if (projectCommands.startCommand) {
-          console.log(`Running start command: ${projectCommands.startCommand}`);
-          
-          try {
-            // IMPORTANT: Pass the entire command as a single string to runCommand
-            // Do NOT split it into command and args
-            const startResult = await runCommand(projectCommands.startCommand);
-            
-            if (startResult.exitCode !== 0) {
-              throw new Error(`Start command failed with exit code ${startResult.exitCode}: ${startResult.output}`);
+        // Wait for terminal to be fully initialized with retries
+        console.log('[DEBUG] Waiting for terminal initialization');
+        const waitForTerminalReady = async (maxRetries = 10, delay = 500) => {
+          for (let i = 0; i < maxRetries; i++) {
+            const terminal = workbenchStore.terminal;
+            if (terminal?.terminal) {
+              console.log(`[DEBUG] Terminal found, checking if ready (attempt ${i + 1}/${maxRetries})`);
+              // Just check if the terminal instance is available
+              // The actual terminal might be in a different component
+              return true;
             }
-            
-            console.log('Start command initiated successfully');
-            // Only switch to preview tab after server is ready
-            // This happens in the server-ready event handler
-          } catch (error) {
-            console.error('Error running start command:', error);
-            setSetupError(`Error running start command: ${error instanceof Error ? error.message : String(error)}`);
-            setSetupRunning(false);
-            return;
+            console.log(`[DEBUG] Terminal not ready yet, waiting... (attempt ${i + 1}/${maxRetries})`);
+            await new Promise(resolve => setTimeout(resolve, delay));
           }
+          throw new Error('Terminal failed to initialize after multiple attempts');
+        };
+
+        try {
+          await waitForTerminalReady();
+          console.log('[DEBUG] Terminal is ready, proceeding with commands');
+          
+          // Get the terminal instance
+          const terminal = workbenchStore.terminal;
+          if (!terminal) {
+            throw new Error('Terminal is not available');
+          }
+
+          // Run setup command if needed
+          if (projectCommands.setupCommand) {
+            console.log(`[DEBUG] SETUP COMMAND: ${projectCommands.setupCommand}`);
+            await terminal.executeCommand(`setup-${Date.now()}`, projectCommands.setupCommand);
+          }
+
+          // Run start command if needed (don't await this one as it's long-running)
+          if (projectCommands.startCommand) {
+            console.log(`[DEBUG] START COMMAND: ${projectCommands.startCommand}`);
+            terminal.executeCommand(`start-${Date.now()}`, projectCommands.startCommand)
+              .catch(error => console.error('Error running start command:', error));
+          }
+          
+        } catch (error) {
+          console.error('[DEBUG] Error initializing terminal or running commands:', error);
+          throw error;
         }
         
         // Setup is complete

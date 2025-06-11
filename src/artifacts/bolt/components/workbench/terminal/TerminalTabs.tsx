@@ -20,45 +20,83 @@ export const DEFAULT_TERMINAL_SIZE = 25;
 export const TerminalTabs = memo(() => {
   const showTerminal = useStore(workbenchStore.showTerminal);
   const theme = useStore(themeStore);
-  const actionRunner = useStore(workbenchStore.actionRunner);
-  const terminal = useStore(workbenchStore.terminal);
+  // Get actionRunner and terminal directly from workbenchStore
+  const actionRunner = workbenchStore.actionRunner.get();
+  const terminal = workbenchStore.terminal;
 
   const terminalRefs = useRef<Array<TerminalRef | null>>([]);
   const terminalPanelRef = useRef<ImperativePanelHandle>(null);
   const terminalToggledByShortcut = useRef(false);
   const hasRunInitialCommands = useRef(false);
+  const isInitialMount = useRef(true);
 
   const [activeTerminal, setActiveTerminal] = useState(0);
   const [terminalCount, setTerminalCount] = useState(1);
+  const [isMounted, setIsMounted] = useState(false);
 
   // Handle running initial commands when the terminal is ready
   useEffect(() => {
     const runInitialCommands = async () => {
       if (!actionRunner || !terminal || hasRunInitialCommands.current) return;
       
+      // Skip if this is the initial mount and we're not showing the terminal
+      if (isInitialMount.current && !showTerminal) {
+        return;
+      }
+      
       hasRunInitialCommands.current = true;
       
       try {
         // Run npm install if needed
         if (workbenchStore.shouldRunNpmInstall) {
-          terminal.write('\r\n$ npm install\r\n');
-          await actionRunner.runCommand('npm install');
+          logger.debug('Running npm install');
+          await terminal.executeCommand(`install-${Date.now()}`, 'npm install');
           workbenchStore.setShouldRunNpmInstall(false);
         }
 
         // Run dev server if needed
         if (workbenchStore.shouldRunDev) {
-          terminal.write('\r\n$ npm run dev\r\n');
-          await actionRunner.runCommand('npm run dev');
+          logger.debug('Running npm run dev');
+          // Don't await this as it's long-running
+          terminal.executeCommand(`dev-${Date.now()}`, 'npm run dev')
+            .catch(error => logger.error('Error running dev server:', error));
           workbenchStore.setShouldRunDev(false);
         }
       } catch (error) {
-        console.error('Error running initial commands:', error);
+        logger.error('Error running initial commands:', error);
       }
     };
 
-    runInitialCommands();
-  }, [actionRunner, terminal]);
+    // Only run if we're showing the terminal
+    if (showTerminal) {
+      runInitialCommands();
+    }
+  }, [actionRunner, terminal, showTerminal]);
+
+  // Set mounted state
+  useEffect(() => {
+    setIsMounted(true);
+    return () => {
+      setIsMounted(false);
+      isInitialMount.current = false;
+    };
+  }, []);
+
+  // Handle terminal visibility changes
+  useEffect(() => {
+    const { current: terminalPanel } = terminalPanelRef;
+    if (!terminalPanel) return;
+
+    const isCollapsed = terminalPanel.isCollapsed();
+
+    if (!showTerminal && !isCollapsed) {
+      terminalPanel.collapse();
+    } else if (showTerminal && isCollapsed) {
+      terminalPanel.resize(DEFAULT_TERMINAL_SIZE);
+    }
+
+    terminalToggledByShortcut.current = false;
+  }, [showTerminal]);
 
   // Initialize the terminal when the component mounts
   useEffect(() => {
@@ -74,24 +112,6 @@ export const TerminalTabs = memo(() => {
       setActiveTerminal(terminalCount);
     }
   };
-
-  useEffect(() => {
-    const { current: terminal } = terminalPanelRef;
-
-    if (!terminal) {
-      return;
-    }
-
-    const isCollapsed = terminal.isCollapsed();
-
-    if (!showTerminal && !isCollapsed) {
-      terminal.collapse();
-    } else if (showTerminal && isCollapsed) {
-      terminal.resize(DEFAULT_TERMINAL_SIZE);
-    }
-
-    terminalToggledByShortcut.current = false;
-  }, [showTerminal]);
 
   useEffect(() => {
     const unsubscribeFromEventEmitter = shortcutEventEmitter.on('toggleTerminal', () => {
