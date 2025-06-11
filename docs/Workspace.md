@@ -50,8 +50,26 @@ We are getting a standalone bolt workbench going on /bolt
 
 It clones a git repo and loads and renders workbench, has some style issues with them, does not preview yet.
 
+## Preview does not work
+
+This is the main issue. We have code. It is not running.
+Maybe this comes down to auto installing "npm i -y" and running. 
+Bolt.diy should have this logic somewhere. I would like to know what they are doing.
+
+manuall npm i works and npm run dev seems to run but not sure what to put in preview window
+
+we did our own POCs of this with both sandpack and webcontainers and we have to be careful to listen for whatever event causes bolt to realize it can open the preview and sets the url to the correct endpoint on the container.
+
+
+## Diff View does not make sense to me
+
+I was not familiar with this feature in bolt.new. Maybe bolt.diy added it. I don't know if it's necessary or helpful. Or what it should look like. 
+
 ## Style Issues
 styles are a bit off but close. code editor seems to think its in a light theme when i'm in a dark one. workbench nav buttons are white. filetree text is black on white but i don't see the toggles, probably bc black on black. 
+
+terminal UX is weird. duplicate line it seems, showing something that should be hidden.
+then goes blank weirdly when i npm run dev. 
 
 we copied in all the bolt components and are using those instead of our own ui/components. so they should have the right markup. probably missing styles. here's class of one that i suspect should have a solid bg but has no bg
 
@@ -66,8 +84,9 @@ Ok we reworked the selectors.
 
 Still testing and confirming
 
-## Preview does not work
+Ok Getting there. Fixed CM theming using JS.
 
-## Diff View does not make sense to me
+Still no icons rendering. We determined it was UnoCSS and tried to port it in, but UnoCSS has issues with NextJS and we never got it working. I'd prefer not to have that dep anyway.
 
-I was not familiar with this feature in bolt.new. Maybe bolt.diy added it. I don't know if it's necessary or helpful. Or what it should look like. 
+But we need a solution to the icons wherever we really use them. Still this is just a POC and I'm ok with finding the edges. 
+

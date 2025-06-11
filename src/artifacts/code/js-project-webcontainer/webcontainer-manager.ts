@@ -15,42 +15,17 @@ export const webcontainerContext: WebContainerContext = {
   loaded: false
 };
 
-// Initialize the WebContainer immediately on module load (client-side only)
-if (typeof window !== 'undefined') {
-  // Only initialize once
-  if (!webcontainerPromise) {
-    console.log('Initializing WebContainer at module level');
-    
-    webcontainerPromise = (async () => {
-      try {
-        // Import WebContainer API
-        const { WebContainer } = await import('@webcontainer/api');
-        
-        // Boot with credentialless COEP option
-        const instance = await WebContainer.boot({
-          coep: 'credentialless',
-          forwardPreviewErrors: true
-        });
-        
-        console.log('WebContainer booted successfully!');
-        webcontainerContext.loaded = true;
-        
-        return instance;
-      } catch (error) {
-        console.error('Failed to boot WebContainer:', error);
-        throw error;
-      }
-    })();
-  }
+// DISABLED: No auto-initialization to prevent conflicts with Bolt's WebContainer
+// This function is kept for compatibility with existing code that might call it
+export function initWebContainer(): Promise<WebContainer> {
+  console.warn('initWebContainer called but disabled to prevent conflicts with Bolt WebContainer');
+  return Promise.reject(new Error('WebContainer initialization disabled to prevent conflicts'));
 }
 
-// Simple getter that doesn't create new instances
+// DISABLED: No auto-initialization to prevent conflicts with Bolt's WebContainer
 export async function getWebContainerInstance(): Promise<WebContainer> {
-  if (!webcontainerPromise) {
-    throw new Error('WebContainer is not initialized or not supported in this environment');
-  }
-  
-  return webcontainerPromise;
+  console.warn('getWebContainerInstance called but disabled to prevent conflicts with Bolt WebContainer');
+  return Promise.reject(new Error('WebContainer access disabled to prevent conflicts'));
 }
 
 export async function mountFiles(files: Record<string, string>): Promise<void> {
