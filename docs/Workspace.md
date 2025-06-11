@@ -2,6 +2,10 @@
 
 This is where we track global instructions and describe what we are actively working and focused on.
 
+I am an expert swe with 25 years experience.
+
+I am running the dev server. You can run another if you want, ie to do api or ui smoke tests or something, but I always test on mine as you go. 
+
 ## Priorities
 
 ### Make. It. Work.
@@ -10,6 +14,9 @@ Make it work. Make it right. Make it fast. These are classic boundaries where a 
 And for our purposes, we ONLY care about making it work.
 For TypeScript, that means focusing on breaking issues and ignoring inconsequential TS errors and warnings.
 
+### Do NOT write new code files when PORTING. COPY using CLI (or script for 2+)
+
+Do not waste time and tokens rewriting files. Instead create a script with the file operations to copy from the original source project. THEN make adaptations however you like. Script find/replace ie to replace ~/ matches within artifacts/bolt with ~/artifacts/bolt. 
 
 ### Do NOT get distracted by the details.
 
@@ -37,3 +44,19 @@ diy is a community fork of bolt.new which has not had commits in about 6 mos.
 
 It's probably worth reading the change log of bolt.DIY to see what they've added see what we want to harvest from it. I would like to have a similar write up and inspiration of old.DIY and then in our docs, I would like you to create a document or bolt artifacts bolt yes bolt artifacts. I don't think we need to go into too much detail on features here because the goal is to lift as much as we can wholesale in terms of entire files and file trees I would like to Start by creating artifacts/bolt and copying in I don't know possibly the entire project from either bolt DIY or bolt new whichever seems to be the best foundation, and then looking at its package Jason to figure out what dependencies we need and add those/reconciled them with our own package, Jason then try to create a route where we in bed bolt hole as is I think that once we have proven that integration and old actually vendors in our route or somewhere once we have that, I think we're in great shape we can start actually factoring it into our a but we're not there yet. That's what I want you to do now and I want you to be very prudent about how you do it if you have a bunch of file system actions in mind it might be best to write those as scripts when it's more than a couple of commands so that we don't have too many round trips with the AI and yeah, actually I would like for you to think through your plan and what files you're gonna copy and really you don't need to be specific about the files. Well, I'm hoping we can just be like copy the source delete any problematic stuff which if we haven't installed Dan modules I don't think we need to worry about that, you know maybe copying I don't know about you decide whether we copy the source folder copy the whole project folder but that's what I'm getting out. Big file system moves, followed by adaptations to get the whole app running here on a ripped.
 
+# Bolt UX Fidelity on /bolt route
+
+We are getting a standalone bolt workbench going on /bolt
+
+It clones a git repo and loads and renders workbench, has some style issues with them, does not preview yet.
+
+styles are a bit off but close. code editor seems to think its in a light theme when i'm in a dark one. workbench nav buttons are white. filetree text is black on white but i don't see the toggles, probably bc black on black. 
+
+we copied in all the bolt components and are using those instead of our own ui/components. so they should have the right markup. probably missing styles. here's class of one that i suspect should have a solid bg but has no bg
+
+class="max-h-[50vh] min-w-[300px] overflow-scroll bg-bolt-elements-background-depth-1 border border-bolt-elements-borderColor shadow-sm rounded-lg"
+
+I have determined the problem is that while both codebases use data-theme on :root, 
+there is a conflict because ours uses named themes like cyberpunk-neon-dark and theirs uses dark/light. So we need to update the imported styles from Bolt to use better selectors than explicit "dark" and "light" because our app does not have those.
+
+Chat. How should we address this? 

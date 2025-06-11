@@ -101,13 +101,27 @@ export default function BoltWorkbenchWrapper() {
     if (!actionRunner || !gitReady || !historyReady || bootstrapped) {
       return;
     }
+    
+    let isMounted = true;
+    let gitCloneAttempted = false;
+    
     const bootstrapProject = async () => {
       try {
+        if (gitCloneAttempted) {
+          console.log('Git clone already attempted, preventing retry loop');
+          return;
+        }
+        
+        gitCloneAttempted = true;
         setDebugInfo('Bootstrapping project for testing...');
         console.log('Bootstrapping project for testing...');
         const repoUrl = 'https://github.com/xKevIsDev/bolt-nextjs-shadcn-template.git';
         setDebugInfo(`Cloning repository: ${repoUrl}`);
+        
         const { workdir, data } = await gitClone(repoUrl);
+        
+        if (!isMounted) return;
+        
         const textDecoder = new TextDecoder('utf-8');
         const filePaths = Object.keys(data);
         const fileContents = filePaths
@@ -120,6 +134,7 @@ export default function BoltWorkbenchWrapper() {
             };
           })
           .filter((f) => f.content);
+        
         const filesMessage: Message = {
           role: 'assistant',
           content: `Cloning the repo ${repoUrl} into ${workdir}
@@ -136,16 +151,29 @@ ${escapeBoltTags(file.content)}
           id: generateId(),
           createdAt: new Date(),
         };
+        
         console.log('Chat import would happen here, but is stubbed for now');
         console.log('Project bootstrapped with:', repoUrl);
         setDebugInfo('Project bootstrapped successfully');
         setBootstrapped(true);
       } catch (error) {
         console.error('Error bootstrapping project:', error);
-        setDebugInfo(`Error bootstrapping project: ${error instanceof Error ? error.message : String(error)}`);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        setDebugInfo(`Error bootstrapping project: ${errorMessage}`);
+        
+        // Set bootstrapped to true even on error to prevent retry loops
+        setBootstrapped(true);
+        
+        // Display a more user-friendly error in the UI
+        setError(`Failed to bootstrap project: ${errorMessage}`);
       }
     };
+    
     bootstrapProject();
+    
+    return () => {
+      isMounted = false;
+    };
   }, [actionRunner, gitReady, historyReady, bootstrapped, gitClone, importChat]);
 
   if (isLoading) {
