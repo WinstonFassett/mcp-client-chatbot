@@ -60,6 +60,17 @@ manuall npm i works and npm run dev seems to run but not sure what to put in pre
 
 we did our own POCs of this with both sandpack and webcontainers and we have to be careful to listen for whatever event causes bolt to realize it can open the preview and sets the url to the correct endpoint on the container.
 
+Update: preview works with live updating now. 
+
+### Preview open on separate tab does not work
+
+In bolt.diy it depends on this route:
+inspiration/bolt.diy/app/routes/webcontainer.connect.$id.tsx
+
+we need to port that into a next route in our app under artifacts/bolt.
+
+### Bolt Terminal should be where npm i and npm run dev get executed / surfaced
+
 
 ## Diff View does not make sense to me
 

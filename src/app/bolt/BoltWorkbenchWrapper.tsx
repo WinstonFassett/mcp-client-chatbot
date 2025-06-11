@@ -186,31 +186,36 @@ export default function BoltWorkbenchWrapper() {
         console.log('WebContainer initialized successfully');
         
         if (!webcontainerInstance) {
-          throw new Error('WebContainer instance is null after initialization');
+          setSetupRunning(false);
+          throw new Error('WebContainer initialization failed');
         }
         
-        // Set up server-ready event listener - this is the ONLY event we need
+        // Set up server-ready event listener
         webcontainerInstance.on('server-ready', (port, url) => {
           console.log(`Server ready event received! Port: ${port}, URL: ${url}`);
           setPreviewUrl(url);
           setPreviewReady(true);
-          setSetupRunning(false);
+          
+          // Now that the server is ready, switch to preview tab
+          workbenchStore.currentView.set('preview');
         });
-      } catch (error) {
-        console.error('Failed to initialize WebContainer:', error);
-        setSetupRunning(false);
-        throw new Error('WebContainer initialization failed');
-      }
-      
-      try {
         // Chat import would happen here
         // For now, we'll just clone a sample repo
         const repoUrl = 'https://github.com/xKevIsDev/bolt-nextjs-shadcn-template.git';
         console.log(`Cloning ${repoUrl}...`);
-        await gitClone(repoUrl);
         
+        // Clone the repository
+        await gitClone(repoUrl);
         console.log('Repository cloned successfully');
+        
+        // IMPORTANT: Show the workbench immediately after git clone
+        // This matches bolt.diy's behavior
         setFilesReady(true);
+        
+        // Make sure the code tab is active initially
+        workbenchStore.currentView.set('code');
+        // Show the workbench
+        workbenchStore.showWorkbench.set(true);
         
         // Get the actual files from the cloned repo
         const fileSystem = webcontainerInstance.fs;
@@ -248,10 +253,12 @@ export default function BoltWorkbenchWrapper() {
         
         // Detect project commands based on file contents
         const projectCommands = await detectProjectCommands(validFiles);
-        
         console.log('Detected project commands:', projectCommands);
         
-        // Run setup command
+        // Make terminal visible before running commands
+        workbenchStore.toggleTerminal(true);
+        
+        // Run setup command in the visible terminal
         if (projectCommands.setupCommand) {
           console.log(`Running setup command: ${projectCommands.setupCommand}`);
           const [cmd, ...args] = projectCommands.setupCommand.split(' ');
@@ -262,10 +269,9 @@ export default function BoltWorkbenchWrapper() {
           }
         }
         
-        // Run start command
+        // Run start command in the visible terminal
         if (projectCommands.startCommand) {
           console.log(`Running start command: ${projectCommands.startCommand}`);
-          setDebugInfo(prev => prev + `\nRunning start command: ${projectCommands.startCommand}`);
           
           try {
             // Run the start command using our terminal-integrated function
@@ -275,19 +281,23 @@ export default function BoltWorkbenchWrapper() {
             if (result.exitCode !== 0) {
               throw new Error(`Start command failed with exit code ${result.exitCode}: ${result.output}`);
             }
+            
+            // Only switch to preview tab after server is ready
+            // This happens in the server-ready event handler
           } catch (error) {
             console.error('Error running start command:', error);
             setSetupError(`Error running start command: ${error instanceof Error ? error.message : String(error)}`);
             setSetupRunning(false);
             return;
           }
-        } else {
-          setSetupRunning(false);
         }
+        
+        // Setup is complete
+        setSetupRunning(false);
+        
       } catch (error) {
         console.error('Error bootstrapping project:', error);
         const errorMessage = error instanceof Error ? error.message : String(error);
-        setDebugInfo(prev => prev + `\nError bootstrapping project: ${errorMessage}`);
         
         // Reset state on error
         setSetupRunning(false);
@@ -326,17 +336,8 @@ export default function BoltWorkbenchWrapper() {
     // No need for cleanup as we're using refs to track state
   }, [gitReady, historyReady]);
 
-  if (setupRunning) {
-    return (
-      <div className="h-screen w-screen flex items-center justify-center bg-gray-900 text-white">
-        <div className="text-center">
-          <div className="text-2xl font-bold mb-4">Setting up project...</div>
-          <div className="animate-pulse mb-4">Installing dependencies and starting preview server</div>
-          <div className="text-sm text-gray-400 mt-4">{debugInfo}</div>
-        </div>
-      </div>
-    );
-  }
+  // REMOVED the setupRunning check that was blocking the workbench from showing
+  // We want to show the workbench as soon as files are ready, even if setup is still running
 
   if (setupError) {
     return (
