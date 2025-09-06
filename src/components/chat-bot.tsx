@@ -90,35 +90,12 @@ export default function ChatBot({ threadId, initialMessages, slots }: Props) {
     id: threadId,
     api: "/api/chat",
     initialMessages,
-    experimental_prepareRequestBody: ({ messages }) => {
-      window.history.replaceState({}, "", `/chat/${threadId}`);
-      const lastMessage = messages.at(-1)!;
-      vercelAISdkV4ToolInvocationIssueCatcher(lastMessage);
-
-      // Ensure latestRef is synced
-      if (!latestRef.current || !latestRef.current.threadId) {
-        latestRef.current = {
-          toolChoice,
-          model,
-          allowedAppDefaultToolkit,
-          allowedMcpServers,
-          messages,
-          threadId,
-        };
-      }
-
-      const request: ChatApiSchemaRequestBody = {
-        id: latestRef.current.threadId,
-        model: latestRef.current.model,
-        toolChoice: latestRef.current.toolChoice,
-        allowedAppDefaultToolkit: latestRef.current.allowedAppDefaultToolkit,
-        allowedMcpServers: latestRef.current.allowedMcpServers,
-        message: lastMessage,
-      };
-
-      return request;
+    body: {
+      model: model,
+      toolChoice: toolChoice,
+      allowedAppDefaultToolkit: allowedAppDefaultToolkit,
+      allowedMcpServers: allowedMcpServers,
     },
-    sendExtraMessageFields: true,
     generateId: generateUUID,
     experimental_throttle: 100,
     onFinish() {
@@ -251,7 +228,7 @@ export default function ChatBot({ threadId, initialMessages, slots }: Props) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  const handleFormSubmit = useCallback(
+  const _handleFormSubmit = useCallback(
     async (
       event?: { preventDefault?: () => void },
       chatRequestOptions?: ChatRequestOptions,
@@ -389,13 +366,6 @@ export default function ChatBot({ threadId, initialMessages, slots }: Props) {
   );
 }
 
-function vercelAISdkV4ToolInvocationIssueCatcher(message: UIMessage) {
-  if (message.role != "assistant") return;
-  const lastPart = message.parts.at(-1);
-  if (lastPart?.type != "tool-invocation") return;
-  if (!message.toolInvocations)
-    message.toolInvocations = [lastPart.toolInvocation];
-}
 
 function DeleteThreadPopup({
   threadId,

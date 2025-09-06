@@ -44,12 +44,13 @@ export type ChatMessageAnnotation = {
 export enum AppDefaultToolkit {
   Visualization = "visualization",
   Weather = "weather",
+  WebSearch = "websearch",
 }
 
 export const chatApiSchemaRequestBodySchema = z.object({
   id: z.string(),
   projectId: z.string().optional(),
-  message: z.any() as z.ZodType<UIMessage>,
+  messages: z.array(z.any()) as z.ZodType<UIMessage[]>,
   model: z.string().min(1).max(2000),
   toolChoice: z.enum(["auto", "none", "manual"]),
   allowedMcpServers: z.record(z.string(), AllowedMCPServerZodSchema).optional(),

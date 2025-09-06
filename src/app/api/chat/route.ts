@@ -12,6 +12,7 @@ import {
 } from "ai";
 
 import { myProvider } from "@/lib/ai/models";
+import { generateUUID } from "lib/utils";
 
 import { mcpClientsManager } from "lib/ai/mcp/mcp-manager";
 
@@ -28,7 +29,6 @@ import {
 
 import { AppDefaultToolkit } from "app-types/chat";
 import { defaultTools } from "lib/ai/tools";
-import { errorIf, safe } from "ts-safe";
 import type { ChatRequestBody } from "./types";
 
 import {
@@ -52,6 +52,9 @@ import { updateDocument } from "lib/ai/tools/update-document";
 export async function POST(request: Request) {
   try {
     const json = (await request.json()) as ChatRequestBody;
+    
+    // Debug logging to understand AI SDK v5 request structure
+    console.log('[DEBUG] Chat API - Full request body:', JSON.stringify(json, null, 2));
 
     const session = await getSession();
 
@@ -61,13 +64,19 @@ export async function POST(request: Request) {
 
     const {
       id,
-      message,
+      messages: requestMessages,
       model: modelName,
       toolChoice,
       allowedAppDefaultToolkit,
       allowedMcpServers,
       projectId,
     } = chatApiSchemaRequestBodySchema.parse(json);
+    
+    // AI SDK v5 sends messages array, we want the last one
+    const message = requestMessages[requestMessages.length - 1];
+    
+    console.log('[DEBUG] Chat API - Parsed messages:', JSON.stringify(requestMessages, null, 2));
+    console.log('[DEBUG] Chat API - Current message:', JSON.stringify(message, null, 2));
 
     const model = myProvider.getModel(modelName);
 
@@ -135,12 +144,24 @@ export async function POST(request: Request) {
       artifactTools.updateDocument = createToolWithDataStream(updateDocument);
     }
 
-    // Get weather tools directly
-    const weatherTools = defaultTools[AppDefaultToolkit.Weather] ?? {};
+    // Get enabled default toolkit tools based on allowedAppDefaultToolkit
+    const enabledDefaultTools: Record<string, Tool> = {};
+    
+    if (allowedAppDefaultToolkit?.includes(AppDefaultToolkit.Weather)) {
+      Object.assign(enabledDefaultTools, defaultTools[AppDefaultToolkit.Weather] ?? {});
+    }
+    
+    if (allowedAppDefaultToolkit?.includes(AppDefaultToolkit.WebSearch)) {
+      Object.assign(enabledDefaultTools, defaultTools[AppDefaultToolkit.WebSearch] ?? {});
+    }
+    
+    if (allowedAppDefaultToolkit?.includes(AppDefaultToolkit.Visualization)) {
+      Object.assign(enabledDefaultTools, defaultTools[AppDefaultToolkit.Visualization] ?? {});
+    }
 
     // Get all available tools
     const availableTools: Record<string, Tool> = {
-      ...weatherTools,
+      ...enabledDefaultTools,
       ...artifactTools,
       ...(isToolCallAllowed ? mcpTools : {}),
     };
@@ -169,7 +190,7 @@ export async function POST(request: Request) {
     const messages: Message[] = isLastMessageUserMessage
       ? appendClientMessage({
           messages: previousMessages,
-          message,
+          message: message,
         })
       : previousMessages;
 
@@ -236,7 +257,7 @@ export async function POST(request: Request) {
                 role: "user",
                 parts: message.parts,
                 attachments: message.experimental_attachments,
-                id: message.id,
+                id: message.id || generateUUID(),
                 annotations: appendAnnotations(message.annotations, {
                   usageTokens: usage.promptTokens,
                 }),

@@ -101,20 +101,14 @@ export default function ProjectPage() {
   const { input, setInput, append, stop, status } = useChat({
     id: threadId,
     api: "/api/chat",
-    experimental_prepareRequestBody: ({ messages }) => {
-      const request: ChatApiSchemaRequestBody = {
-        id: threadId,
-        model: latestRef.current.model,
-        toolChoice: latestRef.current.toolChoice,
-        allowedAppDefaultToolkit: latestRef.current.allowedAppDefaultToolkit,
-        allowedMcpServers: latestRef.current.allowedMcpServers,
-        projectId: id as string,
-        message: messages.at(-1)!,
-      };
-      return request;
-    },
     initialMessages: [],
-    sendExtraMessageFields: true,
+    body: {
+      model: latestRef.current.model,
+      toolChoice: latestRef.current.toolChoice,
+      allowedAppDefaultToolkit: latestRef.current.allowedAppDefaultToolkit,
+      allowedMcpServers: latestRef.current.allowedMcpServers,
+      projectId: id as string,
+    },
     generateId: generateUUID,
     experimental_throttle: 100,
     onFinish: () => {
