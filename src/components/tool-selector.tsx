@@ -1,3 +1,5 @@
+"use client";
+
 import { selectMcpClientsAction } from "@/app/api/mcp/actions";
 import { appStore } from "@/app/store";
 import { useStateWithBrowserStorage } from "@/hooks/use-state-with-browserstorage";
