@@ -21,6 +21,7 @@ import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Button } from "./ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { Weather } from "./weather";
+import { WebSearchToolInvocation } from "./tool-invocation/web-search";
 
 // Combine Props from message.original.tsx and message.inbound.tsx
 interface Props {
@@ -191,11 +192,20 @@ const PurePreviewMessage = ({
                     <div
                       key={toolCallId}
                       className={cx({
-                        skeleton: ["getWeather"].includes(toolName),
+                        skeleton: ["getWeather", "webSearchTool", "webContentsTool"].includes(toolName),
                       })}
                     >
                       {toolName === "getWeather" ? (
                         <Weather />
+                      ) : toolName === "webSearchTool" || toolName === "webContentsTool" || toolName.includes("tavily-search") ? (
+                        <WebSearchToolInvocation
+                          part={{
+                            state: "pending",
+                            input: args,
+                            toolCallId,
+                            toolName
+                          } as any}
+                        />
                       ) : toolName === "createDocument" ? (
                         <DocumentPreview isReadonly={isReadonly} args={args} />
                       ) : toolName === "updateDocument" ? (
@@ -216,7 +226,7 @@ const PurePreviewMessage = ({
                 }
 
                 if (state === "result") {
-                  const { result } = toolInvocation;
+                  const { result, args } = toolInvocation;
 
                   return (
                     <div key={toolCallId}>
@@ -238,6 +248,16 @@ const PurePreviewMessage = ({
                           type="request-suggestions"
                           result={result}
                           isReadonly={isReadonly}
+                        />
+                      ) : toolName === "webSearchTool" || toolName === "webContentsTool" || toolName.includes("tavily-search") ? (
+                        <WebSearchToolInvocation
+                          part={{
+                            state: "output-complete",
+                            input: args,
+                            output: result,
+                            toolCallId,
+                            toolName
+                          } as any}
                         />
                       ) : (
                         <pre>{JSON.stringify(result, null, 2)}</pre>

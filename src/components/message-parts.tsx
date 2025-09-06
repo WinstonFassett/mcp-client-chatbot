@@ -49,6 +49,7 @@ import { Skeleton } from "ui/skeleton";
 import { PieChart } from "./tool-invocation/pie-chart";
 import { BarChart } from "./tool-invocation/bar-chart";
 import { LineChart } from "./tool-invocation/line-chart";
+import { WebSearchToolInvocation } from "./tool-invocation/web-search";
 import { PROMPT_PASTE_MAX_LENGTH } from "lib/const";
 
 type MessagePart = UIMessage["parts"][number];
@@ -437,7 +438,28 @@ export const ToolMessagePart = memo(
         .watch(() => setIsDeleting(false))
         .unwrap();
     }, [message.id, setMessages]);
-    const ToolResultComponent = useMemo(() => {
+    
+    // Custom tool component for special tools that bypass the generic UI
+    const CustomToolComponent = useMemo(() => {
+      console.log('[DEBUG] ToolMessagePart - toolName:', toolName, 'state:', state);
+      
+      // Handle web search tools with custom UI
+      if (toolName === "webSearchTool" || toolName === "webContentsTool") {
+        console.log('[DEBUG] ToolMessagePart - Matched web search tool, rendering WebSearchToolInvocation');
+        return (
+          <Suspense fallback={<Skeleton className="h-24 w-full rounded-md" />}>
+            <WebSearchToolInvocation
+              key={`${toolCallId}-${toolName}`}
+              part={part as any}
+            />
+          </Suspense>
+        );
+      }
+      console.log('[DEBUG] ToolMessagePart - No match for web search, toolName was:', toolName);
+      return null;
+    }, [toolName, part, toolCallId, state]);
+    
+    const ToolResultComponent = useMemo(() => {      
       if (state === "result") {
         switch (toolName) {
           case DefaultToolName.CreatePieChart:
@@ -476,7 +498,7 @@ export const ToolMessagePart = memo(
         }
       }
       return null;
-    }, [toolName, state]);
+    }, [toolName, state, part, toolCallId]);
 
     const result = useMemo(() => {
       if (state === "result") {
@@ -501,7 +523,9 @@ export const ToolMessagePart = memo(
 
     return (
       <div key={toolCallId} className="flex flex-col gap-2 group w-full">
-        {ToolResultComponent ? (
+        {CustomToolComponent ? (
+          CustomToolComponent
+        ) : ToolResultComponent ? (
           ToolResultComponent
         ) : (
           <>

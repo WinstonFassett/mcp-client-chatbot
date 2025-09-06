@@ -165,6 +165,8 @@ export async function POST(request: Request) {
       ...artifactTools,
       ...(isToolCallAllowed ? mcpTools : {}),
     };
+    
+    console.log('[DEBUG] Available tools:', Object.keys(availableTools));
 
     // Filter tools based on mentions if needed
     const filteredTools =
@@ -232,6 +234,8 @@ export async function POST(request: Request) {
             ? "required"
             : "auto";
 
+        console.log('[DEBUG] Final tools passed to streamText:', Object.keys(tools || {}));
+        
         const result = streamText({
           model,
           system: systemPrompt,

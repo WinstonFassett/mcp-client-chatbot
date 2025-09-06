@@ -99,9 +99,9 @@ export const webSearchTool = tool({
       .describe("Number of search results to return"),
     type: z
       .enum(["auto", "keyword", "neural"])
-      .default("auto")
+      .default("keyword")
       .describe(
-        "Search type - auto lets Exa decide, keyword for exact matches, neural for semantic search",
+        "Search type - keyword for typical web searches (default), neural for semantic search, auto lets Exa decide",
       ),
     category: z
       .enum([
@@ -143,9 +143,12 @@ export const webSearchTool = tool({
   }),
   execute: (params) => {
     return safe(async () => {
+      // Use provided search type or default to keyword
+      const searchType = params.type || "keyword";
+      
       const searchRequest: ExaSearchRequest = {
         query: params.query,
-        type: params.type || "auto",
+        type: searchType,
         numResults: params.numResults || 5,
         contents: {
           text: {
@@ -166,7 +169,20 @@ export const webSearchTool = tool({
       if (params.endPublishedDate)
         searchRequest.endPublishedDate = params.endPublishedDate;
 
+      // Debug logging
+      console.log('[EXA SEARCH] Input params:', JSON.stringify(params, null, 2));
+      console.log('[EXA SEARCH] Final request:', JSON.stringify(searchRequest, null, 2));
+
       const result = await fetchExa("/search", searchRequest);
+      
+      // Debug logging for results
+      console.log('[EXA SEARCH] Response:', JSON.stringify({
+        requestId: result.requestId,
+        autopromptString: result.autopromptString,
+        resolvedSearchType: result.resolvedSearchType,
+        resultCount: result.results?.length || 0,
+        resultTitles: result.results?.map((r: any) => r.title).slice(0, 3) || []
+      }, null, 2));
 
       return {
         ...result,
