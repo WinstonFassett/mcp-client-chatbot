@@ -21,58 +21,101 @@ function PureWebSearchToolInvocation({ part }: WebSearchToolInvocationProps) {
   const result = useMemo(() => {
     if (!part.state || !part.state.startsWith("output")) return null;
     
-    // Handle Tavily MCP tool results
-    if (part.toolName?.includes("tavily-search")) {
-      const tavilyResult = part.output as any;
-      console.log('[DEBUG] Tavily raw result:', JSON.stringify(tavilyResult, null, 2));
-      if (tavilyResult?.content?.[0]?.text) {
-        // Parse Tavily's text format into Exa-like results
-        const text = tavilyResult.content[0].text;
-        const results = [];
-        
-        // Extract Title and URL pairs from Tavily format
+    // Shape-based normalization
+    const output: any = part.output;
+    if (!output) return null;
+
+    // 1) Tavily structured shape: { structuredContent: { images: string[], results: [{ url, title, content, score, raw_content? }], ... }, isError }
+    const sc = output.structuredContent;
+    if (sc && Array.isArray(sc.results)) {
+      console.log('[DEBUG] Detected Tavily structuredContent shape');
+      const normalizedResults = sc.results.map((r: any) => ({
+        id: r.url,
+        title: r.title,
+        url: r.url,
+        text: (r.content || "").slice(0, 1000),
+        publishedDate: "",
+        author: "",
+        score: typeof r.score === 'number' ? r.score : 1,
+        image: null as string | null,
+        favicon: null as string | null,
+      }));
+      const topImages: string[] = Array.isArray(sc.images) ? sc.images : [];
+      return {
+        results: normalizedResults,
+        images: topImages,
+        requestId: output.request_id || output.requestId || `tavily-${Date.now()}`,
+        resolvedSearchType: "tavily",
+        searchTime: output.response_time || output.searchTime || 0,
+        isError: !!output.isError,
+        error: output.error,
+      } as any;
+    }
+
+    // 2) Tavily JSON-in-text shape inside content[0].text
+    if (output?.content?.[0]?.text) {
+      const text: string = output.content[0].text;
+      console.log('[DEBUG] Tavily text payload present');
+      try {
+        const parsed = JSON.parse(text);
+        if (parsed && Array.isArray(parsed.results)) {
+          console.log('[DEBUG] Parsed Tavily JSON-in-text shape');
+          const normalizedResults = parsed.results.map((r: any) => ({
+            id: r.url,
+            title: r.title,
+            url: r.url,
+            text: (r.content || "").slice(0, 1000),
+            publishedDate: "",
+            author: "",
+            score: typeof r.score === 'number' ? r.score : 1,
+            image: null as string | null,
+            favicon: null as string | null,
+          }));
+          const topImages: string[] = Array.isArray(parsed.images) ? parsed.images : [];
+          return {
+            results: normalizedResults,
+            images: topImages,
+            requestId: parsed.request_id || parsed.requestId || `tavily-${Date.now()}`,
+            resolvedSearchType: "tavily",
+            searchTime: parsed.response_time || 0,
+            isError: !!output.isError,
+            error: output.error,
+          } as any;
+        }
+      } catch {
+        // Fallback to regex Title/URL/Content parsing if text is not JSON
+        const results = [] as any[];
         const matches = text.matchAll(/Title: (.+?)\nURL: (.+?)\nContent: (.+?)(?=\n\nTitle:|$)/gs);
         for (const match of matches) {
           results.push({
             id: match[2],
             title: match[1],
-            url: match[2], 
-            text: match[3].substring(0, 500), // Truncate content
+            url: match[2],
+            text: (match[3] || "").slice(0, 1000),
             publishedDate: "",
             author: "",
             score: 1,
             image: null,
-            favicon: null
+            favicon: null,
           });
         }
-        
-        // Check if Tavily provided images in other parts of the response
-        let images = [];
-        if (tavilyResult.images) {
-          images = tavilyResult.images;
-          console.log('[DEBUG] Tavily images found:', images);
+        if (results.length) {
+          const topImages: string[] = Array.isArray(output.images) ? output.images : [];
+          return {
+            results,
+            images: topImages,
+            requestId: `tavily-${Date.now()}`,
+            resolvedSearchType: "tavily",
+            searchTime: 0,
+            isError: !!output.isError,
+            error: output.error,
+          } as any;
         }
-        
-        // If images exist, try to associate them with results
-        if (images.length > 0 && results.length > 0) {
-          results.forEach((result, index) => {
-            if (images[index]) {
-              result.image = images[index];
-            }
-          });
-        }
-        
-        return {
-          results,
-          requestId: "tavily-" + Date.now(),
-          resolvedSearchType: "tavily",
-          searchTime: 0
-        };
       }
     }
-    
-    // Handle Exa results
-    return part.output as ExaSearchResponse & {
+
+    // 3) Default: assume Exa-compatible result shape
+    return output as ExaSearchResponse & {
       isError: boolean;
       error?: string;
     };
@@ -107,22 +150,40 @@ function PureWebSearchToolInvocation({ part }: WebSearchToolInvocationProps) {
   };
 
   const images = useMemo(() => {
-    // Exa doesn't provide separate images array, but individual results may have image property
-    return (
-      result?.results
-        ?.filter((r) => {
-          if (!r.image || errorSrc.includes(r.image)) return false;
-          // Filter out relative URLs and invalid URLs
-          try {
-            new URL(r.image);
-            return r.image.startsWith('http://') || r.image.startsWith('https://');
-          } catch {
-            return false;
-          }
-        })
-        .map((r) => ({ url: r.image!, description: r.title })) ?? []
-    );
-  }, [result?.results, errorSrc]);
+    const urls: string[] = [];
+
+    // Prefer top-level images array if present (Tavily normalized)
+    const topImages = (result as any)?.images as string[] | undefined;
+    if (Array.isArray(topImages)) {
+      for (const u of topImages) {
+        if (typeof u === 'string') urls.push(u);
+      }
+    }
+
+    // Also collect per-result images (Exa style)
+    for (const r of result?.results ?? []) {
+      if (r.image && !errorSrc.includes(r.image)) {
+        urls.push(r.image);
+      }
+    }
+
+    // Validate and dedupe
+    const seen = new Set<string>();
+    const items = [] as { url: string; description?: string }[];
+    for (const u of urls) {
+      if (!u || seen.has(u)) continue;
+      try {
+        const parsed = new URL(u);
+        if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+          seen.add(u);
+          items.push({ url: u, description: '' });
+        }
+      } catch {
+        // ignore invalid URLs
+      }
+    }
+    return items;
+  }, [result, errorSrc]);
 
   if (!part.state.startsWith("output"))
     return (
@@ -159,7 +220,7 @@ function PureWebSearchToolInvocation({ part }: WebSearchToolInvocationProps) {
                       <div
                         key={image.url}
                         onClick={() => {
-                          toast.custom((t) => (
+                          toast.custom(() => (
                             <div className="max-w-[90vw] max-h-[90vh] p-6 bg-background border rounded-lg shadow-lg">
                               <div className="flex flex-col h-full gap-4">
                                 <div className="flex-1 flex items-center justify-center min-h-0 py-6">

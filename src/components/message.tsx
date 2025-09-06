@@ -74,6 +74,39 @@ const PurePreviewMessage = ({
   // const isUserMessage = useMemo(() => message.role === "user", [message.role]);
   const [mode, setMode] = useState<"view" | "edit">("view");
 
+  // Detect whether a tool call/output is web-search related
+  const isSearchToolName = (name: string | undefined) => {
+    if (!name) return false;
+    const lower = name.toLowerCase();
+    return (
+      lower === "websearchtool" ||
+      lower === "webcontentstool" ||
+      lower.includes("tavily") ||
+      lower.includes("search")
+    );
+  };
+
+  const looksLikeSearchOutput = (result: any) => {
+    if (!result) return false;
+    // Tavily structured
+    if (result?.structuredContent?.results && Array.isArray(result.structuredContent.results)) {
+      return true;
+    }
+    // Exa-like
+    if (Array.isArray(result?.results)) return true;
+    // Tavily JSON string in content[0].text
+    const text = result?.content?.[0]?.text;
+    if (typeof text === "string" && text.length > 0) {
+      try {
+        const parsed = JSON.parse(text);
+        if (Array.isArray(parsed?.results)) return true;
+      } catch {
+        // ignore
+      }
+    }
+    return false;
+  };
+
   return (
     <AnimatePresence>
       <motion.div
@@ -188,23 +221,26 @@ const PurePreviewMessage = ({
                 if (state === "call") {
                   const { args } = toolInvocation;
 
+                  const showSearchSkeleton = isSearchToolName(toolName);
                   return (
                     <div
                       key={toolCallId}
                       className={cx({
-                        skeleton: ["getWeather", "webSearchTool", "webContentsTool"].includes(toolName),
+                        skeleton: ["getWeather"].includes(toolName) || showSearchSkeleton,
                       })}
                     >
                       {toolName === "getWeather" ? (
                         <Weather />
-                      ) : toolName === "webSearchTool" || toolName === "webContentsTool" || toolName.includes("tavily-search") ? (
+                      ) : showSearchSkeleton ? (
                         <WebSearchToolInvocation
-                          part={{
-                            state: "pending",
-                            input: args,
-                            toolCallId,
-                            toolName
-                          } as any}
+                          part={
+                            {
+                              state: "pending",
+                              input: args,
+                              toolCallId,
+                              toolName,
+                            } as any
+                          }
                         />
                       ) : toolName === "createDocument" ? (
                         <DocumentPreview isReadonly={isReadonly} args={args} />
@@ -228,6 +264,7 @@ const PurePreviewMessage = ({
                 if (state === "result") {
                   const { result, args } = toolInvocation;
 
+                  const showSearch = isSearchToolName(toolName) || looksLikeSearchOutput(result);
                   return (
                     <div key={toolCallId}>
                       {toolName === "getWeather" ? (
@@ -249,18 +286,22 @@ const PurePreviewMessage = ({
                           result={result}
                           isReadonly={isReadonly}
                         />
-                      ) : toolName === "webSearchTool" || toolName === "webContentsTool" || toolName.includes("tavily-search") ? (
+                      ) : showSearch ? (
                         <WebSearchToolInvocation
-                          part={{
-                            state: "output-complete",
-                            input: args,
-                            output: result,
-                            toolCallId,
-                            toolName
-                          } as any}
+                          part={
+                            {
+                              state: "output-complete",
+                              input: args,
+                              output: result,
+                              toolCallId,
+                              toolName,
+                            } as any
+                          }
                         />
                       ) : (
-                        <pre>{JSON.stringify(result, null, 2)}</pre>
+                        <pre>
+                          {toolName}: {JSON.stringify(result, null, 2)}
+                        </pre>
                       )}
                     </div>
                   );
