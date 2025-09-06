@@ -34,7 +34,6 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.8",
-    "@ai-sdk/fireworks": "^2.0.8",
     "@ai-sdk/google": "^2.0.11",
     "@ai-sdk/openai": "^2.0.22",
     "@ai-sdk/react": "^2.0.26",
