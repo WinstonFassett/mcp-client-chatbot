@@ -12,7 +12,6 @@ import { ReactNode, useCallback, useMemo, useState } from "react";
 import { Button } from "ui/button";
 import { notImplementedToast } from "ui/shared-toast";
 import { PastesContentCard } from "./pasts-content";
-import { UseChatHelpers } from "@ai-sdk/react";
 import { SelectModel } from "./select-model";
 import { appStore } from "@/app/store";
 import { useShallow } from "zustand/shallow";
@@ -32,7 +31,7 @@ interface PromptInputProps {
   setInput: (value: string) => void;
   input: string;
   onStop: () => void;
-  append: UseChatHelpers["append"];
+  append: (message: any, options?: any) => Promise<any>;
   toolDisabled?: boolean;
   isLoading?: boolean;
   model?: string;
@@ -144,7 +143,6 @@ export default function PromptInput({
     setInput("");
     append!({
       role: "user",
-      content: "",
       annotations,
       parts: [
         ...pastedContentsParsed,

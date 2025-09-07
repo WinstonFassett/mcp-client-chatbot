@@ -5,7 +5,6 @@ import { memo, useMemo, useState } from "react";
 import equal from "fast-deep-equal";
 
 import { cn, truncateString } from "lib/utils";
-import type { UseChatHelpers } from "@ai-sdk/react";
 import { Alert, AlertDescription, AlertTitle } from "ui/alert";
 import {
   UserMessagePart,
@@ -22,11 +21,11 @@ interface Props {
   threadId?: string;
   isLoading: boolean;
   isLastMessage: boolean;
-  setMessages: UseChatHelpers["setMessages"];
-  reload: UseChatHelpers["reload"];
+  setMessages: (updater: any) => void;
+  reload: (opts?: any) => any;
   className?: string;
   onPoxyToolCall?: (answer: boolean) => void;
-  status: UseChatHelpers["status"];
+  status: any;
   messageIndex: number;
   isError?: boolean;
 }
@@ -54,12 +53,12 @@ const PurePreviewMessage = ({
         )}
       >
         <div className="flex flex-col gap-4 w-full">
-          {message.experimental_attachments && (
+          {(message as any).experimental_attachments && (
             <div
               data-testid={"message-attachments"}
               className="flex flex-row justify-end gap-2"
             >
-              {message.experimental_attachments.map((attachment) => (
+              {(message as any).experimental_attachments.map((attachment: any) => (
                 <Alert key={attachment.url}>
                   <AlertTitle>Attachment</AlertTitle>
                   <AlertDescription>
@@ -78,7 +77,7 @@ const PurePreviewMessage = ({
               return (
                 <ReasoningPart
                   key={key}
-                  reasoning={part.reasoning}
+                  reasoning={(part as any).reasoning ?? ""}
                   isThinking={isLastPart}
                 />
               );
@@ -122,7 +121,7 @@ const PurePreviewMessage = ({
                   message={message}
                   onPoxyToolCall={isLast ? onPoxyToolCall : undefined}
                   key={key}
-                  part={part}
+                  part={part as any}
                   isError={isError}
                   setMessages={setMessages}
                 />

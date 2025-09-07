@@ -17,13 +17,11 @@ export const specialModels = {
 
 export const allModels = {
   openai: {
-    "4o-mini": openai("gpt-4o-mini", {}),
+    "4o-mini": openai("gpt-4o-mini"),
     "gpt-4.1": openai("gpt-4.1"),
     "gpt-4.1-mini": openai("gpt-4.1-mini"),
     "4o": openai("gpt-4o"),
-    "o4-mini": openai("o4-mini", {
-      reasoningEffort: "medium",
-    }),
+    "o4-mini": openai("o4-mini"),
   },
   google: {
     "gemini-2.5-flash": google("gemini-2.5-flash-preview-04-17"),
