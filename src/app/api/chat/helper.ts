@@ -98,12 +98,16 @@ export function manualToolExecuteByLastMessage(
   part: ToolInvocationUIPart,
   message: UIMessage,
 ) {
-  const { args, toolName } = part.toolInvocation;
+  const _p = part as any;
+  const { args, toolName } = _p.toolInvocation as any;
 
   const manulConfirmation = (message.parts as any[]).find(
     (_part) => {
       const ti = (_part as any).toolInvocation;
-      return ti?.state == "result" && ti?.toolCallId == part.toolInvocation.toolCallId;
+      return (
+        ti?.state == "result" &&
+        ti?.toolCallId == (_p.toolInvocation as any).toolCallId
+      );
     },
   )?.toolInvocation as any;
 
@@ -158,9 +162,10 @@ export function extractInProgressToolPart(
   return null;
 }
 export function assignToolResult(toolPart: ToolInvocationUIPart, result: any) {
-  return Object.assign(toolPart, {
+  const p: any = toolPart as any;
+  return Object.assign(p, {
     toolInvocation: {
-      ...toolPart.toolInvocation,
+      ...p.toolInvocation,
       state: "result",
       result,
     },

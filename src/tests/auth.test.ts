@@ -5,7 +5,7 @@ import { test, expect, type Page } from '@playwright/test';
 test.use({ storageState: { cookies: [], origins: [] } });
 
 const testEmail = `test-${getUnixTime(new Date())}@playwright.com`;
-const testPassword = generateId(16);
+const testPassword = generateId();
 
 class AuthPage {
   constructor(private page: Page) {}

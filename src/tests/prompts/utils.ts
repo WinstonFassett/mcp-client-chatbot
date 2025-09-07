@@ -1,4 +1,4 @@
-import type { CoreMessage, LanguageModelV1StreamPart } from 'ai';
+import type { CoreMessage } from 'ai';
 import { TEST_PROMPTS } from './basic';
 
 export function compareMessages(
@@ -39,18 +39,18 @@ export function compareMessages(
   return true;
 }
 
-const textToDeltas = (text: string): LanguageModelV1StreamPart[] => {
+const textToDeltas = (text: string): any[] => {
   const deltas = text
     .split(' ')
-    .map((char) => ({ type: 'text-delta' as const, textDelta: `${char} ` }));
+    .map((char) => ({ type: 'text-delta' as const, textDelta: `${char} ` } as any));
 
   return deltas;
 };
 
-const reasoningToDeltas = (text: string): LanguageModelV1StreamPart[] => {
+const reasoningToDeltas = (text: string): any[] => {
   const deltas = text
     .split(' ')
-    .map((char) => ({ type: 'reasoning' as const, textDelta: `${char} ` }));
+    .map((char) => ({ type: 'reasoning' as const, textDelta: `${char} ` } as any));
 
   return deltas;
 };
@@ -58,7 +58,7 @@ const reasoningToDeltas = (text: string): LanguageModelV1StreamPart[] => {
 export const getResponseChunksByPrompt = (
   prompt: CoreMessage[],
   isReasoningEnabled = false,
-): Array<LanguageModelV1StreamPart> => {
+): Array<any> => {
   const recentMessage = prompt.at(-1);
 
   if (!recentMessage) {

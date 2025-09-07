@@ -1,6 +1,7 @@
+// Loosen message typing during v5 migration to avoid strict ToolResultPart errors
 import type { CoreMessage } from 'ai';
 
-export const TEST_PROMPTS: Record<string, CoreMessage> = {
+export const TEST_PROMPTS: Record<string, any> = {
   USER_SKY: {
     role: 'user',
     content: [{ type: 'text', text: 'Why is the sky blue?' }],

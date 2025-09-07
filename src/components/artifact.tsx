@@ -63,7 +63,7 @@ export function PureArtifact({
   setInput: (value: string) => void;
   status: "submitted" | "streaming" | "ready" | "error";
   stop: () => void;
-  append: (message: any, options?: any) => Promise<void> | void;
+  append: (message: any, options?: any) => Promise<any>;
   messages: Array<UIMessage>;
   setMessages?: (updater: any) => void;
   reload?: () => void;

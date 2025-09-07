@@ -143,8 +143,6 @@ export const PreviewMessage = memo(
     if (prevProps.isLastMessage !== nextProps.isLastMessage) return false;
     if (prevProps.className !== nextProps.className) return false;
     if (prevProps.status !== nextProps.status) return false;
-    if (prevProps.message.annotations !== nextProps.message.annotations)
-      return false;
     if (prevProps.isError !== nextProps.isError) return false;
     if (prevProps.onPoxyToolCall !== nextProps.onPoxyToolCall) return false;
     if (!equal(prevProps.message.parts, nextProps.message.parts)) return false;

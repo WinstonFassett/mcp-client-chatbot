@@ -109,11 +109,6 @@ export async function PUT(request: Request) {
       session: session as BetterAuthSession,
       dataStream: {
         writeData: async (_data: any) => {},
-        write: async () => {},
-        writeMessageAnnotation: async () => {},
-        writeSource: async () => {},
-        merge: async () => {},
-        onError: (error) => error?.toString() || "Unknown error",
       },
     });
 
