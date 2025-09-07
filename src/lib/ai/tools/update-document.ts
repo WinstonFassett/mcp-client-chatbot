@@ -1,4 +1,5 @@
-import { type DataStreamWriter, tool } from "ai";
+import { tool } from "ai";
+import type { DataStreamWriter } from "@/lib/artifacts/server";
 import type { Session } from "better-auth";
 import { z } from "zod";
 import { getDocumentById } from "@/lib/db/queries";
@@ -12,7 +13,7 @@ interface UpdateDocumentProps {
 }
 
 export const updateDocument = ({ session, dataStream }: UpdateDocumentProps) =>
-  tool({
+  (tool({
     description: "Update a document with the given description.",
     parameters: z.object({
       id: z.string().describe("The ID of the document to update"),
@@ -20,7 +21,7 @@ export const updateDocument = ({ session, dataStream }: UpdateDocumentProps) =>
         .string()
         .describe("The description of changes that need to be made"),
     }),
-    execute: async ({ id, description }) => {
+    execute: async ({ id, description }: any) => {
       const documents = await getDocumentById({ id });
       const document = documents[0];
 
@@ -60,4 +61,4 @@ export const updateDocument = ({ session, dataStream }: UpdateDocumentProps) =>
         content: "The document has been updated successfully.",
       };
     },
-  });
+  }) as any);

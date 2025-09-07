@@ -9,7 +9,8 @@ import {
   type MCPServerConfig,
   type MCPToolInfo,
 } from "app-types/mcp";
-import { jsonSchema, Tool, tool, ToolExecutionOptions } from "ai";
+import { Tool, tool } from "ai";
+import { z } from "zod";
 import { isMaybeSseConfig, isMaybeStdioConfig } from "./is-mcp-config";
 import logger from "logger";
 import type { ConsolaInstance } from "consola";
@@ -153,23 +154,16 @@ export class MCPClient {
 
       // Create AI SDK tool wrappers for each MCP tool
       this.tools = toolResponse.tools.reduce((prev, _tool) => {
-        const parameters = jsonSchema(
-          toAny({
-            ..._tool.inputSchema,
-            properties: _tool.inputSchema.properties ?? {},
-            additionalProperties: false,
-          }),
-        );
+        const inputSchema = z.any();
         prev[_tool.name] = tool({
-          parameters,
+          inputSchema,
           description: _tool.description,
-          execute: (params, options: ToolExecutionOptions) => {
-            options?.abortSignal?.throwIfAborted();
+          execute: async (params) => {
             return this.callTool(_tool.name, params);
           },
         });
         return prev;
-      }, {});
+      }, {} as Record<string, Tool>);
       this.scheduleAutoDisconnect();
     } catch (error) {
       this.log.error(error);

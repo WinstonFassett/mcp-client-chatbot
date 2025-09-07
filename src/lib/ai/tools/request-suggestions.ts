@@ -1,13 +1,13 @@
 import { z } from "zod";
 import type { Session } from "better-auth";
-import { type DataStreamWriter, streamObject, tool } from "ai";
+import { streamObject, tool } from "ai";
+import type { DataStreamWriter } from "@/lib/artifacts/server";
 import { getDocumentById, saveSuggestions } from "@/lib/db/queries";
 import { generateUUID } from "@/lib/utils";
 import { myProvider } from "../models";
-import type { InferSelectModel } from "drizzle-orm";
 import { SuggestionSchema } from "@/lib/db/pg/schema.pg";
 
-type Suggestion = InferSelectModel<typeof SuggestionSchema>;
+type Suggestion = typeof SuggestionSchema.$inferSelect;
 
 type BetterAuthSession = { session: Session; user: any };
 
@@ -41,11 +41,7 @@ export const requestSuggestions = ({
 
       const suggestions: Array<Suggestion> = [];
 
-      const { elementStream } = streamObject<{
-        originalSentence: string;
-        suggestedSentence: string;
-        description: string;
-      }>({
+      const { elementStream } = streamObject({
         model: myProvider.getModel("artifact-model"),
         system:
           "You are a help writing assistant. Given a piece of writing, please offer suggestions to improve the piece of writing and describe the change. It is very important for the edits to contain full sentences instead of just words. Max 5 suggestions.",
@@ -58,14 +54,14 @@ export const requestSuggestions = ({
         }),
       });
 
-      for await (const element of elementStream) {
+      for await (const element of elementStream as any) {
         const suggestion = {
           id: generateUUID(),
           documentId,
           documentCreatedAt: doc.createdAt,
-          originalText: element.originalSentence,
-          suggestedText: element.suggestedSentence,
-          description: element.description ?? null,
+          originalText: (element as any).originalSentence,
+          suggestedText: (element as any).suggestedSentence,
+          description: (element as any).description ?? null,
           isResolved: false,
           createdAt: new Date(),
           updatedAt: new Date(),

@@ -277,9 +277,8 @@ export function convertToUIMessage(message: ChatMessage): UIMessage {
     id: message.id,
     parts: message.parts as UIMessage["parts"],
     role: message.role as UIMessage["role"],
-    content: "",
-    annotations: message.annotations as UIMessage["annotations"],
-    createdAt: new Date(message.createdAt),
+    // annotations are heterogenous; keep as-is if present
+    ...(message.annotations ? { annotations: message.annotations as any } : {}),
   };
   return um;
 }

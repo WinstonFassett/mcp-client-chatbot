@@ -3,7 +3,10 @@ import { imageDocumentHandler } from "@/artifacts/image/server";
 import { sheetDocumentHandler } from "@/artifacts/sheet/server";
 import { textDocumentHandler } from "@/artifacts/text/server";
 import type { ArtifactKind } from "@/components/artifact";
-import type { DataStreamWriter } from "ai";
+// Minimal writer used by artifact tools to send deltas to the client
+export type DataStreamWriter = {
+  writeData: (delta: { type: string; content: any }) => void;
+};
 import type { Document } from "../db/pg/schema.pg";
 import { saveDocument } from "../db/queries";
 import type { Session } from "better-auth";

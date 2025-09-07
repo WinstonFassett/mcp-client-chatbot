@@ -1,4 +1,4 @@
-import type { UIMessage, Message } from "ai";
+import type { UIMessage } from "ai";
 import { z } from "zod";
 import { AllowedMCPServerZodSchema } from "./mcp";
 import { UserPreferences } from "./user";
@@ -62,7 +62,7 @@ export type ChatApiSchemaRequestBody = z.infer<
 >;
 
 export type ToolInvocationUIPart = Extract<
-  Exclude<Message["parts"], undefined>[number],
+  UIMessage["parts"][number],
   { type: "tool-invocation" }
 >;
 

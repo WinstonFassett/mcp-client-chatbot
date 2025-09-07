@@ -89,7 +89,7 @@ const fetchExa = async (endpoint: string, body: any): Promise<any> => {
 export const webSearchTool = tool({
   description:
     "Search the web using Exa AI - performs real-time web searches with semantic and neural search capabilities. Returns high-quality, relevant results with full content extraction.",
-  parameters: z.object({
+  inputSchema: z.object({
     query: z.string().describe("Search query"),
     numResults: z
       .number()
@@ -204,7 +204,7 @@ export const webSearchTool = tool({
 export const webContentsTool = tool({
   description:
     "Extract detailed content from specific URLs using Exa AI - retrieves full text content, metadata, and structured information from web pages with live crawling capabilities.",
-  parameters: z.object({
+  inputSchema: z.object({
     urls: z
       .array(z.string())
       .describe("List of URLs to extract content from"),
