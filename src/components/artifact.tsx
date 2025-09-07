@@ -21,7 +21,6 @@ import { codeArtifact } from "@/artifacts/code/client";
 import { sheetArtifact } from "@/artifacts/sheet/client";
 import { textArtifact } from "@/artifacts/text/client";
 import equal from "fast-deep-equal";
-import { UseChatHelpers } from "@ai-sdk/react";
 
 export const artifactDefinitions = [
   textArtifact,
@@ -61,13 +60,13 @@ export function PureArtifact({
 }: {
   threadId: string;
   input: string;
-  setInput: UseChatHelpers["setInput"];
-  status: UseChatHelpers["status"];
-  stop: UseChatHelpers["stop"];
-  append: UseChatHelpers["append"];
+  setInput: (value: string) => void;
+  status: "submitted" | "streaming" | "ready" | "error";
+  stop: () => void;
+  append: (message: any, options?: any) => Promise<void> | void;
   messages: Array<UIMessage>;
-  setMessages: UseChatHelpers["setMessages"];
-  reload: UseChatHelpers["reload"];
+  setMessages?: (updater: any) => void;
+  reload?: () => void;
   votes?: Vote[];
   isReadonly: boolean;
 }) {

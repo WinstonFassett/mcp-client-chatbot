@@ -1,7 +1,6 @@
 "use client";
 
 import { Suggestion } from "@/lib/db/pg/schema.pg";
-import { UseChatHelpers } from "@ai-sdk/react";
 import { ComponentType, Dispatch, ReactNode, SetStateAction } from "react";
 import { DataStreamDelta } from "./data-stream-handler";
 import { UIArtifact } from "./artifact";
@@ -25,7 +24,7 @@ type ArtifactAction<M = any> = {
 };
 
 export type ArtifactToolbarContext = {
-  appendMessage: UseChatHelpers["append"];
+  appendMessage: (message: any, options?: any) => any;
 };
 
 export type ArtifactToolbarItem = {

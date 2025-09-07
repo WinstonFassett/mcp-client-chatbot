@@ -7,15 +7,14 @@ import { UIMessage } from "ai";
 import { memo } from "react";
 import equal from "fast-deep-equal";
 import { UIArtifact } from "./artifact";
-import { UseChatHelpers } from "@ai-sdk/react";
 
 interface ArtifactMessagesProps {
   threadId: string;
-  status?: UseChatHelpers["status"];
+  status?: "submitted" | "streaming" | "ready" | "error";
   votes?: Array<Vote> | undefined;
   messages: Array<UIMessage>;
-  setMessages?: UseChatHelpers["setMessages"];
-  reload?: UseChatHelpers["reload"];
+  setMessages?: (updater: any) => void;
+  reload?: () => void;
   isReadonly: boolean;
   artifactStatus: UIArtifact["status"];
 }

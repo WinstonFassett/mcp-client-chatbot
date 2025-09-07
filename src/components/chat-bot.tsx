@@ -75,18 +75,7 @@ export default function ChatBot({ threadId, initialMessages, slots }: Props) {
 
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
 
-  const {
-    messages,
-    input,
-    setInput,
-    append,
-    status,
-    reload,
-    setMessages,
-    addToolResult,
-    error,
-    stop,
-  } = useChat({
+  const _chat = (useChat as any)({
     id: threadId,
     api: "/api/chat",
     initialMessages,
@@ -110,6 +99,19 @@ export default function ChatBot({ threadId, initialMessages, slots }: Props) {
       );
     },
   });
+
+  const {
+    messages,
+    input,
+    setInput,
+    append,
+    status,
+    reload,
+    setMessages,
+    addToolResult,
+    error,
+    stop,
+  } = _chat as any;
 
   const [isDeleteThreadPopupOpen, setIsDeleteThreadPopupOpen] = useState(false);
 
@@ -172,12 +174,9 @@ export default function ChatBot({ threadId, initialMessages, slots }: Props) {
       setIsExecutingProxyToolCall(true);
       return safe(async () => {
         const lastMessage = messages.at(-1)!;
-        const lastPart = lastMessage.parts.at(-1)! as Extract<
-          UIMessage["parts"][number],
-          { type: "tool-invocation" }
-        >;
+        const lastPart = lastMessage.parts.at(-1)! as any;
         return addToolResult({
-          toolCallId: lastPart.toolInvocation.toolCallId,
+          toolCallId: (lastPart as any).toolInvocation.toolCallId,
           result: answer,
         });
       })

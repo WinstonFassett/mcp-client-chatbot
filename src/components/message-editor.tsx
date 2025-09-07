@@ -1,28 +1,19 @@
 "use client";
 
 import { deleteTrailingMessages } from "@/app/(chat)/actions";
-import { UseChatHelpers } from "@ai-sdk/react";
-import { Message } from "ai";
+import type { UIMessage } from "ai";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { toast } from "sonner";
 
-// Type for message parts
-type TextPart = {
-  type: "text";
-  text: string;
-};
-
-type UIMessage = Message & {
-  parts?: Array<TextPart | { type: string }>;
-};
+// Minimal UIMessage shape is provided by ai's UIMessage.
 
 export type MessageEditorProps = {
   message: UIMessage;
   setMode: Dispatch<SetStateAction<"view" | "edit">>;
-  setMessages?: UseChatHelpers["setMessages"];
-  reload?: UseChatHelpers["reload"];
+  setMessages?: (updater: any) => void;
+  reload?: () => void;
 };
 
 export function MessageEditor({
@@ -34,9 +25,7 @@ export function MessageEditor({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [draftContent, setDraftContent] = useState(
-    message.content ||
-      (message.parts?.find((p) => p.type === "text") as { text: string })
-        ?.text ||
+    (message.parts?.find((p) => p.type === "text") as { text: string } | undefined)?.text ||
       "",
   );
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -68,14 +57,12 @@ export function MessageEditor({
       });
 
       if (setMessages) {
-        // @ts-expect-error todo: support UIMessage in setMessages
-        setMessages((messages) => {
+        setMessages((messages: UIMessage[]) => {
           const index = messages.findIndex((m) => m.id === message.id);
 
           if (index !== -1) {
-            const updatedMessage = {
+            const updatedMessage: UIMessage = {
               ...message,
-              content: draftContent,
               parts: [{ type: "text", text: draftContent }],
             };
 

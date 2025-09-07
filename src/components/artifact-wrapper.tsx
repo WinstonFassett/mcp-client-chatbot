@@ -16,11 +16,11 @@ export function ArtifactWrapper() {
           input=""
           setInput={(_value) => {}}
           status="ready"
-          stop={() => Promise.resolve()}
-          append={() => Promise.resolve("")}
+          stop={() => { /* no-op */ }}
+          append={async () => { /* no-op */ }}
           messages={[]}
-          setMessages={() => {}}
-          reload={() => Promise.resolve("")}
+          setMessages={() => { /* no-op */ }}
+          reload={() => { /* no-op */ }}
           votes={undefined}
           isReadonly={false}
         />

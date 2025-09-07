@@ -1,6 +1,7 @@
 "use client";
 
-import type { ChatRequestOptions, CreateMessage, Message } from "ai";
+import type { ChatRequestOptions } from "ai";
+import type { UIMessage } from "ai";
 import cx from "classnames";
 import {
   AnimatePresence,
@@ -29,7 +30,7 @@ import {
 import { ArrowUpIcon, StopIcon, SummarizeIcon } from "./icons";
 import { artifactDefinitions, ArtifactKind } from "./artifact";
 import { ArtifactToolbarItem } from "./create-artifact";
-import { UseChatHelpers } from "@ai-sdk/react";
+// Note: avoid tight coupling to UseChatHelpers types to prevent SDK version friction
 
 type ToolProps = {
   description: string;
@@ -39,14 +40,11 @@ type ToolProps = {
   isToolbarVisible?: boolean;
   setIsToolbarVisible?: Dispatch<SetStateAction<boolean>>;
   isAnimating: boolean;
-  append: (
-    message: Message | CreateMessage,
-    chatRequestOptions?: ChatRequestOptions,
-  ) => Promise<string | null | undefined>;
+  append: (message: any, chatRequestOptions?: ChatRequestOptions) => any;
   onClick: ({
     appendMessage,
   }: {
-    appendMessage: UseChatHelpers["append"];
+    appendMessage: (message: any, chatRequestOptions?: ChatRequestOptions) => any;
   }) => void;
 };
 
@@ -143,10 +141,7 @@ const ReadingLevelSelector = ({
 }: {
   setSelectedTool: Dispatch<SetStateAction<string | null>>;
   isAnimating: boolean;
-  append: (
-    message: Message | CreateMessage,
-    chatRequestOptions?: ChatRequestOptions,
-  ) => Promise<string | null | undefined>;
+  append: (message: any, chatRequestOptions?: ChatRequestOptions) => any;
 }) => {
   const LEVELS = [
     "Elementary",
@@ -257,10 +252,7 @@ export const Tools = ({
   isToolbarVisible: boolean;
   selectedTool: string | null;
   setSelectedTool: Dispatch<SetStateAction<string | null>>;
-  append: (
-    message: Message | CreateMessage,
-    chatRequestOptions?: ChatRequestOptions,
-  ) => Promise<string | null | undefined>;
+  append: (message: any, chatRequestOptions?: ChatRequestOptions) => any;
   isAnimating: boolean;
   setIsToolbarVisible: Dispatch<SetStateAction<boolean>>;
   tools: Array<ArtifactToolbarItem>;
@@ -316,10 +308,10 @@ const PureToolbar = ({
 }: {
   isToolbarVisible: boolean;
   setIsToolbarVisible: Dispatch<SetStateAction<boolean>>;
-  status: UseChatHelpers["status"];
-  append: UseChatHelpers["append"];
-  stop: UseChatHelpers["stop"];
-  setMessages?: Dispatch<SetStateAction<Message[]>>;
+  status: "submitted" | "streaming" | "ready" | "error";
+  append: (message: any, chatRequestOptions?: ChatRequestOptions) => any;
+  stop: () => void;
+  setMessages?: Dispatch<SetStateAction<UIMessage[]>>;
   artifactKind: ArtifactKind;
 }) => {
   // Use HTMLDivElement since the ref is attached to a div element
