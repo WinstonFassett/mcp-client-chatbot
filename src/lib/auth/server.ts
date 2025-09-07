@@ -71,17 +71,31 @@ export const auth = betterAuth({
       }
     },
   },
-  socialProviders: {
-    github: {
-      clientId: process.env.GITHUB_CLIENT_ID || "",
-      clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
-    },
-    google: {
-      prompt: "select_account",
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-    },
-  },
+  // Register social providers only if credentials are present to avoid
+  // build-time warnings from Better Auth when env vars are missing.
+  socialProviders: (() => {
+    const providers: Record<string, unknown> = {};
+    const githubClientId = process.env.GITHUB_CLIENT_ID;
+    const githubClientSecret = process.env.GITHUB_CLIENT_SECRET;
+    if (githubClientId && githubClientSecret) {
+      providers.github = {
+        clientId: githubClientId,
+        clientSecret: githubClientSecret,
+      };
+    }
+
+    const googleClientId = process.env.GOOGLE_CLIENT_ID;
+    const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    if (googleClientId && googleClientSecret) {
+      providers.google = {
+        prompt: "select_account",
+        clientId: googleClientId,
+        clientSecret: googleClientSecret,
+      };
+    }
+
+    return providers;
+  })(),
   hooks: {
     async before(inputContext) {
       return v1_4_0_user_migrate_middleware(inputContext);
