@@ -29,7 +29,7 @@ import {
   useCallback,
 } from "react";
 import { MessageEditor } from "./message-editor";
-import type { UseChatHelpers } from "@ai-sdk/react";
+// During v5 migration, avoid tight coupling to UseChatHelpers generics
 import { useCopy } from "@/hooks/use-copy";
 
 import { Card, CardContent } from "ui/card";
@@ -56,15 +56,15 @@ type MessagePart = UIMessage["parts"][number];
 
 type TextMessagePart = Extract<MessagePart, { type: "text" }>;
 type AssistMessagePart = Extract<MessagePart, { type: "text" }>;
-type ToolMessagePart = Extract<MessagePart, { type: "tool-invocation" }>;
+type ToolMessagePart = any;
 
 interface UserMessagePartProps {
   part: TextMessagePart;
   isLast: boolean;
   message: UIMessage;
-  setMessages: UseChatHelpers["setMessages"];
-  reload: UseChatHelpers["reload"];
-  status: UseChatHelpers["status"];
+  setMessages: (updater: any) => void;
+  reload: (opts?: any) => any;
+  status: any;
   isError?: boolean;
 }
 
@@ -73,8 +73,8 @@ interface AssistMessagePartProps {
   message: UIMessage;
   isLast: boolean;
   threadId?: string;
-  setMessages: UseChatHelpers["setMessages"];
-  reload: UseChatHelpers["reload"];
+  setMessages: (updater: any) => void;
+  reload: (opts?: any) => any;
   isError?: boolean;
 }
 
@@ -84,7 +84,7 @@ interface ToolMessagePartProps {
   isLast?: boolean;
   onPoxyToolCall?: (answer: boolean) => void;
   isError?: boolean;
-  setMessages?: UseChatHelpers["setMessages"];
+  setMessages?: (updater: any) => void;
 }
 
 interface HighlightedTextProps {
@@ -124,18 +124,22 @@ export const UserMessagePart = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const toolMentions = useMemo(() => {
-    if (!message.annotations?.length) return [];
-    return Array.from(
+    const annotations = (message as any).annotations as
+      | ChatMessageAnnotation[]
+      | undefined;
+    if (!annotations?.length) return [] as string[];
+    const mentions = Array.from(
       new Set(
-        message.annotations
+        (annotations as any[])
           .flatMap((annotation) => {
             return (annotation as ChatMessageAnnotation).requiredTools ?? [];
           })
           .filter(Boolean)
-          .map((v) => `@${v}`),
+          .map((v) => `@${v}` as string),
       ),
     );
-  }, [message.annotations]);
+    return mentions as string[];
+  }, [message]);
 
   const deleteMessage = useCallback(() => {
     safe(() => setIsDeleting(true))

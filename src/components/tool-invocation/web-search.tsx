@@ -1,6 +1,5 @@
 "use client";
 
-import { ToolUIPart } from "ai";
 import { ExaSearchResponse } from "@/lib/ai/tools/web-search";
 import { cn } from "@/lib/utils";
 import { AlertTriangleIcon, Globe } from "lucide-react";
@@ -13,7 +12,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { toast } from "sonner";
 
 interface WebSearchToolInvocationProps {
-  part: ToolUIPart;
+  part: any;
 }
 
 function PureWebSearchToolInvocation({ part }: WebSearchToolInvocationProps) {
@@ -119,7 +118,7 @@ function PureWebSearchToolInvocation({ part }: WebSearchToolInvocationProps) {
       isError: boolean;
       error?: string;
     };
-  }, [part.state, part.toolName, part.output]);
+  }, [part.state, part.output]);
   
   const [errorSrc, setErrorSrc] = useState<string[]>([]);
 

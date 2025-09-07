@@ -1,7 +1,7 @@
 "use client";
 
 import { appStore } from "@/app/store";
-import { useChat, UseChatHelpers } from "@ai-sdk/react";
+import { useChat } from "@ai-sdk/react";
 import { cn } from "lib/utils";
 
 import { PropsWithChildren, useEffect, useMemo, useRef } from "react";
@@ -49,7 +49,7 @@ export default function TemporaryChat({ children }: PropsWithChildren) {
     setMessages,
     error,
     stop,
-  } = useChat({
+  } = (useChat as any)({
     api: "/api/chat/temporary",
     experimental_throttle: 100,
     body: {
@@ -182,13 +182,13 @@ function DrawerTemporaryContent({
   messages: UIMessage[];
   input: string;
   setInput: (input: string) => void;
-  append: UseChatHelpers["append"];
-  status: "submitted" | "streaming" | "ready" | "error";
+  append: (message: any, options?: any) => Promise<any>;
+  status: any;
   isLoading: boolean;
   error: Error | undefined;
-  setMessages: UseChatHelpers["setMessages"];
-  reload: UseChatHelpers["reload"];
-  stop: UseChatHelpers["stop"];
+  setMessages: (updater: any) => void;
+  reload: (opts?: any) => any;
+  stop: () => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
 

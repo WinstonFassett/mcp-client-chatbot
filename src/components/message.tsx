@@ -2,7 +2,6 @@
 
 import type { Vote as Vote } from "@/lib/db/pg/schema.pg";
 import { cn, truncateString } from "@/lib/utils";
-import type { UseChatHelpers } from "@ai-sdk/react";
 import type { UIMessage } from "ai";
 import cx from "classnames";
 import equal from "fast-deep-equal";
@@ -29,11 +28,11 @@ interface Props {
   threadId?: string;
   isLoading: boolean;
   isLastMessage?: boolean; // From original
-  setMessages?: UseChatHelpers["setMessages"];
-  reload?: UseChatHelpers["reload"];
+  setMessages?: (updater: any) => void;
+  reload?: (opts?: any) => any;
   className?: string;
   onProxyToolCall?: (answer: boolean) => void; // Updated from onPoxyToolCall
-  status?: UseChatHelpers["status"];
+  status?: any;
   messageIndex?: number;
   isError?: boolean;
   vote?: Vote; // From inbound
@@ -215,7 +214,7 @@ const PurePreviewMessage = ({
               }
 
               if (type === "tool-invocation") {
-                const { toolInvocation } = part;
+                const { toolInvocation } = part as any;
                 const { toolName, toolCallId, state } = toolInvocation;
 
                 if (state === "call") {

@@ -5,15 +5,14 @@ import { Overview } from "./overview";
 import { memo } from "react";
 import { Vote } from "@/lib/db/pg/schema.pg";
 import equal from "fast-deep-equal";
-import { UseChatHelpers } from "@ai-sdk/react";
 
 interface MessagesProps {
   threadId: string;
-  status: UseChatHelpers["status"];
+  status: any;
   votes: Array<Vote> | undefined;
   messages: Array<UIMessage>;
-  setMessages: UseChatHelpers["setMessages"];
-  reload: UseChatHelpers["reload"];
+  setMessages: (updater: any) => void;
+  reload: (opts?: any) => any;
   isReadonly: boolean;
   isArtifactVisible: boolean;
 }

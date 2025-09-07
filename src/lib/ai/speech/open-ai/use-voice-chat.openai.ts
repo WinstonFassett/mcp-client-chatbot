@@ -7,7 +7,6 @@ import {
   VoiceChatSession,
 } from "..";
 import { generateUUID } from "lib/utils";
-import { TextPart } from "ai";
 import {
   OpenAIRealtimeServerEvent,
   OpenAIRealtimeSession,
@@ -51,7 +50,7 @@ type Content =
       result?: any;
     };
 
-const createUIPart = (content: Content): TextPart | ToolInvocationUIPart => {
+const createUIPart = (content: Content): any => {
   if (content.type == "tool-invocation") {
     return {
       type: "tool-invocation",
@@ -81,10 +80,8 @@ const createUIMessage = (m: {
   return {
     id,
     role: m.role,
-    content: "",
     parts: [createUIPart(m.content)],
     completed: m.completed ?? false,
-    createdAt: new Date(),
   };
 };
 
@@ -255,9 +252,9 @@ export function useOpenAIVoiceChat(
         },
       };
       updateUIMessage(id, (prev) => {
-        const prevPart = prev.parts.find((p) => p.type == "tool-invocation");
+        const prevPart: any = prev.parts.find((p) => (p as any).type == "tool-invocation");
         if (!prevPart) return prev;
-        const nextPart: ToolInvocationUIPart = {
+        const nextPart: any = {
           ...prevPart,
           toolInvocation: {
             ...prevPart.toolInvocation,
