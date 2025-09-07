@@ -98,7 +98,7 @@ export default function ProjectPage() {
     allowedAppDefaultToolkit,
   });
 
-  const { input, setInput, append, stop, status } = useChat({
+  const chatHelpers = (useChat as any)({
     id: threadId,
     api: "/api/chat",
     initialMessages: [],
@@ -117,6 +117,8 @@ export default function ProjectPage() {
       });
     },
   });
+
+  const { input, setInput, append, stop, status } = chatHelpers as any;
 
   const isCreatingThread = useMemo(() => {
     return status == "submitted" || status == "streaming";

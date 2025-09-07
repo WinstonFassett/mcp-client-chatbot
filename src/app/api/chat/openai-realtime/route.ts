@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
             name,
             type: "function",
             description: tool.description,
-            parameters: tool.parameters?.jsonSchema ?? {
+            parameters: (tool as any).inputSchema?.jsonSchema ?? {
               type: "object",
               properties: {},
               required: [],

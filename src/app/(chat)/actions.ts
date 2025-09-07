@@ -1,6 +1,7 @@
 "use server";
 
-import { generateText, type Message } from "ai";
+import { generateText } from "ai";
+import type { UIMessage } from "ai";
 import { cookies } from "next/headers";
 
 import {
@@ -25,7 +26,7 @@ export async function saveToolChoiceAsCookie(
 export async function generateTitleFromUserMessage({
   message,
 }: {
-  message: Message;
+  message: UIMessage;
 }) {
   const { text: title } = await generateText({
     model: myProvider.getModel("title-model"),

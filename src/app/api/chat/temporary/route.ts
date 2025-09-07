@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getSession } from "auth/server";
-import { Message, smoothStream, streamText } from "ai";
+import { type UIMessage, convertToCoreMessages, smoothStream, streamText } from "ai";
 import { myProvider } from "lib/ai/models";
 import logger from "logger";
 import { buildUserSystemPrompt } from "lib/ai/prompts";
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     }
 
     const { messages, model: modelName } = json as {
-      messages: Message[];
+      messages: UIMessage[];
       model: string;
     };
 
@@ -29,11 +29,9 @@ export async function POST(request: Request) {
     return streamText({
       model,
       system: buildUserSystemPrompt(session.user, userPreferences),
-      messages,
-      maxSteps: 10,
-      experimental_continueSteps: true,
+      messages: convertToCoreMessages(messages as any),
       experimental_transform: smoothStream({ chunking: "word" }),
-    }).toDataStreamResponse();
+    }).toTextStreamResponse();
   } catch (error: any) {
     logger.error(error);
     return new Response(error.message || "Oops, an error occured!", {

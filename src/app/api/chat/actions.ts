@@ -5,7 +5,7 @@ import {
   generateText,
   jsonSchema,
   LanguageModel,
-  type Message,
+  type UIMessage,
 } from "ai";
 
 import {
@@ -37,7 +37,7 @@ export async function getUserId() {
 export async function generateTitleFromUserMessageAction({
   message,
   model,
-}: { message: Message; model: LanguageModel }) {
+}: { message: UIMessage; model: LanguageModel }) {
   // Debug logging to understand the message structure
   console.log('[DEBUG] generateTitleFromUserMessageAction - message:', JSON.stringify(message, null, 2));
   

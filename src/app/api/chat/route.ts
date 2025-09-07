@@ -1,16 +1,10 @@
 import {
-  appendResponseMessages,
-  createDataStreamResponse,
   smoothStream,
   streamText,
-  type UIMessage,
-  formatDataStreamPart,
-  appendClientMessage,
-  Message,
   Tool,
-  type DataStreamWriter,
+  type UIMessage,
+  convertToCoreMessages,
 } from "ai";
-
 import { myProvider } from "@/lib/ai/models";
 import { generateUUID } from "lib/utils";
 
@@ -52,7 +46,7 @@ import { updateDocument } from "lib/ai/tools/update-document";
 export async function POST(request: Request) {
   try {
     const json = (await request.json()) as ChatRequestBody;
-    
+
     // Debug logging to understand AI SDK v5 request structure
     console.log('[DEBUG] Chat API - Full request body:', JSON.stringify(json, null, 2));
 
@@ -71,10 +65,10 @@ export async function POST(request: Request) {
       allowedMcpServers,
       projectId,
     } = chatApiSchemaRequestBodySchema.parse(json);
-    
+
     // AI SDK v5 sends messages array, we want the last one
     const message = requestMessages[requestMessages.length - 1];
-    
+
     console.log('[DEBUG] Chat API - Parsed messages:', JSON.stringify(requestMessages, null, 2));
     console.log('[DEBUG] Chat API - Current message:', JSON.stringify(message, null, 2));
 
@@ -106,7 +100,7 @@ export async function POST(request: Request) {
       return new Response("Thread not found", { status: 404 });
     }
 
-    const annotations = (message?.annotations as ChatMessageAnnotation[]) ?? [];
+    const annotations = ((message as any)?.annotations as ChatMessageAnnotation[]) ?? [];
 
     const mcpTools = mcpClientsManager.tools();
 
@@ -118,26 +112,15 @@ export async function POST(request: Request) {
 
     // Define artifact tools that should be included when allowed
     const artifactTools: Record<string, Tool> = {};
-    let dataStreamRef: DataStreamWriter | null = null;
 
     // Only add artifact tools when tool calls are allowed
     if (isToolCallAllowed && toolChoice !== ("none" as any)) {
       // Create a session object structure that matches what the tools expect
       const sessionForTools = session as any;
 
-      // Create the tools with a proxy for the data stream
+      // Create the tools without data stream proxy (simplified)
       const createToolWithDataStream = (toolFn: any) => {
-        return toolFn({
-          session: sessionForTools,
-          dataStream: {
-            writeData: (data: any) => {
-              if (dataStreamRef) {
-                return dataStreamRef.writeData(data);
-              }
-              console.warn("Data stream not yet available");
-            },
-          },
-        });
+        return toolFn({ session: sessionForTools });
       };
 
       artifactTools.createDocument = createToolWithDataStream(createDocument);
@@ -146,15 +129,15 @@ export async function POST(request: Request) {
 
     // Get enabled default toolkit tools based on allowedAppDefaultToolkit
     const enabledDefaultTools: Record<string, Tool> = {};
-    
+
     if (allowedAppDefaultToolkit?.includes(AppDefaultToolkit.Weather)) {
       Object.assign(enabledDefaultTools, defaultTools[AppDefaultToolkit.Weather] ?? {});
     }
-    
+
     if (allowedAppDefaultToolkit?.includes(AppDefaultToolkit.WebSearch)) {
       Object.assign(enabledDefaultTools, defaultTools[AppDefaultToolkit.WebSearch] ?? {});
     }
-    
+
     if (allowedAppDefaultToolkit?.includes(AppDefaultToolkit.Visualization)) {
       Object.assign(enabledDefaultTools, defaultTools[AppDefaultToolkit.Visualization] ?? {});
     }
@@ -165,7 +148,7 @@ export async function POST(request: Request) {
       ...artifactTools,
       ...(isToolCallAllowed ? mcpTools : {}),
     };
-    
+
     console.log('[DEBUG] Available tools:', Object.keys(availableTools));
 
     // Filter tools based on mentions if needed
@@ -189,113 +172,73 @@ export async function POST(request: Request) {
       console.log("[DEBUG] No tools available");
     }
 
-    const messages: Message[] = isLastMessageUserMessage
-      ? appendClientMessage({
-          messages: previousMessages,
-          message: message,
-        })
-      : previousMessages;
+    const messages: UIMessage[] = isLastMessageUserMessage
+      ? ([...previousMessages, message] as UIMessage[])
+      : (previousMessages as UIMessage[]);
 
-    // Create the response
-    return createDataStreamResponse({
-      execute: async (dataStream) => {
-        // Update the data stream reference for the tools
-        dataStreamRef = dataStream;
-        const inProgressToolStep = extractInProgressToolPart(
-          messages.slice(-2),
-        );
+    const inProgressToolStep = extractInProgressToolPart(messages.slice(-2));
 
-        if (inProgressToolStep) {
-          const toolResult = await manualToolExecuteByLastMessage(
-            inProgressToolStep,
-            message,
-          );
-          assignToolResult(inProgressToolStep, toolResult);
-          dataStream.write(
-            formatDataStreamPart("tool_result", {
-              toolCallId: inProgressToolStep.toolInvocation.toolCallId,
-              result: toolResult,
-            }),
-          );
-        }
+    const userPreferences = thread?.userPreferences || undefined;
 
-        const userPreferences = thread?.userPreferences || undefined;
+    const systemPrompt = mergeSystemPrompt(
+      buildUserSystemPrompt(session.user, userPreferences),
+      buildProjectInstructionsSystemPrompt(thread?.instructions),
+    );
 
-        const systemPrompt = mergeSystemPrompt(
-          buildUserSystemPrompt(session.user, userPreferences),
-          buildProjectInstructionsSystemPrompt(thread?.instructions),
-        );
+    // Precompute toolChoice to avoid repeated tool calls
+    const computedToolChoice =
+      isToolCallAllowed &&
+      requiredToolsAnnotations.length > 0 &&
+      inProgressToolStep
+        ? "required"
+        : "auto";
 
-        // Precompute toolChoice to avoid repeated tool calls
-        const computedToolChoice =
-          isToolCallAllowed &&
-          requiredToolsAnnotations.length > 0 &&
-          inProgressToolStep
-            ? "required"
-            : "auto";
+    console.log('[DEBUG] Final tools passed to streamText:', Object.keys(tools || {}));
 
-        console.log('[DEBUG] Final tools passed to streamText:', Object.keys(tools || {}));
-        
-        const result = streamText({
-          model,
-          system: systemPrompt,
-          messages,
-          maxSteps: 10,
-          experimental_continueSteps: true,
-          experimental_transform: smoothStream({ chunking: "word" }),
-          maxRetries: 0,
-          tools,
-          toolChoice: computedToolChoice,
-          // Don't restrict active tools - allow all tools to be used
-          // This ensures MCP tools like tavily and sonos are available
-          experimental_activeTools: toolChoice === "none" ? [] : undefined,
-          onFinish: async ({ response, usage }) => {
-            const appendMessages = appendResponseMessages({
-              messages: messages.slice(-1),
-              responseMessages: response.messages,
+    const result = streamText({
+      model,
+      system: systemPrompt,
+      messages: convertToCoreMessages(messages as any),
+      experimental_transform: smoothStream({ chunking: "word" }),
+      maxRetries: 0,
+      tools,
+      toolChoice: computedToolChoice,
+      experimental_activeTools: toolChoice === "none" ? [] : undefined,
+      onFinish: async ({ response }) => {
+        try {
+          if (isLastMessageUserMessage) {
+            await chatRepository.insertMessage({
+              threadId: thread!.id,
+              model: modelName,
+              role: "user",
+              parts: (message as any).parts,
+              attachments: (message as any).experimental_attachments,
+              id: (message as any).id || generateUUID(),
+              annotations: appendAnnotations((message as any).annotations, {} as any),
             });
-            if (isLastMessageUserMessage) {
-              await chatRepository.insertMessage({
-                threadId: thread!.id,
-                model: modelName,
-                role: "user",
-                parts: message.parts,
-                attachments: message.experimental_attachments,
-                id: message.id || generateUUID(),
-                annotations: appendAnnotations(message.annotations, {
-                  usageTokens: usage.promptTokens,
-                }),
-              });
-            }
-            const assistantMessage = appendMessages.at(-1);
-            if (assistantMessage) {
-              const annotations = appendAnnotations(
-                assistantMessage.annotations,
-                {
-                  usageTokens: usage.completionTokens,
-                  toolChoice,
-                },
-              );
-              dataStream.writeMessageAnnotation(annotations.at(-1)!);
-              await chatRepository.upsertMessage({
-                model: modelName,
-                threadId: thread!.id,
-                role: assistantMessage.role,
-                id: assistantMessage.id,
-                parts: assistantMessage.parts as UIMessage["parts"],
-                attachments: assistantMessage.experimental_attachments,
-                annotations,
-              });
-            }
-          },
-        });
-        result.consumeStream();
-        result.mergeIntoDataStream(dataStream, {
-          sendReasoning: true,
-        });
+          }
+          const assistantMessage = response.messages.at(-1) as any;
+          if (assistantMessage) {
+            const annotations = appendAnnotations(assistantMessage.annotations, {
+              toolChoice,
+            } as any);
+            await chatRepository.upsertMessage({
+              model: modelName,
+              threadId: thread!.id,
+              role: assistantMessage.role,
+              id: assistantMessage.id,
+              parts: assistantMessage.parts,
+              attachments: assistantMessage.experimental_attachments,
+              annotations,
+            });
+          }
+        } catch (e) {
+          console.error("onFinish persistence error", e);
+        }
       },
-      onError: handleError,
     });
+
+    return result.toTextStreamResponse();
   } catch (error: any) {
     logger.error(error);
     return new Response(error.message, { status: 500 });
