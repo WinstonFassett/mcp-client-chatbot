@@ -18,7 +18,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { MessageEditor } from "./message-editor";
 import { DocumentPreview } from "./document-preview";
 import { MessageReasoning } from "./message-reasoning";
-import type { UseChatHelpers } from "@ai-sdk/react";
 
 const PurePreviewMessage = ({
   threadId,
@@ -33,8 +32,8 @@ const PurePreviewMessage = ({
   message: UIMessage;
   vote: Vote | undefined;
   isLoading: boolean;
-  setMessages: UseChatHelpers["setMessages"];
-  reload: UseChatHelpers["reload"];
+  setMessages: (updater: any) => void;
+  reload: (opts?: any) => any;
   isReadonly: boolean;
 }) => {
   const [mode, setMode] = useState<"view" | "edit">("view");
@@ -66,12 +65,12 @@ const PurePreviewMessage = ({
           )}
 
           <div className="flex flex-col gap-4 w-full">
-            {message.experimental_attachments && (
+            {(message as any).experimental_attachments && (
               <div
                 data-testid={`message-attachments`}
                 className="flex flex-row justify-end gap-2"
               >
-                {message.experimental_attachments.map((attachment) => (
+                {(message as any).experimental_attachments.map((attachment: any) => (
                   <PreviewAttachment
                     key={attachment.url}
                     attachment={attachment}
@@ -89,7 +88,7 @@ const PurePreviewMessage = ({
                   <MessageReasoning
                     key={key}
                     isLoading={isLoading}
-                    reasoning={part.reasoning}
+                    reasoning={(part as any).reasoning ?? ""}
                   />
                 );
               }
@@ -147,7 +146,7 @@ const PurePreviewMessage = ({
               }
 
               if (type === "tool-invocation") {
-                const { toolInvocation } = part;
+                const { toolInvocation } = part as any;
                 const { toolName, toolCallId, state } = toolInvocation;
 
                 if (state === "call") {

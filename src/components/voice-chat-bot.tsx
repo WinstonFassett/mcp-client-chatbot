@@ -475,7 +475,7 @@ function ConversationView({
                       key={index}
                       part={part}
                       message={message}
-                      isLast={part.toolInvocation.state != "result"}
+                      isLast={(part as any).toolInvocation.state != "result"}
                     />
                   );
                 }

@@ -84,7 +84,7 @@ function PureWebSearchToolInvocation({ part }: WebSearchToolInvocationProps) {
       } catch {
         // Fallback to regex Title/URL/Content parsing if text is not JSON
         const results = [] as any[];
-        const matches = text.matchAll(/Title: (.+?)\nURL: (.+?)\nContent: (.+?)(?=\n\nTitle:|$)/gs);
+        const matches = text.matchAll(/Title: (.+?)\nURL: (.+?)\nContent: ([\s\S]*?)(?=\n\nTitle:|$)/g);
         for (const match of matches) {
           results.push({
             id: match[2],
